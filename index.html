@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>表記ゆれさん</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <script src="js/defaultDict.js"></script>
+  <script src="js/dictManager.js"></script>
+  <script src="js/analyzer.js"></script>
+  <style>
+    [x-cloak] { display: none; }
+    .drop-active { @apply border-blue-400 bg-blue-50; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<!-- ヘッダー -->
+<header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center gap-3">
+  <div class="text-2xl">📝</div>
+  <div>
+    <h1 class="text-xl font-bold text-gray-800">表記ゆれさん</h1>
+    <p class="text-xs text-gray-500">文章中の表記ゆれを検出・統一します</p>
+  </div>
+</header>
+
+<!-- メインレイアウト -->
+<div class="flex gap-4 p-4 h-[calc(100vh-65px)]">
+
+  <!-- 左ペイン：入力・プレビュー -->
+  <div class="flex-[2] flex flex-col gap-4 min-w-0">
+
+    <!-- ファイルドロップ -->
+    <div id="dropZone"
+         class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center text-sm text-gray-500 cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors"
+         onclick="document.getElementById('fileInput').click()">
+      <div class="text-2xl mb-1">📂</div>
+      <div>Word / PDF をドロップ、またはクリックして選択</div>
+      <div class="text-xs text-gray-400 mt-1">.docx / .pdf</div>
+      <input id="fileInput" type="file" accept=".docx,.pdf" class="hidden">
+    </div>
+
+    <!-- ローディング -->
+    <div id="loading" class="hidden text-center text-sm text-blue-500 py-1">
+      <span class="animate-pulse">⏳ 読み込み中...</span>
+    </div>
+
+    <!-- テキスト入力 -->
+    <div class="flex-1 flex flex-col gap-2 min-h-0">
+      <div class="flex items-center justify-between">
+        <label class="text-sm font-medium text-gray-700">入力テキスト</label>
+        <button onclick="clearAll()" class="text-xs text-gray-400 hover:text-red-400 transition-colors">クリア</button>
+      </div>
+      <textarea id="inputText"
+                class="flex-1 w-full border border-gray-200 rounded-lg p-3 text-sm resize-none focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 font-sans"
+                placeholder="ここにテキストを入力、またはファイルをドロップしてください..."></textarea>
+    </div>
+
+    <!-- プレビュー -->
+    <div class="flex-1 flex flex-col gap-2 min-h-0">
+      <div class="flex items-center justify-between">
+        <label class="text-sm font-medium text-gray-700">プレビュー（ハイライト）</label>
+        <span id="previewCount" class="text-xs text-gray-400"></span>
+      </div>
+      <div id="preview"
+           class="flex-1 overflow-y-auto border border-gray-200 rounded-lg p-3 text-sm bg-white font-sans leading-relaxed whitespace-pre-wrap break-words text-gray-700">
+        <span class="text-gray-300">ここにハイライト表示されます</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 右サイドバー -->
+  <div class="w-80 flex flex-col gap-4 overflow-y-auto">
+
+    <!-- 検知結果 -->
+    <div class="bg-white rounded-lg border border-gray-200 flex flex-col">
+      <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+        <span class="font-semibold text-sm text-gray-700">検知されたゆらぎ</span>
+        <span id="resultCount" class="text-xs bg-gray-100 text-gray-500 rounded-full px-2 py-0.5">0 件</span>
+      </div>
+      <div id="results" class="p-3 flex flex-col gap-3 overflow-y-auto max-h-[40vh]">
+        <p class="text-xs text-gray-400 text-center py-4">ゆらぎは検知されていません</p>
+      </div>
+    </div>
+
+    <!-- カスタム辞書 -->
+    <div class="bg-white rounded-lg border border-gray-200 flex flex-col">
+      <button onclick="toggleCustomDict()"
+              class="px-4 py-3 border-b border-gray-100 flex items-center justify-between text-left w-full hover:bg-gray-50">
+        <span class="font-semibold text-sm text-gray-700">カスタム辞書</span>
+        <span id="customDictToggle" class="text-gray-400 text-xs">▼ 開く</span>
+      </button>
+      <div id="customDictPanel" class="hidden p-3 flex flex-col gap-3">
+
+        <!-- 追加フォーム -->
+        <div class="flex flex-col gap-2">
+          <label class="text-xs text-gray-500">単語をカンマ区切りで入力（2語以上）</label>
+          <input id="newRuleInput" type="text"
+                 class="border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-400"
+                 placeholder="例: ウェブ,ウエブ,Web">
+          <button onclick="addCustomRule()"
+                  class="bg-blue-500 text-white text-xs rounded px-3 py-1.5 hover:bg-blue-600 transition-colors">
+            追加する
+          </button>
+        </div>
+
+        <!-- カスタム辞書リスト -->
+        <div id="customDictList" class="flex flex-col gap-1.5 max-h-48 overflow-y-auto"></div>
+
+        <!-- エクスポート/インポート -->
+        <div class="flex gap-2 pt-1 border-t border-gray-100">
+          <button onclick="dictManager.exportJSON()"
+                  class="flex-1 text-xs text-gray-500 border border-gray-200 rounded px-2 py-1 hover:bg-gray-50 transition-colors">
+            書き出し
+          </button>
+          <label class="flex-1 text-xs text-gray-500 border border-gray-200 rounded px-2 py-1 hover:bg-gray-50 transition-colors text-center cursor-pointer">
+            読み込み
+            <input type="file" accept=".json" class="hidden" onchange="importCustomDict(event)">
+          </label>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+  const dictManager = new DictionaryManager();
+  let currentText = '';
+
+  // ---- ファイル読み込み ----
+
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('border-blue-400', 'bg-blue-50'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-blue-400', 'bg-blue-50'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('border-blue-400', 'bg-blue-50');
+    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
+
+  async function handleFile(file) {
+    setLoading(true);
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const name = file.name.toLowerCase();
+      let text = '';
+
+      if (name.endsWith('.pdf') || file.type === 'application/pdf') {
+        text = await extractPDF(arrayBuffer);
+      } else if (name.endsWith('.docx')) {
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        text = result.value;
+      } else {
+        alert('対応形式: .docx / .pdf');
+        return;
+      }
+
+      document.getElementById('inputText').value = text;
+      runCheck();
+    } catch (e) {
+      alert('読み込みエラー: ' + e.message);
+    } finally {
+      setLoading(false);
+      fileInput.value = '';
+    }
+  }
+
+  async function extractPDF(arrayBuffer) {
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let text = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      text += content.items.map(item => item.str).join('') + '\n';
+    }
+    return text;
+  }
+
+  // ---- チェック処理 ----
+
+  function runCheck() {
+    currentText = document.getElementById('inputText').value;
+    const results = analyze(currentText, dictManager.getAll());
+    renderResults(results);
+    renderPreview(results);
+  }
+
+  function renderResults(results) {
+    const container = document.getElementById('results');
+    const countEl = document.getElementById('resultCount');
+
+    if (results.length === 0) {
+      container.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">ゆらぎは検知されていません</p>';
+      countEl.textContent = '0 件';
+      return;
+    }
+
+    countEl.textContent = results.length + ' 件';
+    container.innerHTML = '';
+
+    results.forEach(({ group, recommended, counts, others }) => {
+      const card = document.createElement('div');
+      card.className = 'border border-amber-200 bg-amber-50 rounded-lg p-3 flex flex-col gap-2';
+
+      const countsHtml = counts.map(c =>
+        `<span class="${c.word === recommended ? 'text-green-600 font-semibold' : 'text-red-500'}">${escapeHTML(c.word)}<span class="text-gray-400 text-xs ml-1">(${c.count})</span></span>`
+      ).join('<span class="text-gray-300 mx-1">·</span>');
+
+      card.innerHTML = `
+        <div class="flex flex-wrap items-center gap-1 text-sm">${countsHtml}</div>
+        <div class="text-xs text-gray-500">推奨：<span class="text-green-600 font-semibold">${escapeHTML(recommended)}</span></div>
+        <button class="text-xs bg-green-500 text-white rounded px-3 py-1 hover:bg-green-600 transition-colors self-start">
+          「${escapeHTML(recommended)}」に統一
+        </button>
+      `;
+
+      card.querySelector('button').addEventListener('click', () => {
+        const ta = document.getElementById('inputText');
+        ta.value = replaceGroup(ta.value, group, recommended);
+        runCheck();
+      });
+
+      container.appendChild(card);
+    });
+  }
+
+  function renderPreview(results) {
+    const preview = document.getElementById('preview');
+    const countEl = document.getElementById('previewCount');
+
+    if (!currentText) {
+      preview.innerHTML = '<span class="text-gray-300">ここにハイライト表示されます</span>';
+      countEl.textContent = '';
+      return;
+    }
+
+    const totalHighlights = results.reduce((sum, r) => sum + r.others.length, 0);
+    countEl.textContent = totalHighlights > 0 ? `⚠ ${totalHighlights} 種類のゆらぎ` : '✓ ゆらぎなし';
+    preview.innerHTML = buildHighlightedHTML(currentText, results);
+  }
+
+  // ---- カスタム辞書UI ----
+
+  function toggleCustomDict() {
+    const panel = document.getElementById('customDictPanel');
+    const toggle = document.getElementById('customDictToggle');
+    const isHidden = panel.classList.toggle('hidden');
+    toggle.textContent = isHidden ? '▼ 開く' : '▲ 閉じる';
+    if (!isHidden) renderCustomDictList();
+  }
+
+  function addCustomRule() {
+    const input = document.getElementById('newRuleInput');
+    const words = input.value.split(',').map(w => w.trim()).filter(Boolean);
+    if (words.length < 2) { alert('2語以上をカンマ区切りで入力してください'); return; }
+    dictManager.addCustomGroup(words);
+    input.value = '';
+    renderCustomDictList();
+    runCheck();
+  }
+
+  function renderCustomDictList() {
+    const container = document.getElementById('customDictList');
+    const custom = dictManager.getCustom();
+
+    if (custom.length === 0) {
+      container.innerHTML = '<p class="text-xs text-gray-400">カスタム辞書は空です</p>';
+      return;
+    }
+
+    container.innerHTML = '';
+    custom.forEach((group, idx) => {
+      const row = document.createElement('div');
+      row.className = 'flex items-center justify-between text-xs bg-gray-50 rounded px-2 py-1.5';
+      row.innerHTML = `
+        <span class="text-gray-600 truncate flex-1">${group.map(w => escapeHTML(w)).join(' · ')}</span>
+        <button class="ml-2 text-gray-300 hover:text-red-400 transition-colors flex-shrink-0" title="削除">✕</button>
+      `;
+      row.querySelector('button').addEventListener('click', () => {
+        dictManager.removeCustomGroup(idx);
+        renderCustomDictList();
+        runCheck();
+      });
+      container.appendChild(row);
+    });
+  }
+
+  async function importCustomDict(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    try {
+      await dictManager.importJSON(file);
+      renderCustomDictList();
+      runCheck();
+    } catch (e) {
+      alert('インポートエラー: ' + e.message);
+    }
+    event.target.value = '';
+  }
+
+  // ---- ユーティリティ ----
+
+  function clearAll() {
+    document.getElementById('inputText').value = '';
+    runCheck();
+  }
+
+  function setLoading(on) {
+    document.getElementById('loading').classList.toggle('hidden', !on);
+  }
+
+  // イベント
+  document.getElementById('inputText').addEventListener('input', runCheck);
+  runCheck();
+</script>
+</body>
+</html>
