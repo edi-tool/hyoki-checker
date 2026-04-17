@@ -57,6 +57,29 @@ class DictionaryManager {
     this._saveCustom(data);
   }
 
+  /**
+   * TSV / CSV テキストをカスタム辞書にインポートする（追記）
+   * 形式: A列=語A, B列=語B（片方が空の行はスキップ）
+   * @param {string} text - ファイルテキスト
+   * @param {string} sep - 区切り文字（デフォルト: タブ）
+   * @returns {number} 追加されたグループ数
+   */
+  importDelimited(text, sep = '\t') {
+    text = text.replace(/^\uFEFF/, ''); // BOM除去
+    const lines = text.split(/\r?\n/);
+    const groups = [];
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      const cols = line.split(sep);
+      const a = cols[0]?.trim();
+      const b = cols[1]?.trim();
+      if (a && b) groups.push([a, b]);
+    }
+    const existing = this._loadCustom();
+    this._saveCustom([...existing, ...groups]);
+    return groups.length;
+  }
+
   _loadCustom() {
     try {
       return JSON.parse(localStorage.getItem(this._key)) || [];
