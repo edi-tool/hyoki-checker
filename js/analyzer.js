@@ -8,6 +8,7 @@ function analyze(text, dict) {
   const results = [];
 
   for (const group of dict) {
+    if (!Array.isArray(group) || group.length < 2) continue;
     const counts = group.map(word => {
       const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const matches = text.match(new RegExp(escaped, 'g'));
@@ -118,6 +119,7 @@ function fuzzyAnalyze(text, dict, maxDistance = 1) {
   const candidateMap = new Map();
 
   for (const group of dict) {
+    if (!Array.isArray(group) || group.length < 2) continue;
     for (const word of group) {
       const wlen = word.length;
       const minL = Math.max(1, wlen - maxDistance);
@@ -156,7 +158,88 @@ function fuzzyAnalyze(text, dict, maxDistance = 1) {
   return [...resultMap.values()];
 }
 
-// フェーズ2: Kuromoji フック（将来的に品詞フィルタリングを挿入する口）
-// let _tokenizer = null;
-// async function initKuromoji(dictPath) { ... }
-// function filterByPos(tokens, targetPos) { ... }
+// ---- Kuromoji 形態素解析 ----
+
+let _tokenizer = null;
+
+/**
+ * Kuromoji トークナイザーを初期化する（CDNから辞書を取得、約7MB）
+ * @returns {Promise<void>}
+ */
+function initKuromoji() {
+  return new Promise((resolve, reject) => {
+    kuromoji
+      .builder({ dicPath: 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/' })
+      .build((err, tokenizer) => {
+        if (err) reject(err);
+        else { _tokenizer = tokenizer; resolve(); }
+      });
+  });
+}
+
+/** @returns {boolean} Kuromoji が使用可能か */
+function isKuromojiReady() { return _tokenizer !== null; }
+
+/**
+ * 形態素解析を用いて活用形を含む表記ゆれを検出する
+ * 辞書グループ内の各単語を基本形で照合し、複数の書き方が混在していれば検出する
+ * @param {string} text
+ * @param {string[][]} dict
+ * @returns {{
+ *   group: string[],
+ *   recommendedWord: string,
+ *   foundBases: { base: string, word: string, count: number, surfaces: string[] }[]
+ * }[]}
+ */
+function kuromojiAnalyze(text, dict) {
+  if (!_tokenizer) return [];
+
+  const tokens = _tokenizer.tokenize(text);
+
+  const results = [];
+
+  for (const group of dict) {
+    if (!Array.isArray(group) || group.length < 2) continue;
+
+    // グループ内の各単語を形態素解析し、basic_form → 単語 のマップを作成
+    const baseToWord = new Map();
+    for (const word of group) {
+      const wt = _tokenizer.tokenize(word);
+      const bf = wt[0]?.basic_form;
+      if (bf && bf !== '*' && !baseToWord.has(bf)) {
+        baseToWord.set(bf, word);
+      }
+    }
+
+    // basic_form が2種類以上ないグループはスキップ（例：異なる語幹を持たない）
+    if (baseToWord.size < 2) continue;
+
+    // テキストのトークンをスキャンしてbasic_formで照合
+    const foundBases = new Map(); // basic_form → { count, surfaces: Set }
+    for (const token of tokens) {
+      const bf = token.basic_form;
+      if (!bf || bf === '*' || !baseToWord.has(bf)) continue;
+      if (!foundBases.has(bf)) foundBases.set(bf, { count: 0, surfaces: new Set() });
+      foundBases.get(bf).count++;
+      foundBases.get(bf).surfaces.add(token.surface_form);
+    }
+
+    // 2種類以上のbasic_formが出現している場合のみゆれと判定
+    if (foundBases.size < 2) continue;
+
+    const sorted = [...foundBases.entries()].sort((a, b) => b[1].count - a[1].count);
+
+    results.push({
+      group,
+      recommendedWord: baseToWord.get(sorted[0][0]),
+      foundBases: sorted.map(([bf, data]) => ({
+        base: bf,
+        word: baseToWord.get(bf),
+        count: data.count,
+        surfaces: [...data.surfaces],
+      })),
+    });
+  }
+
+  return results;
+}

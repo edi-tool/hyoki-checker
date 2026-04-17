@@ -80,6 +80,34 @@ class DictionaryManager {
     return groups.length;
   }
 
+  /**
+   * 辞書配列を検証して問題グループを報告する
+   * @param {any[]} dict - 検証対象の辞書配列
+   * @returns {{ valid: boolean, total: number, validCount: number, errors: {index: number, value: any, reason: string}[] }}
+   */
+  validateDict(dict) {
+    const errors = [];
+    dict.forEach((group, i) => {
+      if (!Array.isArray(group)) {
+        errors.push({ index: i, value: group, reason: 'グループが配列ではありません（カンマ漏れの可能性）' });
+      } else if (group.length < 2) {
+        errors.push({ index: i, value: group, reason: '単語が1語のみです（2語以上必要）' });
+      } else {
+        group.forEach((word, j) => {
+          if (typeof word !== 'string' || word.trim() === '') {
+            errors.push({ index: i, value: group, reason: `${j + 1}番目の単語が空か文字列ではありません` });
+          }
+        });
+      }
+    });
+    return {
+      valid: errors.length === 0,
+      total: dict.length,
+      validCount: dict.length - errors.length,
+      errors,
+    };
+  }
+
   _loadCustom() {
     try {
       return JSON.parse(localStorage.getItem(this._key)) || [];

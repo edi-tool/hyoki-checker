@@ -8,11 +8,30 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/build/kuromoji.js"></script>
   <script src="js/defaultDict.js"></script>
   <script src="js/dictManager.js"></script>
   <script src="js/analyzer.js"></script>
 </head>
 <body class="bg-gray-50 min-h-screen">
+
+<!-- 辞書バリデーション警告バナー -->
+<div id="dictErrorBanner" class="hidden bg-red-50 border-b border-red-200 px-6 py-3">
+  <div class="flex items-start justify-between gap-4">
+    <div class="flex-1">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-red-600 font-semibold text-sm">⚠ 辞書に問題が見つかりました</span>
+        <span id="dictErrorSummary" class="text-xs text-red-500"></span>
+      </div>
+      <ul id="dictErrorList" class="text-xs text-red-600 space-y-0.5 list-disc list-inside hidden"></ul>
+      <button onclick="toggleDictErrorDetail()"
+              id="dictErrorDetailBtn"
+              class="text-xs text-red-400 underline mt-1 hover:text-red-600">詳細を表示 ▼</button>
+    </div>
+    <button onclick="document.getElementById('dictErrorBanner').classList.add('hidden')"
+            class="text-red-300 hover:text-red-500 text-lg leading-none flex-shrink-0">×</button>
+  </div>
+</div>
 
 <!-- ヘッダー -->
 <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center gap-3">
@@ -88,6 +107,30 @@
       </div>
       <div id="results" class="p-3 flex flex-col gap-3 overflow-y-auto max-h-[35vh]">
         <p class="text-xs text-gray-400 text-center py-4">ゆらぎは検知されていません</p>
+      </div>
+    </div>
+
+    <!-- Kuromoji 活用形ゆれ -->
+    <div class="bg-white rounded-lg border border-gray-200 flex flex-col">
+      <button onclick="toggleKuromoji()"
+              class="px-4 py-3 border-b border-gray-100 flex items-center justify-between text-left w-full hover:bg-gray-50">
+        <span class="font-semibold text-sm text-gray-700">活用形のゆれ</span>
+        <span id="kuromojiToggle" class="text-gray-400 text-xs">▼ 開く</span>
+      </button>
+      <div id="kuromojiPanel" class="hidden p-3 flex flex-col gap-3">
+        <p class="text-xs text-gray-500">「みて / 見て」のような活用形ゆれを形態素解析で検出します。辞書ファイル（約7MB）をCDNから取得します。</p>
+        <div id="kuromojiStatus" class="text-xs text-gray-400 flex items-center gap-1.5">
+          <span class="inline-block w-2 h-2 rounded-full bg-gray-300"></span>未初期化
+        </div>
+        <button id="kuromojiInitBtn" onclick="initAndRunKuromoji()"
+                class="bg-indigo-500 text-white text-xs rounded px-3 py-1.5 hover:bg-indigo-600 transition-colors">
+          Kuromoji を初期化して解析
+        </button>
+        <button id="kuromojiRunBtn" onclick="runKuromojiAnalysis()" class="hidden
+                bg-indigo-100 text-indigo-700 text-xs rounded px-3 py-1.5 hover:bg-indigo-200 transition-colors">
+          再解析
+        </button>
+        <div id="kuromojiResults" class="flex flex-col gap-2 max-h-60 overflow-y-auto"></div>
       </div>
     </div>
 
@@ -304,6 +347,75 @@
     preview.innerHTML = buildHighlightedHTML(currentText, results);
   }
 
+  // ---- Kuromoji 活用形解析 ----
+
+  function toggleKuromoji() {
+    const panel = document.getElementById('kuromojiPanel');
+    const toggle = document.getElementById('kuromojiToggle');
+    const isHidden = panel.classList.toggle('hidden');
+    toggle.textContent = isHidden ? '▼ 開く' : '▲ 閉じる';
+  }
+
+  async function initAndRunKuromoji() {
+    const btn = document.getElementById('kuromojiInitBtn');
+    const status = document.getElementById('kuromojiStatus');
+    btn.disabled = true;
+    btn.textContent = '読み込み中...';
+    setKuromojiStatus('loading', '辞書ファイルを取得中...');
+    try {
+      await initKuromoji();
+      setKuromojiStatus('ready', '準備完了');
+      btn.classList.add('hidden');
+      document.getElementById('kuromojiRunBtn').classList.remove('hidden');
+      runKuromojiAnalysis();
+    } catch (e) {
+      setKuromojiStatus('error', '初期化失敗: ' + e.message);
+      btn.disabled = false;
+      btn.textContent = 'Kuromoji を初期化して解析';
+    }
+  }
+
+  function runKuromojiAnalysis() {
+    if (!isKuromojiReady()) return;
+    const results = kuromojiAnalyze(currentText, dictManager.getAll());
+    renderKuromojiResults(results);
+  }
+
+  function renderKuromojiResults(results) {
+    const container = document.getElementById('kuromojiResults');
+    if (!currentText.trim()) {
+      container.innerHTML = '<p class="text-xs text-gray-400 text-center">テキストを入力してください</p>';
+      return;
+    }
+    if (results.length === 0) {
+      container.innerHTML = '<p class="text-xs text-gray-400 text-center">活用形のゆれは検出されませんでした</p>';
+      return;
+    }
+    container.innerHTML = '';
+    results.forEach(({ recommendedWord, foundBases }) => {
+      const card = document.createElement('div');
+      card.className = 'border border-indigo-200 bg-indigo-50 rounded-lg p-2.5 flex flex-col gap-1.5';
+      const basesHtml = foundBases.map(({ word, count, surfaces }, i) => {
+        const tag = i === 0
+          ? '<span class="text-indigo-600 font-semibold">推奨</span>'
+          : '<span class="text-red-500">非推奨</span>';
+        const surfaceList = surfaces.map(s => `<code class="bg-white rounded px-1 text-xs">${escapeHTML(s)}</code>`).join(' ');
+        return `<div class="flex items-start gap-1.5 text-xs">${tag}<span class="text-gray-600">${escapeHTML(word)}系</span><span class="text-gray-400">(${count}回)</span><span class="flex flex-wrap gap-0.5">${surfaceList}</span></div>`;
+      }).join('');
+      card.innerHTML = `
+        <div class="text-xs font-semibold text-indigo-700">推奨：${escapeHTML(recommendedWord)}</div>
+        ${basesHtml}
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function setKuromojiStatus(state, text) {
+    const el = document.getElementById('kuromojiStatus');
+    const colors = { loading: 'bg-yellow-400', ready: 'bg-green-400', error: 'bg-red-400' };
+    el.innerHTML = `<span class="inline-block w-2 h-2 rounded-full ${colors[state] || 'bg-gray-300'}"></span>${escapeHTML(text)}`;
+  }
+
   // ---- ファジーチェック ----
 
   function toggleFuzzy() {
@@ -509,8 +621,41 @@
     document.getElementById('loading').classList.toggle('hidden', !on);
   }
 
+  // ---- 辞書バリデーション ----
+
+  function runDictValidation() {
+    const result = dictManager.validateDict(dictManager.getAll());
+    if (result.valid) return;
+
+    const banner = document.getElementById('dictErrorBanner');
+    const summary = document.getElementById('dictErrorSummary');
+    const list = document.getElementById('dictErrorList');
+
+    summary.textContent = `（${result.validCount} / ${result.total} グループが有効、${result.errors.length} 件の問題）`;
+
+    list.innerHTML = '';
+    result.errors.forEach(({ index, value, reason }) => {
+      const li = document.createElement('li');
+      const preview = Array.isArray(value)
+        ? `['${value.join("', '")}']`
+        : String(value);
+      li.textContent = `インデックス ${index}: ${reason}  ＞ ${preview.slice(0, 40)}`;
+      list.appendChild(li);
+    });
+
+    banner.classList.remove('hidden');
+  }
+
+  function toggleDictErrorDetail() {
+    const list = document.getElementById('dictErrorList');
+    const btn = document.getElementById('dictErrorDetailBtn');
+    const isHidden = list.classList.toggle('hidden');
+    btn.textContent = isHidden ? '詳細を表示 ▼' : '詳細を隠す ▲';
+  }
+
   // イベント
   document.getElementById('inputText').addEventListener('input', runCheck);
+  runDictValidation();
   runCheck();
 </script>
 </body>
