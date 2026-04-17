@@ -12,210 +12,325 @@
   <script src="js/defaultDict.js"></script>
   <script src="js/dictManager.js"></script>
   <script src="js/analyzer.js"></script>
-</head>
-<body class="bg-gray-50 min-h-screen">
 
-<!-- 辞書バリデーション警告バナー -->
-<div id="dictErrorBanner" class="hidden bg-red-50 border-b border-red-200 px-6 py-3">
+  <style>
+    /* Typography & Visual Theme */
+    body {
+        font-family: noto-sans, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, arial, sans-serif;
+        background-color: #f8f6f2;
+        color: #0f0f0f;
+        line-height: 1.5;
+        letter-spacing: -0.4px;
+        font-feature-settings: "liga";
+        word-break: break-all;
+        overflow-wrap: break-word;
+        line-break: strict;
+        
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 24px 16px;
+        box-sizing: border-box;
+    }
+
+    /* Cards Component (App Container) */
+    .app-container {
+        background-color: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 28px 32px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        width: 100%;
+        max-width: 1300px; /* 2ペインのUIを維持するために幅を広めに設定 */
+        height: calc(100vh - 48px);
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+    }
+
+    /* Headings */
+    h1 { 
+        margin-top: 0; 
+        margin-bottom: 2px;
+        font-size: 24px;
+        font-weight: 700;
+        color: #0f0f0f; 
+    }
+    .subtitle {
+        font-size: 13px;
+        color: #757575;
+        display: block;
+    }
+
+    /* File Input & Dropzone Styling */
+    .drop-zone {
+        border: 2px dashed #d4d4d4;
+        background-color: #fafafa;
+        transition: all 0.2s ease;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+        border-color: #118e9e;
+        background-color: #f0fbfc;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background-color: #118e9e;
+        color: white;
+        transition: background-color 0.2s;
+        border: none;
+    }
+    .btn-primary:hover {
+        background-color: #0e7784;
+    }
+    .btn-success {
+        background-color: #43a047;
+        color: white;
+        transition: background-color 0.2s;
+        border: none;
+    }
+    .btn-success:hover {
+        background-color: #388e3c;
+    }
+
+    /* Tabs Styling */
+    .tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    .tab-btn {
+        padding: 12px 18px;
+        border: 1px solid transparent;
+        background-color: transparent;
+        color: #757575;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.2s;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -2px; /* border-bottomに重ねる */
+        border-radius: 8px 8px 0 0;
+        font-family: inherit;
+    }
+    .tab-btn:hover {
+        color: #0f0f0f;
+        background-color: #f5f5f5;
+    }
+    .tab-btn.active {
+        color: #118e9e;
+        border-bottom: 3px solid #118e9e;
+        background-color: #fff;
+    }
+
+    /* Highlight Override (analyzer.jsの出力スタイルを上書き) */
+    #preview span[style*="background-color"], .highlight {
+        font-weight: bold !important;
+        padding: 0 2px !important;
+        border-radius: 2px !important;
+        color: #000 !important;
+        background-color: #fff59d !important;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body>
+
+<div id="dictErrorBanner" class="hidden w-full max-w-[1300px] bg-[#fef2f2] border border-[#f87171] rounded-xl px-5 py-3 mb-4 shadow-sm">
   <div class="flex items-start justify-between gap-4">
     <div class="flex-1">
       <div class="flex items-center gap-2 mb-1">
-        <span class="text-red-600 font-semibold text-sm">⚠ 辞書に問題が見つかりました</span>
-        <span id="dictErrorSummary" class="text-xs text-red-500"></span>
+        <span class="text-red-700 font-bold text-sm">⚠ 辞書に問題が見つかりました</span>
+        <span id="dictErrorSummary" class="text-xs text-red-500 font-medium"></span>
       </div>
-      <ul id="dictErrorList" class="text-xs text-red-600 space-y-0.5 list-disc list-inside hidden"></ul>
+      <ul id="dictErrorList" class="text-xs text-red-600 space-y-1 list-disc list-inside hidden mt-2 bg-white/50 p-2 rounded"></ul>
       <button onclick="toggleDictErrorDetail()"
               id="dictErrorDetailBtn"
-              class="text-xs text-red-400 underline mt-1 hover:text-red-600">詳細を表示 ▼</button>
+              class="text-xs text-red-500 font-semibold underline mt-1 hover:text-red-700">詳細を表示 ▼</button>
     </div>
     <button onclick="document.getElementById('dictErrorBanner').classList.add('hidden')"
-            class="text-red-300 hover:text-red-500 text-lg leading-none flex-shrink-0">×</button>
+            class="text-red-400 hover:text-red-600 text-xl font-bold leading-none flex-shrink-0">×</button>
   </div>
 </div>
 
-<!-- ヘッダー -->
-<header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center gap-3">
-  <div class="text-2xl">📝</div>
-  <div>
-    <h1 class="text-xl font-bold text-gray-800">表記ゆれさん</h1>
-    <p class="text-xs text-gray-500">文章中の表記ゆれを検出・統一します</p>
-  </div>
-</header>
-
-<!-- メインレイアウト -->
-<div class="flex gap-4 p-4 h-[calc(100vh-65px)]">
-
-  <!-- 左ペイン：入力・プレビュー -->
-  <div class="flex-[2] flex flex-col gap-3 min-w-0">
-
-    <!-- ファイルドロップ -->
-    <div id="dropZone"
-         class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center text-sm text-gray-500 cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors"
-         onclick="document.getElementById('fileInput').click()">
-      <div class="text-2xl mb-1">📂</div>
-      <div>Word / PDF をドロップ、またはクリックして選択</div>
-      <div class="text-xs text-gray-400 mt-1">.docx / .pdf</div>
-      <input id="fileInput" type="file" accept=".docx,.pdf" class="hidden">
-    </div>
-
-    <!-- ローディング -->
-    <div id="loading" class="hidden text-center text-sm text-blue-500 py-1">
-      <span class="animate-pulse">⏳ 読み込み中...</span>
-    </div>
-
-    <!-- ツールバー -->
-    <div class="flex items-center gap-2">
-      <button onclick="downloadCorrectedDocx()"
-              class="flex items-center gap-1.5 text-xs bg-green-600 text-white rounded px-3 py-1.5 hover:bg-green-700 transition-colors">
-        📄 修正済みWordを出力
-      </button>
-      <div class="flex-1"></div>
-      <span id="replacementBadge" class="hidden text-xs text-green-600 bg-green-50 border border-green-200 rounded-full px-2 py-0.5"></span>
-      <button onclick="clearAll()" class="text-xs text-gray-400 hover:text-red-400 transition-colors">クリア</button>
-    </div>
-
-    <!-- テキスト入力 -->
-    <div class="flex-1 flex flex-col gap-1 min-h-0">
-      <label class="text-sm font-medium text-gray-700">入力テキスト</label>
-      <textarea id="inputText"
-                class="flex-1 w-full border border-gray-200 rounded-lg p-3 text-sm resize-none focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 font-sans"
-                placeholder="ここにテキストを入力、またはファイルをドロップしてください..."></textarea>
-    </div>
-
-    <!-- プレビュー -->
-    <div class="flex-1 flex flex-col gap-1 min-h-0">
-      <div class="flex items-center justify-between">
-        <label class="text-sm font-medium text-gray-700">プレビュー（ハイライト）</label>
-        <span id="previewCount" class="text-xs text-gray-400"></span>
-      </div>
-      <div id="preview"
-           class="flex-1 overflow-y-auto border border-gray-200 rounded-lg p-3 text-sm bg-white font-sans leading-relaxed whitespace-pre-wrap break-words text-gray-700">
-        <span class="text-gray-300">ここにハイライト表示されます</span>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- 右サイドバー -->
-  <div class="w-80 flex flex-col gap-4 overflow-y-auto">
-
-    <!-- 検知結果（完全一致） -->
-    <div class="bg-white rounded-lg border border-gray-200 flex flex-col">
-      <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-        <span class="font-semibold text-sm text-gray-700">検知されたゆらぎ</span>
-        <span id="resultCount" class="text-xs bg-gray-100 text-gray-500 rounded-full px-2 py-0.5">0 件</span>
-      </div>
-      <div id="results" class="p-3 flex flex-col gap-3 overflow-y-auto max-h-[35vh]">
-        <p class="text-xs text-gray-400 text-center py-4">ゆらぎは検知されていません</p>
-      </div>
-    </div>
-
-    <!-- Kuromoji 活用形ゆれ -->
-    <div class="bg-white rounded-lg border border-gray-200 flex flex-col">
-      <button onclick="toggleKuromoji()"
-              class="px-4 py-3 border-b border-gray-100 flex items-center justify-between text-left w-full hover:bg-gray-50">
-        <span class="font-semibold text-sm text-gray-700">活用形のゆれ</span>
-        <span id="kuromojiToggle" class="text-gray-400 text-xs">▼ 開く</span>
-      </button>
-      <div id="kuromojiPanel" class="hidden p-3 flex flex-col gap-3">
-        <p class="text-xs text-gray-500">「みて / 見て」のような活用形ゆれを形態素解析で検出します。辞書ファイル（約7MB）をCDNから取得します。</p>
-        <div id="kuromojiStatus" class="text-xs text-gray-400 flex items-center gap-1.5">
-          <span class="inline-block w-2 h-2 rounded-full bg-gray-300"></span>未初期化
-        </div>
-        <button id="kuromojiInitBtn" onclick="initAndRunKuromoji()"
-                class="bg-indigo-500 text-white text-xs rounded px-3 py-1.5 hover:bg-indigo-600 transition-colors">
-          Kuromoji を初期化して解析
-        </button>
-        <button id="kuromojiRunBtn" onclick="runKuromojiAnalysis()" class="hidden
-                bg-indigo-100 text-indigo-700 text-xs rounded px-3 py-1.5 hover:bg-indigo-200 transition-colors">
-          再解析
-        </button>
-        <div id="kuromojiResults" class="flex flex-col gap-2 max-h-60 overflow-y-auto"></div>
-      </div>
-    </div>
-
-    <!-- ファジーチェック -->
-    <div class="bg-white rounded-lg border border-gray-200 flex flex-col">
-      <button onclick="toggleFuzzy()"
-              class="px-4 py-3 border-b border-gray-100 flex items-center justify-between text-left w-full hover:bg-gray-50">
-        <span class="font-semibold text-sm text-gray-700">ファジーチェック</span>
-        <span id="fuzzyToggle" class="text-gray-400 text-xs">▼ 開く</span>
-      </button>
-      <div id="fuzzyPanel" class="hidden p-3 flex flex-col gap-3">
-        <p class="text-xs text-gray-500">辞書に近い（ただし一致しない）表記をスキャンします。誤字・異体字の検出に有効です。</p>
-        <div class="flex flex-col gap-2">
-          <div class="flex items-center justify-between text-xs text-gray-600">
-            <label>編集距離</label>
-            <span id="fuzzyDistLabel" class="font-semibold text-purple-600">1（厳格）</span>
-          </div>
-          <input type="range" id="fuzzyThreshold" min="1" max="2" value="1"
-                 class="w-full accent-purple-500"
-                 oninput="document.getElementById('fuzzyDistLabel').textContent = this.value == 1 ? '1（厳格）' : '2（緩やか）'">
-        </div>
-        <button onclick="runFuzzyCheck()"
-                class="bg-purple-500 text-white text-xs rounded px-3 py-1.5 hover:bg-purple-600 transition-colors">
-          ファジーチェックを実行
-        </button>
-        <div id="fuzzyLoading" class="hidden text-xs text-purple-400 text-center animate-pulse">⏳ 解析中...</div>
-        <div id="fuzzyResults" class="flex flex-col gap-2 max-h-48 overflow-y-auto"></div>
-      </div>
-    </div>
-
-    <!-- カスタム辞書 -->
-    <div class="bg-white rounded-lg border border-gray-200 flex flex-col">
-      <button onclick="toggleCustomDict()"
-              class="px-4 py-3 border-b border-gray-100 flex items-center justify-between text-left w-full hover:bg-gray-50">
-        <span class="font-semibold text-sm text-gray-700">カスタム辞書</span>
-        <span id="customDictToggle" class="text-gray-400 text-xs">▼ 開く</span>
-      </button>
-      <div id="customDictPanel" class="hidden p-3 flex flex-col gap-3">
-
-        <!-- 手動追加 -->
-        <div class="flex flex-col gap-2">
-          <label class="text-xs text-gray-500">単語をカンマ区切りで入力（2語以上）</label>
-          <input id="newRuleInput" type="text"
-                 class="border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-400"
-                 placeholder="例: ウェブ,ウエブ,Web"
-                 onkeydown="if(event.key==='Enter') addCustomRule()">
-          <button onclick="addCustomRule()"
-                  class="bg-blue-500 text-white text-xs rounded px-3 py-1.5 hover:bg-blue-600 transition-colors">
-            追加する
-          </button>
-        </div>
-
-        <!-- TSV/CSVインポート -->
-        <div class="border-t border-gray-100 pt-2 flex flex-col gap-1">
-          <p class="text-xs text-gray-500 font-medium">TSV / CSV から一括インポート</p>
-          <p class="text-xs text-gray-400">形式: A列=語A&emsp;B列=語B（タブまたはカンマ区切り）</p>
-          <label class="mt-1 block text-center text-xs text-blue-500 border border-blue-200 rounded px-3 py-1.5 hover:bg-blue-50 cursor-pointer transition-colors">
-            📋 ファイルを選択
-            <input type="file" accept=".tsv,.csv,.txt" class="hidden" onchange="importTSVCSV(event)">
-          </label>
-        </div>
-
-        <!-- カスタム辞書リスト -->
-        <div id="customDictList" class="flex flex-col gap-1.5 max-h-48 overflow-y-auto"></div>
-
-        <!-- JSON エクスポート/インポート -->
-        <div class="flex gap-2 pt-1 border-t border-gray-100">
-          <button onclick="dictManager.exportJSON()"
-                  class="flex-1 text-xs text-gray-500 border border-gray-200 rounded px-2 py-1 hover:bg-gray-50 transition-colors">
-            JSON書き出し
-          </button>
-          <label class="flex-1 text-xs text-gray-500 border border-gray-200 rounded px-2 py-1 hover:bg-gray-50 transition-colors text-center cursor-pointer">
-            JSON読み込み
-            <input type="file" accept=".json" class="hidden" onchange="importCustomDict(event)">
-          </label>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
+<div class="app-container">
   
-<footer>
-    &copy; 2026 ISHIKAWA, Natsuki | MIT License
-</footer>
+  <header class="flex items-center gap-4 border-b border-[#e0e0e0] pb-5 mb-5 flex-shrink-0">
+    <div class="text-4xl">📝</div>
+    <div>
+      <h1>表記ゆれさん</h1>
+      <span class="subtitle">文章中の表記ゆれを検出・統一します</span>
+    </div>
+  </header>
+
+  <div class="flex gap-6 min-h-0 flex-1">
+
+    <div class="flex-[1.8] flex flex-col gap-4 min-w-0 h-full">
+
+      <div id="dropZone"
+           class="drop-zone rounded-xl p-5 text-center cursor-pointer flex-shrink-0 shadow-sm"
+           onclick="document.getElementById('fileInput').click()">
+        <div class="text-3xl mb-2">📂</div>
+        <div class="text-sm font-bold text-gray-700">Word / PDF をドロップ、またはクリックして選択</div>
+        <div class="text-xs text-gray-400 mt-1.5 font-medium">.docx / .pdf 形式に対応</div>
+        <input id="fileInput" type="file" accept=".docx,.pdf" class="hidden">
+      </div>
+
+      <div id="loading" class="hidden text-center text-sm text-[#118e9e] font-bold py-1 bg-[#f0fbfc] rounded-lg">
+        <span class="animate-pulse">⏳ 読み込み中...</span>
+      </div>
+
+      <div class="flex items-center gap-3 flex-shrink-0 bg-[#fafafa] p-2 rounded-lg border border-[#e0e0e0]">
+        <button onclick="downloadCorrectedDocx()"
+                class="flex items-center gap-1.5 text-sm btn-success rounded-md px-4 py-2 font-bold shadow-sm">
+          📄 修正済みWordを出力
+        </button>
+        <div class="flex-1"></div>
+        <span id="replacementBadge" class="hidden text-xs text-[#2e7d32] bg-[#e8f5e9] border border-[#a5d6a7] rounded-full px-3 py-1 font-bold"></span>
+        <button onclick="clearAll()" class="text-sm font-bold text-gray-400 hover:text-red-500 transition-colors px-2">クリア</button>
+      </div>
+
+      <div class="flex-1 flex flex-col gap-5 min-h-0">
+        
+        <div class="flex-1 flex flex-col gap-2 min-h-0">
+          <label class="text-[15px] font-bold text-[#0f0f0f] border-l-4 border-[#118e9e] pl-2 leading-none">入力テキスト</label>
+          <textarea id="inputText"
+                    class="flex-1 w-full border border-[#e0e0e0] rounded-xl p-4 text-[15px] resize-none focus:outline-none focus:border-[#118e9e] focus:ring-2 focus:ring-[#118e9e]/20 transition-shadow bg-white shadow-inner leading-relaxed"
+                    placeholder="ここにテキストを入力、またはファイルをドロップしてください..."></textarea>
+        </div>
+
+        <div class="flex-1 flex flex-col gap-2 min-h-0">
+          <div class="flex items-center justify-between">
+            <label class="text-[15px] font-bold text-[#0f0f0f] border-l-4 border-[#e53935] pl-2 leading-none">プレビュー（ハイライト）</label>
+            <span id="previewCount" class="text-xs font-bold text-gray-500 bg-gray-100 border border-gray-200 px-2 py-0.5 rounded-full"></span>
+          </div>
+          <div id="preview"
+               class="flex-1 overflow-y-auto border border-[#e0e0e0] rounded-xl p-4 text-[15px] bg-[#fafafa] leading-relaxed whitespace-pre-wrap break-words text-gray-800 shadow-inner">
+            <span class="text-gray-400">ここにハイライト表示されます</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="w-[400px] flex flex-col flex-shrink-0 bg-white border border-[#e0e0e0] rounded-xl shadow-sm h-full overflow-hidden">
+
+      <div class="tabs px-2 pt-2 bg-[#fafafa] border-b border-[#e0e0e0]">
+        <button id="tabBtn-results" class="tab-btn active flex items-center gap-1.5" onclick="switchTab('results')">
+          検知結果 <span id="resultCount" class="text-[11px] bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full font-bold">0 件</span>
+        </button>
+        <button id="tabBtn-kuromoji" class="tab-btn" onclick="switchTab('kuromoji')">活用形</button>
+        <button id="tabBtn-fuzzy" class="tab-btn" onclick="switchTab('fuzzy')">ファジー</button>
+        <button id="tabBtn-dict" class="tab-btn" onclick="switchTab('dict')">辞書設定</button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto bg-white p-4">
+
+        <div id="tab-results" class="tab-pane flex flex-col">
+          <div id="results" class="flex flex-col gap-3">
+            <p class="text-sm text-gray-400 text-center py-10 font-medium">ゆらぎは検知されていません</p>
+          </div>
+        </div>
+
+        <div id="tab-kuromoji" class="tab-pane hidden flex-col gap-4">
+          <div class="bg-[#f0fbfc] border border-[#b2ebf2] p-3 rounded-lg text-sm text-[#0e7784] leading-relaxed">
+            「みて / 見て」のような活用形ゆれを、形態素解析を用いて検出します。<br>
+            <span class="text-xs opacity-80">※初回のみ辞書ファイル（約7MB）の取得が必要です。</span>
+          </div>
+          
+          <div id="kuromojiStatus" class="text-sm font-bold text-gray-500 flex items-center gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+            <span class="inline-block w-3 h-3 rounded-full bg-gray-300"></span>未初期化
+          </div>
+          
+          <button id="kuromojiInitBtn" onclick="initAndRunKuromoji()"
+                  class="btn-primary text-sm rounded-lg px-4 py-3 font-bold w-full shadow-sm">
+            Kuromoji を初期化して解析
+          </button>
+          
+          <button id="kuromojiRunBtn" onclick="runKuromojiAnalysis()" class="hidden border-2 border-[#118e9e] text-[#118e9e] hover:bg-[#f0fbfc] text-sm rounded-lg px-4 py-2.5 font-bold transition-colors w-full">
+            再解析を実行
+          </button>
+          
+          <div id="kuromojiResults" class="flex flex-col gap-3 mt-2"></div>
+        </div>
+
+        <div id="tab-fuzzy" class="tab-pane hidden flex-col gap-4">
+          <div class="bg-[#f3e5f5] border border-[#ce93d8] p-3 rounded-lg text-sm text-[#6a1b9a] leading-relaxed">
+            辞書に近い（ただし完全一致しない）表記をスキャンします。誤字や異体字の発見に有効です。
+          </div>
+          
+          <div class="flex flex-col gap-3 bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <div class="flex items-center justify-between text-sm text-gray-800 font-bold">
+              <label>許容する編集距離</label>
+              <span id="fuzzyDistLabel" class="text-[#118e9e] bg-[#f0fbfc] px-2 py-0.5 rounded border border-[#b2ebf2]">1（厳格）</span>
+            </div>
+            <input type="range" id="fuzzyThreshold" min="1" max="2" value="1"
+                   class="w-full accent-[#118e9e] mt-1 cursor-pointer"
+                   oninput="document.getElementById('fuzzyDistLabel').textContent = this.value == 1 ? '1（厳格）' : '2（緩やか）'">
+          </div>
+          
+          <button onclick="runFuzzyCheck()"
+                  class="btn-primary text-sm rounded-lg px-4 py-3 font-bold w-full shadow-sm">
+            ファジーチェックを実行
+          </button>
+          
+          <div id="fuzzyLoading" class="hidden text-sm text-[#118e9e] font-bold text-center animate-pulse py-2">⏳ 解析中...</div>
+          <div id="fuzzyResults" class="flex flex-col gap-3 mt-2"></div>
+        </div>
+
+        <div id="tab-dict" class="tab-pane hidden flex-col gap-6">
+          
+          <div class="flex flex-col gap-2 bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <label class="text-sm font-bold text-gray-800">新しいゆらぎグループを追加</label>
+            <p class="text-xs text-gray-500 mb-1">対象とする単語をカンマ区切りで入力してください。</p>
+            <input id="newRuleInput" type="text"
+                   class="border border-[#e0e0e0] rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[#118e9e] focus:ring-2 focus:ring-[#118e9e]/20 bg-white"
+                   placeholder="例: ウェブ,ウエブ,Web"
+                   onkeydown="if(event.key==='Enter') addCustomRule()">
+            <button onclick="addCustomRule()"
+                    class="btn-primary text-sm rounded-md px-4 py-2 font-bold mt-1">
+              追加する
+            </button>
+          </div>
+
+          <div class="flex flex-col gap-3">
+            <p class="text-sm font-bold text-gray-800 border-b border-gray-200 pb-2">一括データ操作</p>
+            
+            <div class="grid grid-cols-2 gap-2">
+              <label class="block text-center text-sm font-bold text-[#118e9e] border-2 border-[#118e9e] rounded-lg px-2 py-2 hover:bg-[#f0fbfc] cursor-pointer transition-colors bg-white">
+                📥 CSV/TSV 読込
+                <input type="file" accept=".tsv,.csv,.txt" class="hidden" onchange="importTSVCSV(event)">
+              </label>
+              <label class="block text-center text-sm font-bold text-gray-600 border-2 border-gray-300 rounded-lg px-2 py-2 hover:bg-gray-50 cursor-pointer transition-colors bg-white">
+                📁 JSON 読込
+                <input type="file" accept=".json" class="hidden" onchange="importCustomDict(event)">
+              </label>
+            </div>
+            
+            <button onclick="dictManager.exportJSON()"
+                    class="w-full text-sm font-bold text-gray-600 border-2 border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors bg-white mt-1">
+              📤 現在の辞書を JSON で書き出し
+            </button>
+          </div>
+
+          <div class="flex flex-col min-h-0">
+            <p class="text-sm font-bold text-gray-800 mb-2">登録済みカスタム辞書</p>
+            <div id="customDictList" class="flex flex-col gap-2 max-h-[25vh] overflow-y-auto border border-gray-200 rounded-lg p-2 bg-[#fafafa]"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
   pdfjsLib.GlobalWorkerOptions.workerSrc =
@@ -223,18 +338,28 @@
 
   const dictManager = new DictionaryManager();
   let currentText = '';
-  let replacementLog = []; // {original, replacement, count}[]
+  let replacementLog = [];
+
+  // ---- タブ切り替え処理 ----
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    
+    document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+    document.getElementById(`tabBtn-${tabId}`).classList.add('active');
+    
+    if (tabId === 'dict') renderCustomDictList();
+  }
 
   // ---- ファイル読み込み ----
-
   const dropZone = document.getElementById('dropZone');
   const fileInput = document.getElementById('fileInput');
 
-  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('border-blue-400', 'bg-blue-50'); });
-  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-blue-400', 'bg-blue-50'));
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
   dropZone.addEventListener('drop', e => {
     e.preventDefault();
-    dropZone.classList.remove('border-blue-400', 'bg-blue-50');
+    dropZone.classList.remove('dragover');
     if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
   });
   fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
@@ -279,7 +404,6 @@
   }
 
   // ---- チェック処理 ----
-
   function runCheck() {
     currentText = document.getElementById('inputText').value;
     const results = analyze(currentText, dictManager.getAll());
@@ -292,7 +416,7 @@
     const countEl = document.getElementById('resultCount');
 
     if (results.length === 0) {
-      container.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">ゆらぎは検知されていません</p>';
+      container.innerHTML = '<p class="text-sm text-gray-400 text-center py-10 font-medium">ゆらぎは検知されていません</p>';
       countEl.textContent = '0 件';
       return;
     }
@@ -302,17 +426,17 @@
 
     results.forEach(({ group, recommended, counts, others }) => {
       const card = document.createElement('div');
-      card.className = 'border border-amber-200 bg-amber-50 rounded-lg p-3 flex flex-col gap-2';
+      card.className = 'p-4 border border-[#f0f0f0] rounded-xl bg-[#fcfcfc] shadow-sm flex flex-col gap-3';
 
       const countsHtml = counts.map(c =>
-        `<span class="${c.word === recommended ? 'text-green-600 font-semibold' : 'text-red-500'}">${escapeHTML(c.word)}<span class="text-gray-400 text-xs ml-1">(${c.count})</span></span>`
-      ).join('<span class="text-gray-300 mx-1">·</span>');
+        `<span class="${c.word === recommended ? 'text-[#43a047] font-bold' : 'text-[#e53935] font-bold'}">${escapeHTML(c.word)}<span class="text-gray-400 font-normal text-xs ml-1">(${c.count})</span></span>`
+      ).join('<span class="text-gray-300 mx-1.5">|</span>');
 
       card.innerHTML = `
-        <div class="flex flex-wrap items-center gap-1 text-sm">${countsHtml}</div>
-        <div class="text-xs text-gray-500">推奨：<span class="text-green-600 font-semibold">${escapeHTML(recommended)}</span></div>
-        <button class="text-xs bg-green-500 text-white rounded px-3 py-1 hover:bg-green-600 transition-colors self-start">
-          「${escapeHTML(recommended)}」に統一
+        <div class="flex flex-wrap items-center text-[15px] leading-relaxed bg-white p-2 border border-gray-100 rounded-lg">${countsHtml}</div>
+        <div class="text-sm text-gray-600 font-bold">推奨：<span class="text-[#43a047]">${escapeHTML(recommended)}</span></div>
+        <button class="btn-success text-sm rounded-lg px-4 py-2 font-bold shadow-sm self-start">
+          「${escapeHTML(recommended)}」に統一する
         </button>
       `;
 
@@ -341,7 +465,7 @@
     const countEl = document.getElementById('previewCount');
 
     if (!currentText) {
-      preview.innerHTML = '<span class="text-gray-300">ここにハイライト表示されます</span>';
+      preview.innerHTML = '<span class="text-gray-400">ここにハイライト表示されます</span>';
       countEl.textContent = '';
       return;
     }
@@ -352,14 +476,6 @@
   }
 
   // ---- Kuromoji 活用形解析 ----
-
-  function toggleKuromoji() {
-    const panel = document.getElementById('kuromojiPanel');
-    const toggle = document.getElementById('kuromojiToggle');
-    const isHidden = panel.classList.toggle('hidden');
-    toggle.textContent = isHidden ? '▼ 開く' : '▲ 閉じる';
-  }
-
   async function initAndRunKuromoji() {
     const btn = document.getElementById('kuromojiInitBtn');
     const status = document.getElementById('kuromojiStatus');
@@ -388,27 +504,27 @@
   function renderKuromojiResults(results) {
     const container = document.getElementById('kuromojiResults');
     if (!currentText.trim()) {
-      container.innerHTML = '<p class="text-xs text-gray-400 text-center">テキストを入力してください</p>';
+      container.innerHTML = '<p class="text-sm text-gray-400 text-center py-4 font-medium">テキストを入力してください</p>';
       return;
     }
     if (results.length === 0) {
-      container.innerHTML = '<p class="text-xs text-gray-400 text-center">活用形のゆれは検出されませんでした</p>';
+      container.innerHTML = '<p class="text-sm text-gray-400 text-center py-4 font-medium">活用形のゆれは検出されませんでした</p>';
       return;
     }
     container.innerHTML = '';
     results.forEach(({ recommendedWord, foundBases }) => {
       const card = document.createElement('div');
-      card.className = 'border border-indigo-200 bg-indigo-50 rounded-lg p-2.5 flex flex-col gap-1.5';
+      card.className = 'p-3 border border-[#e0e0e0] bg-white rounded-xl shadow-sm flex flex-col gap-2.5';
       const basesHtml = foundBases.map(({ word, count, surfaces }, i) => {
         const tag = i === 0
-          ? '<span class="text-indigo-600 font-semibold">推奨</span>'
-          : '<span class="text-red-500">非推奨</span>';
-        const surfaceList = surfaces.map(s => `<code class="bg-white rounded px-1 text-xs">${escapeHTML(s)}</code>`).join(' ');
-        return `<div class="flex items-start gap-1.5 text-xs">${tag}<span class="text-gray-600">${escapeHTML(word)}系</span><span class="text-gray-400">(${count}回)</span><span class="flex flex-wrap gap-0.5">${surfaceList}</span></div>`;
+          ? '<span class="text-[#118e9e] font-bold text-xs bg-[#f0fbfc] px-1.5 py-0.5 rounded border border-[#b2ebf2]">推奨</span>'
+          : '<span class="text-red-500 font-bold text-xs bg-red-50 px-1.5 py-0.5 rounded border border-red-200">非推奨</span>';
+        const surfaceList = surfaces.map(s => `<code class="bg-gray-100 text-gray-700 rounded px-1.5 py-0.5 text-xs border border-gray-200">${escapeHTML(s)}</code>`).join(' ');
+        return `<div class="flex items-start gap-2 text-sm leading-tight">${tag}<span class="text-gray-800 font-bold">${escapeHTML(word)}系 <span class="text-gray-400 font-normal text-xs">(${count}回)</span></span><div class="flex flex-wrap gap-1 ml-auto">${surfaceList}</div></div>`;
       }).join('');
       card.innerHTML = `
-        <div class="text-xs font-semibold text-indigo-700">推奨：${escapeHTML(recommendedWord)}</div>
-        ${basesHtml}
+        <div class="text-sm font-bold text-[#0f0f0f] border-b border-gray-100 pb-2">推奨：${escapeHTML(recommendedWord)}</div>
+        <div class="flex flex-col gap-2 pt-1">${basesHtml}</div>
       `;
       container.appendChild(card);
     });
@@ -416,33 +532,24 @@
 
   function setKuromojiStatus(state, text) {
     const el = document.getElementById('kuromojiStatus');
-    const colors = { loading: 'bg-yellow-400', ready: 'bg-green-400', error: 'bg-red-400' };
-    el.innerHTML = `<span class="inline-block w-2 h-2 rounded-full ${colors[state] || 'bg-gray-300'}"></span>${escapeHTML(text)}`;
+    const colors = { loading: 'bg-yellow-400', ready: 'bg-[#43a047]', error: 'bg-red-500' };
+    el.innerHTML = `<span class="inline-block w-3 h-3 rounded-full ${colors[state] || 'bg-gray-300'}"></span>${escapeHTML(text)}`;
   }
 
   // ---- ファジーチェック ----
-
-  function toggleFuzzy() {
-    const panel = document.getElementById('fuzzyPanel');
-    const toggle = document.getElementById('fuzzyToggle');
-    const isHidden = panel.classList.toggle('hidden');
-    toggle.textContent = isHidden ? '▼ 開く' : '▲ 閉じる';
-  }
-
   async function runFuzzyCheck() {
     const loadingEl = document.getElementById('fuzzyLoading');
     const resultsEl = document.getElementById('fuzzyResults');
     const maxDist = parseInt(document.getElementById('fuzzyThreshold').value);
 
     if (!currentText.trim()) {
-      resultsEl.innerHTML = '<p class="text-xs text-gray-400 text-center">テキストを入力してください</p>';
+      resultsEl.innerHTML = '<p class="text-sm text-gray-400 text-center py-4 font-medium">テキストを入力してください</p>';
       return;
     }
 
     loadingEl.classList.remove('hidden');
     resultsEl.innerHTML = '';
 
-    // UIを更新してから解析実行
     await new Promise(r => setTimeout(r, 20));
 
     const fuzzResults = fuzzyAnalyze(currentText, dictManager.getAll(), maxDist);
@@ -450,18 +557,18 @@
     loadingEl.classList.add('hidden');
 
     if (fuzzResults.length === 0) {
-      resultsEl.innerHTML = '<p class="text-xs text-gray-400 text-center">ファジーマッチは検出されませんでした</p>';
+      resultsEl.innerHTML = '<p class="text-sm text-gray-400 text-center py-4 font-medium">ファジーマッチは検出されませんでした</p>';
       return;
     }
 
     resultsEl.innerHTML = '';
     fuzzResults.forEach(({ dictWord, group, candidates }) => {
       const card = document.createElement('div');
-      card.className = 'border border-purple-200 bg-purple-50 rounded-lg p-2.5 flex flex-col gap-1';
+      card.className = 'p-3 border border-[#e0e0e0] bg-white rounded-xl shadow-sm flex flex-col gap-1.5';
       card.innerHTML = `
-        <div class="text-xs font-semibold text-purple-700">「${escapeHTML(dictWord)}」に類似</div>
-        <div class="text-xs text-gray-500 flex flex-wrap gap-1">
-          ${candidates.map(c => `<code class="bg-purple-100 text-purple-800 rounded px-1">${escapeHTML(c)}</code>`).join('')}
+        <div class="text-sm font-bold text-[#0f0f0f]">「${escapeHTML(dictWord)}」に類似</div>
+        <div class="text-sm text-gray-600 flex flex-wrap gap-1.5 mt-1">
+          ${candidates.map(c => `<code class="bg-gray-100 text-gray-700 rounded px-1.5 py-0.5 border border-gray-200 font-bold">${escapeHTML(c)}</code>`).join('')}
         </div>
       `;
       resultsEl.appendChild(card);
@@ -469,15 +576,6 @@
   }
 
   // ---- カスタム辞書UI ----
-
-  function toggleCustomDict() {
-    const panel = document.getElementById('customDictPanel');
-    const toggle = document.getElementById('customDictToggle');
-    const isHidden = panel.classList.toggle('hidden');
-    toggle.textContent = isHidden ? '▼ 開く' : '▲ 閉じる';
-    if (!isHidden) renderCustomDictList();
-  }
-
   function addCustomRule() {
     const input = document.getElementById('newRuleInput');
     const words = input.value.split(',').map(w => w.trim()).filter(Boolean);
@@ -493,17 +591,17 @@
     const custom = dictManager.getCustom();
 
     if (custom.length === 0) {
-      container.innerHTML = '<p class="text-xs text-gray-400">カスタム辞書は空です</p>';
+      container.innerHTML = '<p class="text-sm text-gray-400 text-center py-4 font-medium">カスタム辞書は空です</p>';
       return;
     }
 
     container.innerHTML = '';
     custom.forEach((group, idx) => {
       const row = document.createElement('div');
-      row.className = 'flex items-center justify-between text-xs bg-gray-50 rounded px-2 py-1.5';
+      row.className = 'flex items-center justify-between text-[13px] bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-sm';
       row.innerHTML = `
-        <span class="text-gray-600 truncate flex-1">${group.map(w => escapeHTML(w)).join(' · ')}</span>
-        <button class="ml-2 text-gray-300 hover:text-red-400 transition-colors flex-shrink-0" title="削除">✕</button>
+        <span class="text-gray-700 font-bold truncate flex-1">${group.map(w => escapeHTML(w)).join(' <span class="text-gray-300 mx-1 font-normal">/</span> ')}</span>
+        <button class="ml-3 text-gray-300 hover:text-red-500 transition-colors flex-shrink-0 text-base leading-none" title="削除">×</button>
       `;
       row.querySelector('button').addEventListener('click', () => {
         dictManager.removeCustomGroup(idx);
@@ -544,17 +642,14 @@
   }
 
   // ---- Word 出力 ----
-
   function downloadCorrectedDocx() {
     if (!currentText.trim()) { alert('テキストを入力してください'); return; }
 
     const results = analyze(currentText, dictManager.getAll());
 
-    // 本文HTML（非推奨語を黄ハイライト）
     let bodyHtml = '<h2 style="font-size:14pt;margin-bottom:6pt;">本文</h2>';
     bodyHtml += `<p style="white-space:pre-wrap;font-size:11pt;line-height:1.8;">${buildHighlightedHTMLForDocx(currentText, results)}</p>`;
 
-    // 置換ログ
     if (replacementLog.length > 0) {
       bodyHtml += '<h2 style="font-size:14pt;margin-top:18pt;margin-bottom:6pt;">置換ログ</h2>';
       bodyHtml += '<table border="1" cellpadding="6" style="border-collapse:collapse;font-size:10pt;width:100%;">';
@@ -565,7 +660,6 @@
       bodyHtml += '</table>';
     }
 
-    // 未解決のゆらぎ
     if (results.length > 0) {
       bodyHtml += '<h2 style="font-size:14pt;margin-top:18pt;margin-bottom:6pt;">未解決のゆらぎ</h2>';
       bodyHtml += '<table border="1" cellpadding="6" style="border-collapse:collapse;font-size:10pt;width:100%;">';
@@ -586,7 +680,6 @@
     URL.revokeObjectURL(a.href);
   }
 
-  /** docx出力用HTML（インラインスタイル） */
   function buildHighlightedHTMLForDocx(text, results) {
     let escaped = escapeHTML(text);
     for (const { others } of results) {
@@ -602,7 +695,6 @@
   }
 
   // ---- ユーティリティ ----
-
   function clearAll() {
     document.getElementById('inputText').value = '';
     replacementLog = [];
@@ -626,7 +718,6 @@
   }
 
   // ---- 辞書バリデーション ----
-
   function runDictValidation() {
     const result = dictManager.validateDict(dictManager.getAll());
     if (result.valid) return;
@@ -657,7 +748,7 @@
     btn.textContent = isHidden ? '詳細を表示 ▼' : '詳細を隠す ▲';
   }
 
-  // イベント
+  // 初期化イベント
   document.getElementById('inputText').addEventListener('input', runCheck);
   runDictValidation();
   runCheck();
