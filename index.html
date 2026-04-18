@@ -837,8 +837,22 @@ function renderPreview(results) {
     btn.textContent = isHidden ? '詳細を表示 ▼' : '詳細を隠す ▲';
   }
 
-  // 初期化イベント
-  document.getElementById('inputText').addEventListener('input', runCheck);
+// 初期化イベント
+  let checkTimeout; // タイマー用の変数を追加
+  
+  document.getElementById('inputText').addEventListener('input', () => {
+    // 処理中を示す表示（任意ですが、あると親切です）
+    document.getElementById('previewCount').textContent = '入力待機中...';
+    
+    // 前のタイマーをキャンセル
+    clearTimeout(checkTimeout);
+    
+    // 入力が止まってから500ミリ秒（0.5秒）後に runCheck を実行
+    checkTimeout = setTimeout(() => {
+      runCheck();
+    }, 500);
+  });
+
   runDictValidation();
   runCheck();
 </script>
