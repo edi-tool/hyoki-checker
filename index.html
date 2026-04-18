@@ -472,19 +472,33 @@
   const worker = new Worker('js/worker.js');
   let workerCallbackMap = new Map();
   let messageIdCounter = 0;
+  let workerFailed = false;
 
-  function postToWorker(type, payload) {
+  function postToWorker(type, payload, timeoutMs = 30000) {
+    if (workerFailed) {
+      return Promise.reject(new Error('解析エンジンが停止しています。ページを再読み込みしてください。'));
+    }
     return new Promise((resolve, reject) => {
       const id = ++messageIdCounter;
-      workerCallbackMap.set(id, { resolve, reject });
+      const timer = setTimeout(() => {
+        if (workerCallbackMap.has(id)) {
+          workerCallbackMap.delete(id);
+          reject(new Error('解析がタイムアウトしました。ページを再読み込みしてください。'));
+        }
+      }, timeoutMs);
+      workerCallbackMap.set(id, {
+        resolve: (v) => { clearTimeout(timer); resolve(v); },
+        reject:  (e) => { clearTimeout(timer); reject(e); },
+      });
       worker.postMessage({ id, type, payload });
     });
   }
 
   worker.onerror = function(e) {
+    workerFailed = true;
     console.error('Worker エラー:', e);
-    for (const [id, cb] of workerCallbackMap) {
-      cb.reject(new Error('解析エンジンの初期化に失敗しました'));
+    for (const [, cb] of workerCallbackMap) {
+      cb.reject(new Error('解析エンジンの初期化に失敗しました。ページを再読み込みしてください。'));
     }
     workerCallbackMap.clear();
   };
@@ -534,8 +548,15 @@
       if (name.endsWith('.pdf') || file.type === 'application/pdf') {
         text = await extractPDF(arrayBuffer);
       } else if (name.endsWith('.docx')) {
+        if (typeof mammoth === 'undefined') {
+          alert('Word処理ライブラリの読み込みに失敗しました。ページを再読み込みしてください。');
+          return;
+        }
         const result = await mammoth.extractRawText({ arrayBuffer });
-        text = result.value;
+        text = result.value ?? '';
+      } else if (name.endsWith('.doc')) {
+        alert('.doc 形式は非対応です。Word で「名前を付けて保存」→「.docx」に変換してください。');
+        return;
       } else {
         alert('対応形式: .docx / .pdf');
         return;
