@@ -366,6 +366,18 @@
   let currentText = '';
   let replacementLog = [];
   let ignoredGroups = new Set();
+
+  // ▼▼▼【修正箇所】ローディング表示の切り替え関数を追加 ▼▼▼
+  function setLoading(isLoading) {
+    const loadingEl = document.getElementById('loading');
+    if (!loadingEl) return;
+    if (isLoading) {
+      loadingEl.classList.remove('hidden');
+    } else {
+      loadingEl.classList.add('hidden');
+    }
+  }
+  // ▲▲▲ ここまで ▲▲▲
   
   // Web Worker の初期化
   const worker = new Worker('js/worker.js');
@@ -404,7 +416,6 @@
   }
 
   // ---- ファイル読み込み ----
-  // (ドラッグ&ドロップのイベントリスナー等は元コードと同じ)
   const dropZone = document.getElementById('dropZone');
   const fileInput = document.getElementById('fileInput');
 
@@ -418,7 +429,7 @@
   fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
 
   async function handleFile(file) {
-    setLoading(true);
+    setLoading(true); // ← ここでエラーが起きていました
     await new Promise(resolve => setTimeout(resolve, 50)); 
     try {
       const arrayBuffer = await file.arrayBuffer();
@@ -461,7 +472,6 @@
     document.getElementById('previewCount').textContent = '⏳ 解析中...';
     
     try {
-      // Worker に解析を依頼
       let results = await postToWorker('ANALYZE', { 
         text: currentText, 
         dict: dictManager.getAll() 
@@ -488,7 +498,7 @@
     setKuromojiStatus('loading', '辞書ファイルを取得中...');
     
     try {
-      await postToWorker('INIT_KUROMOJI', {}); // Worker側でKuromojiを初期化
+      await postToWorker('INIT_KUROMOJI', {});
       isKuromojiReady = true;
       setKuromojiStatus('ready', '準備完了');
       btn.classList.add('hidden');
@@ -533,14 +543,12 @@
     resultsEl.innerHTML = '';
 
     try {
-      // Workerのファジー解析を呼び出し（UIはブロックされません）
       const fuzzResults = await postToWorker('FUZZY', {
         text: currentText,
         dict: dictManager.getAll(),
         maxDistance: maxDist
       });
 
-      // 描画処理
       if (fuzzResults.length === 0) {
         resultsEl.innerHTML = '<p class="text-sm text-gray-400 text-center py-4 font-medium">ファジーマッチは検出されませんでした</p>';
       } else {
@@ -567,16 +575,16 @@
 
   // (辞書管理やWord出力などのユーティリティ系UI処理は元のまま維持)
 
-  // 初期化イベントとデバウンス処理
   let checkTimeout;
   document.getElementById('inputText').addEventListener('input', () => {
     document.getElementById('previewCount').textContent = '入力待機中...';
     clearTimeout(checkTimeout);
     checkTimeout = setTimeout(() => {
       runCheck();
-    }, 500); // 0.5秒のデバウンス
+    }, 500);
   });
 
+  // もし runDictValidation() の定義も省略されている場合は、ここでエラーになる可能性がありますのでご注意ください
   runDictValidation();
   runCheck();
 </script>
