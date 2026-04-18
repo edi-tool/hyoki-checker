@@ -416,11 +416,8 @@ async function handleFile(file) {
       replacementLog = [];
       document.getElementById('inputText').value = text;
       
-      // 【追加】テキストセット後にも少しスキマを空けてから解析を実行する
-      setTimeout(() => {
-        runCheck();
-        setLoading(false);
-      }, 50);
+      await runCheck();
+      setLoading(false);
 
     } catch (e) {
       alert('読み込みエラー: ' + e.message);
@@ -442,13 +439,10 @@ async function handleFile(file) {
   }
 
   // ---- チェック処理 ----
-  function runCheck() {
+  async function runCheck() {
     currentText = document.getElementById('inputText').value;
-    
-    // ◀◀◀ 以下の2行を修正（無視リストに含まれない結果だけを抽出）
-    const results = analyze(currentText, dictManager.getAll())
+    const results = (await analyzeAsync(currentText, dictManager.getAll()))
                       .filter(r => !ignoredGroups.has(r.group.join(',')));
-                      
     renderResults(results);
     renderPreview(results);
   }

@@ -181,6 +181,36 @@ function fuzzyAnalyze(text, dict, maxDistance = 1) {
   return [...resultMap.values()];
 }
 
+/**
+ * analyze() の非同期版。chunkSize グループごとに setTimeout(0) でUIスレッドを解放する
+ * @param {string} text
+ * @param {string[][]} dict
+ * @param {number} chunkSize
+ * @returns {Promise<{ group: string[], recommended: string, counts: {word:string, count:number}[], others: string[] }[]>}
+ */
+async function analyzeAsync(text, dict, chunkSize = 50) {
+  const results = [];
+  for (let i = 0; i < dict.length; i += chunkSize) {
+    const chunk = dict.slice(i, i + chunkSize);
+    for (const group of chunk) {
+      if (!Array.isArray(group) || group.length < 2) continue;
+      const counts = group.map(word => {
+        const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const matches = text.match(new RegExp(escaped, 'g'));
+        return { word, count: matches ? matches.length : 0 };
+      });
+      const found = counts.filter(c => c.count > 0);
+      if (found.length < 2) continue;
+      found.sort((a, b) => b.count - a.count);
+      const recommended = found[0].word;
+      const others = found.slice(1).map(c => c.word);
+      results.push({ group, recommended, counts: found, others });
+    }
+    await new Promise(r => setTimeout(r, 0));
+  }
+  return results;
+}
+
 // ---- Kuromoji 形態素解析 ----
 
 let _tokenizer = null;
