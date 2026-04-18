@@ -22,10 +22,9 @@
     // ページ読み込み後にバックグラウンドで初期化開始（Web Workerに依頼する形に変更）
     window.addEventListener('load', () => {
       setTimeout(() => {
-        // worker変数が存在し、まだ初期化ボタンが押されていなければWorkerに初期化を指示する
         const btn = document.getElementById('kuromojiInitBtn');
         if (btn && !btn.classList.contains('hidden') && typeof postToWorker === 'function') {
-           // initAndRunKuromoji() を直接呼んで、Worker側でのみ初期化させる
+           // Worker側でのみ初期化させる
            initAndRunKuromoji().catch(e => console.warn("バックグラウンド初期化スキップ:", e));
         }
       }, 2000); 
@@ -33,7 +32,6 @@
   </script>
   
   <style>
-
     /* Typography & Visual Theme */
     body {
         font-family: noto-sans, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, arial, sans-serif;
@@ -63,7 +61,7 @@
         padding: 28px 32px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         width: 100%;
-        max-width: 1300px; /* 2ペインのUIを維持するために幅を広めに設定 */
+        max-width: 1300px;
         height: calc(100vh - 48px);
         display: flex;
         flex-direction: column;
@@ -132,7 +130,7 @@
         font-weight: 600;
         transition: all 0.2s;
         border-bottom: 3px solid transparent;
-        margin-bottom: -2px; /* border-bottomに重ねる */
+        margin-bottom: -2px;
         border-radius: 8px 8px 0 0;
         font-family: inherit;
     }
@@ -146,8 +144,8 @@
         background-color: #fff;
     }
 
-    /* Highlight Override (analyzer.jsの出力スタイルを上書き) */
-    #preview span[style*="background-color"], .highlight {
+    /* Highlight Override */
+    #preview span[style*="background-color"], .highlight, mark {
         font-weight: bold !important;
         padding: 0 2px !important;
         border-radius: 2px !important;
@@ -353,14 +351,20 @@
 </div>
 
 <script>
-  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+  window.addEventListener('load', () => {
+    // 依存スクリプト(pdf.jsなど)がロードされるのを待つため初期化タイミングを少しずらす
+    setTimeout(() => {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+      runDictValidation();
+      runCheck();
+    }, 100);
+  });
 
   const dictManager = new DictionaryManager();
   let currentText = '';
   let replacementLog = [];
   let ignoredGroups = new Set();
 
-  // ▼▼▼【修正箇所】ローディング表示の切り替え関数を追加 ▼▼▼
   function setLoading(isLoading) {
     const loadingEl = document.getElementById('loading');
     if (!loadingEl) return;
@@ -370,14 +374,12 @@
       loadingEl.classList.add('hidden');
     }
   }
-  // ▲▲▲ ここまで ▲▲▲
   
   // Web Worker の初期化
   const worker = new Worker('js/worker.js');
   let workerCallbackMap = new Map();
   let messageIdCounter = 0;
 
-  // Workerとの非同期通信用ヘルパー
   function postToWorker(type, payload) {
     return new Promise((resolve, reject) => {
       const id = ++messageIdCounter;
@@ -422,7 +424,7 @@
   fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
 
   async function handleFile(file) {
-    setLoading(true); // ← ここでエラーが起きていました
+    setLoading(true);
     await new Promise(resolve => setTimeout(resolve, 50)); 
     try {
       const arrayBuffer = await file.arrayBuffer();
@@ -462,7 +464,8 @@
   // ---- チェック処理 (Worker利用) ----
   async function runCheck() {
     currentText = document.getElementById('inputText').value;
-    document.getElementById('previewCount').textContent = '⏳ 解析中...';
+    const previewCountEl = document.getElementById('previewCount');
+    if (previewCountEl) previewCountEl.textContent = '⏳ 解析中...';
     
     try {
       let results = await postToWorker('ANALYZE', { 
@@ -475,32 +478,85 @@
       renderPreview(results);
     } catch (e) {
       console.error("解析エラー:", e);
-      document.getElementById('previewCount').textContent = '⚠ エラー';
+      if (previewCountEl) previewCountEl.textContent = '⚠ エラー';
     }
   }
 
-  // (renderResults と renderPreview は元のコードをそのまま維持してください。UI描画のためメインスレッドに残します)
+  // ---- UI 描画系の復元関数群 ----
+  function renderResults(results) {
+    const resultsEl = document.getElementById('results');
+    const countEl = document.getElementById('resultCount');
+    if (!results || results.length === 0) {
+      resultsEl.innerHTML = '<p class="text-sm text-gray-400 text-center py-10 font-medium">ゆらぎは検知されていません</p>';
+      countEl.textContent = '0 件';
+      return;
+    }
+    countEl.textContent = `${results.length} 件`;
+    
+    let html = '';
+    results.forEach((r) => {
+      // 外部ファイル analyzer.js 内の escapeHTML を使用
+      const recommended = typeof escapeHTML === 'function' ? escapeHTML(r.recommended) : r.recommended;
+      const others = typeof escapeHTML === 'function' ? r.others.map(escapeHTML).join(', ') : r.others.join(', ');
+      
+      html += `<div class="p-3 border border-[#e0e0e0] bg-white rounded-xl shadow-sm flex flex-col gap-1.5">
+        <div class="text-sm font-bold text-[#0f0f0f]">統一候補: <span class="text-[#118e9e]">${recommended}</span></div>
+        <div class="text-xs text-gray-600 bg-gray-50 p-2 rounded">
+          その他の表記: <strong>${others}</strong>
+        </div>
+      </div>`;
+    });
+    resultsEl.innerHTML = html;
+  }
+
+  function renderPreview(results) {
+    const previewEl = document.getElementById('preview');
+    const countEl = document.getElementById('previewCount');
+    
+    if (!currentText) {
+      previewEl.innerHTML = '<span class="text-gray-400">ここにハイライト表示されます</span>';
+      countEl.textContent = '';
+      return;
+    }
+    if (results.length === 0) {
+      previewEl.innerHTML = typeof escapeHTML === 'function' ? escapeHTML(currentText).replace(/\n/g, '<br>') : currentText;
+      countEl.textContent = 'ゆらぎなし';
+      return;
+    }
+
+    if (typeof buildHighlightedHTML === 'function') {
+      previewEl.innerHTML = buildHighlightedHTML(currentText, results);
+    } else {
+      previewEl.textContent = currentText; // フォールバック
+    }
+    countEl.textContent = `${results.length}件のグループ`;
+  }
 
   // ---- Kuromoji 活用形解析 (Worker利用) ----
   let isKuromojiReady = false;
 
   async function initAndRunKuromoji() {
     const btn = document.getElementById('kuromojiInitBtn');
-    btn.disabled = true;
-    btn.textContent = '読み込み中...';
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = '読み込み中...';
+    }
     setKuromojiStatus('loading', '辞書ファイルを取得中...');
     
     try {
       await postToWorker('INIT_KUROMOJI', {});
       isKuromojiReady = true;
       setKuromojiStatus('ready', '準備完了');
-      btn.classList.add('hidden');
-      document.getElementById('kuromojiRunBtn').classList.remove('hidden');
+      if (btn) btn.classList.add('hidden');
+      const runBtn = document.getElementById('kuromojiRunBtn');
+      if (runBtn) runBtn.classList.remove('hidden');
       runKuromojiAnalysis();
     } catch (e) {
       setKuromojiStatus('error', '初期化失敗: ' + e.message);
-      btn.disabled = false;
-      btn.textContent = 'Kuromoji を初期化して解析';
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Kuromoji を初期化して解析';
+      }
     }
   }
 
@@ -517,7 +573,30 @@
     }
   }
 
-  // (renderKuromojiResults と setKuromojiStatus は元のまま維持)
+  function setKuromojiStatus(status, text) {
+    const el = document.getElementById('kuromojiStatus');
+    if (!el) return;
+    let colorClass = status === 'ready' ? 'bg-[#43a047]' : (status === 'error' ? 'bg-red-500' : 'bg-gray-300');
+    if (status === 'loading') colorClass = 'bg-yellow-400 animate-pulse';
+    el.innerHTML = `<span class="inline-block w-3 h-3 rounded-full ${colorClass}"></span>${text}`;
+  }
+
+  function renderKuromojiResults(results) {
+    const el = document.getElementById('kuromojiResults');
+    if (!el) return;
+    if (!results || results.length === 0) {
+      el.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">活用形のゆらぎは検知されませんでした</p>';
+      return;
+    }
+    let html = '';
+    results.forEach(r => {
+      const escRecommended = typeof escapeHTML === 'function' ? escapeHTML(r.recommendedWord) : r.recommendedWord;
+      html += `<div class="p-3 border border-[#b2ebf2] bg-white rounded-xl shadow-sm flex flex-col gap-1.5">
+        <div class="text-sm font-bold text-[#0f0f0f]">基本形: <span class="text-[#0e7784]">${escRecommended}</span></div>
+      </div>`;
+    });
+    el.innerHTML = html;
+  }
 
   // ---- ファジーチェック (Worker利用) ----
   async function runFuzzyCheck(event) {
@@ -548,10 +627,12 @@
         fuzzResults.forEach(({ dictWord, group, candidates }) => {
           const card = document.createElement('div');
           card.className = 'p-3 border border-[#e0e0e0] bg-white rounded-xl shadow-sm flex flex-col gap-1.5';
+          const safeDict = typeof escapeHTML === 'function' ? escapeHTML(dictWord) : dictWord;
+          const safeCandidates = typeof escapeHTML === 'function' ? candidates.map(escapeHTML) : candidates;
           card.innerHTML = `
-            <div class="text-sm font-bold text-[#0f0f0f]">「${escapeHTML(dictWord)}」に類似</div>
+            <div class="text-sm font-bold text-[#0f0f0f]">「${safeDict}」に類似</div>
             <div class="text-sm text-gray-600 flex flex-wrap gap-1.5 mt-1">
-              ${candidates.map(c => `<code class="bg-yellow-50 text-red-600 rounded px-1.5 py-0.5 border border-red-100 font-bold">${escapeHTML(c)}</code>`).join('')}
+              ${safeCandidates.map(c => `<code class="bg-yellow-50 text-red-600 rounded px-1.5 py-0.5 border border-red-100 font-bold">${c}</code>`).join('')}
             </div>
           `;
           resultsEl.appendChild(card);
@@ -566,20 +647,126 @@
     }
   }
 
-  // (辞書管理やWord出力などのユーティリティ系UI処理は元のまま維持)
+  // ---- ユーティリティ系UI処理の復元 ----
+  function clearAll() {
+    document.getElementById('inputText').value = '';
+    currentText = '';
+    document.getElementById('fileInput').value = '';
+    renderResults([]);
+    renderPreview([]);
+    const fuzzResults = document.getElementById('fuzzyResults');
+    if (fuzzResults) fuzzResults.innerHTML = '';
+    const kuroResults = document.getElementById('kuromojiResults');
+    if (kuroResults) kuroResults.innerHTML = '';
+  }
 
+  function downloadCorrectedDocx() {
+    if (!currentText) return alert('テキストがありません');
+    if (typeof htmlDocx === 'undefined') return alert('Word生成ライブラリが読み込まれていません');
+    
+    // ※今回は単純にテキストを段落分けしてWord化する簡易実装としています
+    const safeText = typeof escapeHTML === 'function' ? escapeHTML(currentText) : currentText;
+    const htmlContent = `<!DOCTYPE html><html><body><p>${safeText.replace(/\n/g, '<br>')}</p></body></html>`;
+    const converted = htmlDocx.asBlob(htmlContent);
+    
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(converted);
+    a.download = 'corrected.docx';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function runDictValidation() {
+    if (!dictManager || typeof dictManager.validateDict !== 'function') return;
+    const validation = dictManager.validateDict(dictManager.getAll());
+    const banner = document.getElementById('dictErrorBanner');
+    const summary = document.getElementById('dictErrorSummary');
+    const list = document.getElementById('dictErrorList');
+    
+    if (!validation.valid) {
+      banner.classList.remove('hidden');
+      summary.textContent = `エラー ${validation.errors.length} 件`;
+      list.innerHTML = validation.errors.map(err => `<li>インデックス ${err.index}: ${err.reason}</li>`).join('');
+    } else {
+      banner.classList.add('hidden');
+    }
+  }
+
+  function toggleDictErrorDetail() {
+    const list = document.getElementById('dictErrorList');
+    if (list) list.classList.toggle('hidden');
+  }
+
+  function addCustomRule() {
+    const input = document.getElementById('newRuleInput');
+    const val = input.value;
+    const words = val.split(',').map(s => s.trim()).filter(s => s);
+    if (words.length >= 2) {
+      dictManager.addCustomGroup(words);
+      input.value = '';
+      renderCustomDictList();
+      runCheck();
+    } else {
+      alert('カンマ区切りで2語以上入力してください（例: Web,ウェブ）');
+    }
+  }
+
+  function renderCustomDictList() {
+    const el = document.getElementById('customDictList');
+    if (!el) return;
+    const custom = dictManager.getCustom();
+    if(custom.length === 0) {
+      el.innerHTML = '<p class="text-xs text-gray-400 p-2">カスタム辞書はありません</p>';
+      return;
+    }
+    el.innerHTML = custom.map((g, i) => {
+      const safeGroup = typeof escapeHTML === 'function' ? escapeHTML(g.join(', ')) : g.join(', ');
+      return `<div class="flex justify-between items-center text-sm p-2 border-b border-gray-100 hover:bg-gray-50">
+        <span class="text-gray-700 font-medium">${safeGroup}</span>
+        <button onclick="dictManager.removeCustomGroup(${i}); renderCustomDictList(); runCheck();" class="text-red-400 hover:text-red-600 font-bold px-2 py-1 bg-red-50 rounded">削除</button>
+      </div>`;
+    }).join('');
+  }
+
+  async function importCustomDict(e) {
+    if (!e.target.files[0]) return;
+    try {
+      await dictManager.importJSON(e.target.files[0]);
+      renderCustomDictList();
+      runCheck();
+    } catch(err) {
+      alert('読み込み失敗: ' + err.message);
+    } finally {
+      e.target.value = '';
+    }
+  }
+
+  async function importTSVCSV(e) {
+    if (!e.target.files[0]) return;
+    try {
+      const text = await e.target.files[0].text();
+      const separator = e.target.files[0].name.toLowerCase().endsWith('.csv') ? ',' : '\t';
+      dictManager.importDelimited(text, separator);
+      renderCustomDictList();
+      runCheck();
+    } catch(err) {
+      alert('読み込み失敗: ' + err.message);
+    } finally {
+      e.target.value = '';
+    }
+  }
+
+  // 入力イベント（デバウンス処理）
   let checkTimeout;
   document.getElementById('inputText').addEventListener('input', () => {
-    document.getElementById('previewCount').textContent = '入力待機中...';
+    const countEl = document.getElementById('previewCount');
+    if (countEl) countEl.textContent = '入力待機中...';
     clearTimeout(checkTimeout);
     checkTimeout = setTimeout(() => {
       runCheck();
     }, 500);
   });
 
-  // もし runDictValidation() の定義も省略されている場合は、ここでエラーになる可能性がありますのでご注意ください
-  runDictValidation();
-  runCheck();
 </script>
 </body>
 </html>
