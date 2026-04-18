@@ -12,7 +12,20 @@
   <script src="js/defaultDict.js"></script>
   <script src="js/dictManager.js"></script>
   <script src="js/analyzer.js"></script>
-
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./js/sw.js');
+    }
+  
+    // ページ読み込み後にバックグラウンドで初期化開始
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        if (typeof initKuromoji === 'function') {
+          initAndRunKuromoji(true); // サイレントモードでの実行
+        }
+      }, 2000); 
+    });
+  </script>
   <style>
     /* Typography & Visual Theme */
     body {
