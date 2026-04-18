@@ -4,15 +4,30 @@
  * @param {string[][]} dict - 辞書グループ配列
  * @returns {{ group: string[], recommended: string, counts: {word:string, count:number}[], others: string[] }[]}
  */
-function analyze(text, dict) {
+/**
+ * 【追加】形態素解析を利用した高精度な表記ゆれ解析
+ */
+function refinedAnalyze(text, dict) {
+  if (!_tokenizer) return []; 
+
+  const tokens = _tokenizer.tokenize(text);
   const results = [];
 
   for (const group of dict) {
     if (!Array.isArray(group) || group.length < 2) continue;
+
     const counts = group.map(word => {
-      const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const matches = text.match(new RegExp(escaped, 'g'));
-      return { word, count: matches ? matches.length : 0 };
+      let count = 0;
+      for (const token of tokens) {
+        // 表層形が一致し、かつ特定の品詞（名詞・副詞等）である場合のみカウント
+        if (token.surface_form === word) {
+          const pos = token.pos;
+          if (pos === '名詞' || pos === '副詞' || pos === '動詞' || pos === '接続詞' || pos === '感動詞') {
+             count++;
+          }
+        }
+      }
+      return { word, count };
     });
 
     const found = counts.filter(c => c.count > 0);
@@ -24,10 +39,70 @@ function analyze(text, dict) {
 
     results.push({ group, recommended, counts: found, others });
   }
-
   return results;
 }
 
+/**
+ * 【差し替え】高速化版ファジー解析
+ */
+function fuzzyAnalyze(text, dict, maxDistance = 1) {
+  const exactSet = new Set(dict.flat());
+  const candidateMap = new Map();
+  
+  // 辞書の事前フィルタリング（3文字未満はノイズが多いため除外）
+  const dictData = [];
+  for (const group of dict) {
+    for (const word of group) {
+      if (word.length < 3) continue;
+      dictData.push({
+        word,
+        group,
+        chars: new Set(word.split('')),
+        len: word.length
+      });
+    }
+  }
+
+  const textLen = text.length;
+  for (let i = 0; i < textLen; i++) {
+    // 探索窓を3〜15文字に限定
+    for (let l = Math.max(3 - maxDistance, 1); l <= 15; l++) { 
+      if (i + l > textLen) break;
+      const candidate = text.slice(i, i + l);
+      
+      if (exactSet.has(candidate) || _PUNCT_RE.test(candidate)) continue;
+      if (candidateMap.has(candidate)) continue;
+
+      const candidateChars = new Set(candidate.split(''));
+      
+      for (const item of dictData) {
+        if (Math.abs(item.len - l) > maxDistance) continue;
+
+        // 文字セットによる高速フィルタ（共通文字数が少なければスキップ）
+        let commonCount = 0;
+        for (let char of candidateChars) {
+          if (item.chars.has(char)) commonCount++;
+        }
+        if (commonCount < Math.min(l, item.len) - maxDistance) continue;
+
+        const d = levenshtein(candidate, item.word);
+        if (d > 0 && d <= maxDistance) {
+          candidateMap.set(candidate, { dictWord: item.word, group: item.group });
+          break; 
+        }
+      }
+    }
+  }
+
+  const resultMap = new Map();
+  for (const [candidate, { dictWord, group }] of candidateMap) {
+    if (!resultMap.has(dictWord)) {
+      resultMap.set(dictWord, { dictWord, group, candidates: [] });
+    }
+    resultMap.get(dictWord).candidates.push(candidate);
+  }
+  return [...resultMap.values()];
+}
 /**
  * テキスト中の非推奨単語をHTMLハイライトに変換する
  * @param {string} text
