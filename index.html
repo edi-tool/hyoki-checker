@@ -445,9 +445,11 @@
   window.addEventListener('load', () => {
     // 依存スクリプト(pdf.jsなど)がロードされるのを待つため初期化タイミングを少しずらす
     setTimeout(() => {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+      if (typeof pdfjsLib !== 'undefined') {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+      }
       runDictValidation();
-      runCheck();
+      if (document.getElementById('inputText').value.trim()) runCheck();
     }, 100);
   });
 
@@ -478,6 +480,14 @@
       worker.postMessage({ id, type, payload });
     });
   }
+
+  worker.onerror = function(e) {
+    console.error('Worker エラー:', e);
+    for (const [id, cb] of workerCallbackMap) {
+      cb.reject(new Error('解析エンジンの初期化に失敗しました'));
+    }
+    workerCallbackMap.clear();
+  };
 
   worker.onmessage = function(e) {
     const { id, type, results, message } = e.data;
@@ -530,6 +540,10 @@
         alert('対応形式: .docx / .pdf');
         return;
       }
+      if (!text.trim()) {
+        alert('テキストを抽出できませんでした。スキャンPDFや画像ベースのファイルは非対応です。');
+        return;
+      }
       replacementLog = [];
       document.getElementById('inputText').value = text;
       await runCheck();
@@ -547,7 +561,7 @@
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
-      text += content.items.map(item => item.str).join('') + '\n';
+      text += content.items.map(item => item.str || '').join('') + '\n';
     }
     return text;
   }
@@ -570,6 +584,8 @@
     } catch (e) {
       console.error("解析エラー:", e);
       if (previewCountEl) previewCountEl.textContent = '⚠ エラー';
+      const resultsEl = document.getElementById('results');
+      if (resultsEl) resultsEl.innerHTML = `<p class="text-sm text-red-500 text-center py-10 font-medium">解析エラー: ${e.message}</p>`;
     }
   }
 
