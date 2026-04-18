@@ -192,7 +192,7 @@ let _tokenizer = null;
 function initKuromoji() {
   return new Promise((resolve, reject) => {
     kuromoji
-      .builder({ dicPath: 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/' })
+      .builder({ dicPath: './dict/' })
       .build((err, tokenizer) => {
         if (err) reject(err);
         else { _tokenizer = tokenizer; resolve(); }
