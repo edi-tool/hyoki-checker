@@ -1,9 +1,5 @@
 const CACHE_NAME = 'dict-cache-v1';
-const DICT_URLS = [
-  './dict/base.dat.gz',
-  './dict/check.dat.gz',
-  // ... 他の辞書ファイル
-];
+const DICT_URLS = [];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

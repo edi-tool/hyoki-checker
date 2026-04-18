@@ -220,7 +220,7 @@ function initKuromoji() {
     kuromoji
       // ※注意: Workerから見た相対パス、または絶対URLを指定します。
       // うまく動かない場合は 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/' を指定してください。
-      .builder({ dicPath: '../dict/' }) 
+      .builder({ dicPath: 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/' })
       .build((err, tokenizer) => {
         if (err) reject(err);
         else { _tokenizer = tokenizer; resolve(); }
