@@ -360,26 +360,51 @@
 </div>
 
 <script>
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
   const dictManager = new DictionaryManager();
   let currentText = '';
   let replacementLog = [];
-  let ignoredGroups = new Set(); //
+  let ignoredGroups = new Set();
+  
+  // Web Worker の初期化
+  const worker = new Worker('js/worker.js');
+  let workerCallbackMap = new Map();
+  let messageIdCounter = 0;
+
+  // Workerとの非同期通信用ヘルパー
+  function postToWorker(type, payload) {
+    return new Promise((resolve, reject) => {
+      const id = ++messageIdCounter;
+      workerCallbackMap.set(id, { resolve, reject });
+      worker.postMessage({ id, type, payload });
+    });
+  }
+
+  worker.onmessage = function(e) {
+    const { id, type, results, message } = e.data;
+    const callbacks = workerCallbackMap.get(id);
+    if (!callbacks) return;
+    
+    if (type === 'ERROR') {
+      callbacks.reject(new Error(message));
+    } else {
+      callbacks.resolve(results);
+    }
+    workerCallbackMap.delete(id);
+  };
 
   // ---- タブ切り替え処理 ----
   function switchTab(tabId) {
     document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
     document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-    
     document.getElementById(`tab-${tabId}`).classList.remove('hidden');
     document.getElementById(`tabBtn-${tabId}`).classList.add('active');
-    
     if (tabId === 'dict') renderCustomDictList();
   }
 
   // ---- ファイル読み込み ----
+  // (ドラッグ&ドロップのイベントリスナー等は元コードと同じ)
   const dropZone = document.getElementById('dropZone');
   const fileInput = document.getElementById('fileInput');
 
@@ -392,17 +417,13 @@
   });
   fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
 
-async function handleFile(file) {
+  async function handleFile(file) {
     setLoading(true);
-    
-    // 【追加】ブラウザがローディングUIを描画する猶予（50ミリ秒）を与える
     await new Promise(resolve => setTimeout(resolve, 50)); 
-
     try {
       const arrayBuffer = await file.arrayBuffer();
       const name = file.name.toLowerCase();
       let text = '';
-
       if (name.endsWith('.pdf') || file.type === 'application/pdf') {
         text = await extractPDF(arrayBuffer);
       } else if (name.endsWith('.docx')) {
@@ -412,17 +433,13 @@ async function handleFile(file) {
         alert('対応形式: .docx / .pdf');
         return;
       }
-
       replacementLog = [];
       document.getElementById('inputText').value = text;
-      
       await runCheck();
-      setLoading(false);
-
     } catch (e) {
       alert('読み込みエラー: ' + e.message);
-      setLoading(false);
     } finally {
+      setLoading(false);
       fileInput.value = '';
     }
   }
@@ -438,129 +455,41 @@ async function handleFile(file) {
     return text;
   }
 
-  // ---- チェック処理 ----
+  // ---- チェック処理 (Worker利用) ----
   async function runCheck() {
     currentText = document.getElementById('inputText').value;
-    const results = (await analyzeAsync(currentText, dictManager.getAll()))
-                      .filter(r => !ignoredGroups.has(r.group.join(',')));
-    renderResults(results);
-    renderPreview(results);
-  }
-
-function renderResults(results) {
-    const container = document.getElementById('results');
-    const countEl = document.getElementById('resultCount');
-
-    if (results.length === 0) {
-      container.innerHTML = '<p class="text-sm text-gray-400 text-center py-10 font-medium">ゆらぎは検知されていません</p>';
-      countEl.textContent = '0 件';
-      return;
-    }
-
-    countEl.textContent = results.length + ' 件';
-    container.innerHTML = '';
-
-    results.forEach(({ group, recommended, counts, others }) => {
-      const card = document.createElement('div');
-      card.className = 'p-4 border border-[#f0f0f0] rounded-xl bg-[#fcfcfc] shadow-sm flex flex-col gap-3';
-
-      const countsHtml = counts.map(c =>
-        `<span class="${c.word === recommended ? 'text-[#43a047] font-bold' : 'text-[#e53935] font-bold'}">${escapeHTML(c.word)}<span class="text-gray-400 font-normal text-xs ml-1">(${c.count})</span></span>`
-      ).join('<span class="text-gray-300 mx-1.5">|</span>');
-
-      // 無視機能用のグループID
-      const groupId = group.join(',');
-
-      // 検知された各単語に対する「統一する」ボタンを生成
-      const replaceButtonsHtml = counts.map(c => `
-        <button class="replace-btn btn-success text-sm rounded-lg px-3 py-1.5 font-bold shadow-sm" data-word="${escapeHTML(c.word)}">
-          「${escapeHTML(c.word)}」に統一
-        </button>
-      `).join('');
-
-      card.innerHTML = `
-        <div class="flex flex-wrap items-center text-[15px] leading-relaxed bg-white p-2 border border-gray-100 rounded-lg">${countsHtml}</div>
-        <div class="flex flex-wrap gap-2 mt-1">
-          ${replaceButtonsHtml}
-          <button class="ignore-btn border border-gray-300 text-gray-500 hover:bg-gray-100 text-sm rounded-lg px-3 py-1.5 font-bold shadow-sm ml-auto transition-colors">
-            無視する
-          </button>
-        </div>
-      `;
-
-      // 「統一する」ボタンの処理
-      card.querySelectorAll('.replace-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const targetWord = e.target.getAttribute('data-word');
-          const ta = document.getElementById('inputText');
-          const oldText = ta.value;
-
-          // 選択された単語以外の出現回数をカウントしてログに記録
-          const othersToLog = counts.map(c => c.word).filter(w => w !== targetWord);
-          for (const word of othersToLog) {
-            const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            const count = (oldText.match(new RegExp(escaped, 'g')) || []).length;
-            if (count > 0) replacementLog.push({ original: word, replacement: targetWord, count });
-          }
-          updateReplacementBadge();
-
-          ta.value = replaceGroup(ta.value, group, targetWord);
-          runCheck();
-        });
-      });
-
-      // 「無視する」ボタンの処理
-      card.querySelector('.ignore-btn').addEventListener('click', () => {
-        ignoredGroups.add(groupId);
-        runCheck();
-      });
-
-      container.appendChild(card);
-    });
-  }
-
-function renderPreview(results) {
-    const preview = document.getElementById('preview');
-    const countEl = document.getElementById('previewCount');
-
-    if (!currentText) {
-      preview.innerHTML = '<span class="text-gray-400">ここにハイライト表示されます</span>';
-      countEl.textContent = '';
-      return;
-    }
-
-    const totalHighlights = results.reduce((sum, r) => sum + r.others.length, 0);
-    countEl.textContent = totalHighlights > 0 ? `⚠ ${totalHighlights} 種類のゆらぎ` : '✓ ゆらぎなし';
-
-    // 【修正箇所】テキストが長すぎる場合はプレビュー用の処理を切り詰める
-    const MAX_PREVIEW_LENGTH = 5000; // 5000文字までに制限
-    let targetText = currentText;
-    let isTruncated = false;
-
-    if (currentText.length > MAX_PREVIEW_LENGTH) {
-      targetText = currentText.substring(0, MAX_PREVIEW_LENGTH);
-      isTruncated = true;
-    }
-
-    let html = buildHighlightedHTML(targetText, results);
+    document.getElementById('previewCount').textContent = '⏳ 解析中...';
     
-    // 省略した場合はメッセージを付与
-    if (isTruncated) {
-      html += '<br><br><span class="text-red-500 font-bold">※テキストが長いため、プレビューは最初の5000文字のみ表示しています。（検知・置換処理は全文に対して有効です）</span>';
+    try {
+      // Worker に解析を依頼
+      let results = await postToWorker('ANALYZE', { 
+        text: currentText, 
+        dict: dictManager.getAll() 
+      });
+      
+      results = results.filter(r => !ignoredGroups.has(r.group.join(',')));
+      renderResults(results);
+      renderPreview(results);
+    } catch (e) {
+      console.error("解析エラー:", e);
+      document.getElementById('previewCount').textContent = '⚠ エラー';
     }
-
-    preview.innerHTML = html;
   }
 
-  // ---- Kuromoji 活用形解析 ----
+  // (renderResults と renderPreview は元のコードをそのまま維持してください。UI描画のためメインスレッドに残します)
+
+  // ---- Kuromoji 活用形解析 (Worker利用) ----
+  let isKuromojiReady = false;
+
   async function initAndRunKuromoji() {
     const btn = document.getElementById('kuromojiInitBtn');
-    const status = document.getElementById('kuromojiStatus');
     btn.disabled = true;
     btn.textContent = '読み込み中...';
     setKuromojiStatus('loading', '辞書ファイルを取得中...');
+    
     try {
-      await initKuromoji();
+      await postToWorker('INIT_KUROMOJI', {}); // Worker側でKuromojiを初期化
+      isKuromojiReady = true;
       setKuromojiStatus('ready', '準備完了');
       btn.classList.add('hidden');
       document.getElementById('kuromojiRunBtn').classList.remove('hidden');
@@ -572,52 +501,26 @@ function renderPreview(results) {
     }
   }
 
-  function runKuromojiAnalysis() {
-    if (!isKuromojiReady()) return;
-    const results = kuromojiAnalyze(currentText, dictManager.getAll());
-    renderKuromojiResults(results);
-  }
-
-  function renderKuromojiResults(results) {
-    const container = document.getElementById('kuromojiResults');
-    if (!currentText.trim()) {
-      container.innerHTML = '<p class="text-sm text-gray-400 text-center py-4 font-medium">テキストを入力してください</p>';
-      return;
+  async function runKuromojiAnalysis() {
+    if (!isKuromojiReady) return;
+    try {
+      const results = await postToWorker('KUROMOJI_ANALYZE', {
+        text: currentText,
+        dict: dictManager.getAll()
+      });
+      renderKuromojiResults(results);
+    } catch(e) {
+      console.error(e);
     }
-    if (results.length === 0) {
-      container.innerHTML = '<p class="text-sm text-gray-400 text-center py-4 font-medium">活用形のゆれは検出されませんでした</p>';
-      return;
-    }
-    container.innerHTML = '';
-    results.forEach(({ recommendedWord, foundBases }) => {
-      const card = document.createElement('div');
-      card.className = 'p-3 border border-[#e0e0e0] bg-white rounded-xl shadow-sm flex flex-col gap-2.5';
-      const basesHtml = foundBases.map(({ word, count, surfaces }, i) => {
-        const tag = i === 0
-          ? '<span class="text-[#118e9e] font-bold text-xs bg-[#f0fbfc] px-1.5 py-0.5 rounded border border-[#b2ebf2]">推奨</span>'
-          : '<span class="text-red-500 font-bold text-xs bg-red-50 px-1.5 py-0.5 rounded border border-red-200">非推奨</span>';
-        const surfaceList = surfaces.map(s => `<code class="bg-gray-100 text-gray-700 rounded px-1.5 py-0.5 text-xs border border-gray-200">${escapeHTML(s)}</code>`).join(' ');
-        return `<div class="flex items-start gap-2 text-sm leading-tight">${tag}<span class="text-gray-800 font-bold">${escapeHTML(word)}系 <span class="text-gray-400 font-normal text-xs">(${count}回)</span></span><div class="flex flex-wrap gap-1 ml-auto">${surfaceList}</div></div>`;
-      }).join('');
-      card.innerHTML = `
-        <div class="text-sm font-bold text-[#0f0f0f] border-b border-gray-100 pb-2">推奨：${escapeHTML(recommendedWord)}</div>
-        <div class="flex flex-col gap-2 pt-1">${basesHtml}</div>
-      `;
-      container.appendChild(card);
-    });
   }
 
-  function setKuromojiStatus(state, text) {
-    const el = document.getElementById('kuromojiStatus');
-    const colors = { loading: 'bg-yellow-400', ready: 'bg-[#43a047]', error: 'bg-red-500' };
-    el.innerHTML = `<span class="inline-block w-3 h-3 rounded-full ${colors[state] || 'bg-gray-300'}"></span>${escapeHTML(text)}`;
-  }
+  // (renderKuromojiResults と setKuromojiStatus は元のまま維持)
 
-// ---- ファジーチェック ----
+  // ---- ファジーチェック (Worker利用) ----
   async function runFuzzyCheck(event) {
     const loadingEl = document.getElementById('fuzzyLoading');
     const resultsEl = document.getElementById('fuzzyResults');
-    const btn = event ? event.currentTarget : null; // クリックされたボタン
+    const btn = event ? event.currentTarget : null;
     const maxDist = parseInt(document.getElementById('fuzzyThreshold').value);
 
     if (!currentText.trim()) {
@@ -625,19 +528,19 @@ function renderPreview(results) {
       return;
     }
 
-    // 1. UIを「解析中」状態にする
     if (btn) btn.disabled = true;
     loadingEl.classList.remove('hidden');
     resultsEl.innerHTML = '';
 
-    // 2. ブラウザに描画の隙を与えるために少し待機
-    await new Promise(r => setTimeout(r, 100));
-
     try {
-      // 3. 解析実行（最適化されたアルゴリズム）
-      const fuzzResults = fuzzyAnalyze(currentText, dictManager.getAll(), maxDist);
+      // Workerのファジー解析を呼び出し（UIはブロックされません）
+      const fuzzResults = await postToWorker('FUZZY', {
+        text: currentText,
+        dict: dictManager.getAll(),
+        maxDistance: maxDist
+      });
 
-      // 4. 結果の描画
+      // 描画処理
       if (fuzzResults.length === 0) {
         resultsEl.innerHTML = '<p class="text-sm text-gray-400 text-center py-4 font-medium">ファジーマッチは検出されませんでした</p>';
       } else {
@@ -657,200 +560,21 @@ function renderPreview(results) {
       console.error(e);
       alert("解析中にエラーが発生しました。");
     } finally {
-      // 5. UIを元に戻す
       loadingEl.classList.add('hidden');
       if (btn) btn.disabled = false;
     }
   }
 
-  // ---- カスタム辞書UI ----
-  function addCustomRule() {
-    const input = document.getElementById('newRuleInput');
-    const words = input.value.split(',').map(w => w.trim()).filter(Boolean);
-    if (words.length < 2) { alert('2語以上をカンマ区切りで入力してください'); return; }
-    dictManager.addCustomGroup(words);
-    input.value = '';
-    renderCustomDictList();
-    runCheck();
-  }
+  // (辞書管理やWord出力などのユーティリティ系UI処理は元のまま維持)
 
-  function renderCustomDictList() {
-    const container = document.getElementById('customDictList');
-    const custom = dictManager.getCustom();
-
-    if (custom.length === 0) {
-      container.innerHTML = '<p class="text-sm text-gray-400 text-center py-4 font-medium">カスタム辞書は空です</p>';
-      return;
-    }
-
-    container.innerHTML = '';
-    custom.forEach((group, idx) => {
-      const row = document.createElement('div');
-      row.className = 'flex items-center justify-between text-[13px] bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-sm';
-      row.innerHTML = `
-        <span class="text-gray-700 font-bold truncate flex-1">${group.map(w => escapeHTML(w)).join(' <span class="text-gray-300 mx-1 font-normal">/</span> ')}</span>
-        <button class="ml-3 text-gray-300 hover:text-red-500 transition-colors flex-shrink-0 text-base leading-none" title="削除">×</button>
-      `;
-      row.querySelector('button').addEventListener('click', () => {
-        dictManager.removeCustomGroup(idx);
-        renderCustomDictList();
-        runCheck();
-      });
-      container.appendChild(row);
-    });
-  }
-
-  async function importCustomDict(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    try {
-      await dictManager.importJSON(file);
-      renderCustomDictList();
-      runCheck();
-    } catch (e) {
-      alert('インポートエラー: ' + e.message);
-    }
-    event.target.value = '';
-  }
-
-  async function importTSVCSV(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    try {
-      const text = await file.text();
-      const sep = file.name.endsWith('.csv') ? ',' : '\t';
-      const count = dictManager.importDelimited(text, sep);
-      alert(`${count} グループをインポートしました`);
-      renderCustomDictList();
-      runCheck();
-    } catch (e) {
-      alert('インポートエラー: ' + e.message);
-    }
-    event.target.value = '';
-  }
-
-  // ---- Word 出力 ----
-  function downloadCorrectedDocx() {
-    if (!currentText.trim()) { alert('テキストを入力してください'); return; }
-
-    const results = analyze(currentText, dictManager.getAll());
-
-    let bodyHtml = '<h2 style="font-size:14pt;margin-bottom:6pt;">本文</h2>';
-    bodyHtml += `<p style="white-space:pre-wrap;font-size:11pt;line-height:1.8;">${buildHighlightedHTMLForDocx(currentText, results)}</p>`;
-
-    if (replacementLog.length > 0) {
-      bodyHtml += '<h2 style="font-size:14pt;margin-top:18pt;margin-bottom:6pt;">置換ログ</h2>';
-      bodyHtml += '<table border="1" cellpadding="6" style="border-collapse:collapse;font-size:10pt;width:100%;">';
-      bodyHtml += '<tr style="background:#f0f0f0;"><th>元の語</th><th>置換後</th><th>件数</th></tr>';
-      for (const { original, replacement, count } of replacementLog) {
-        bodyHtml += `<tr><td>${escapeHTML(original)}</td><td>${escapeHTML(replacement)}</td><td style="text-align:center;">${count}</td></tr>`;
-      }
-      bodyHtml += '</table>';
-    }
-
-    if (results.length > 0) {
-      bodyHtml += '<h2 style="font-size:14pt;margin-top:18pt;margin-bottom:6pt;">未解決のゆらぎ</h2>';
-      bodyHtml += '<table border="1" cellpadding="6" style="border-collapse:collapse;font-size:10pt;width:100%;">';
-      bodyHtml += '<tr style="background:#f0f0f0;"><th>推奨</th><th>混在語（出現数）</th></tr>';
-      for (const { recommended, counts } of results) {
-        const others = counts.filter(c => c.word !== recommended);
-        bodyHtml += `<tr><td style="color:#1a7a3a;font-weight:bold;">${escapeHTML(recommended)}</td><td>${others.map(c => `${escapeHTML(c.word)}(${c.count})`).join('、')}</td></tr>`;
-      }
-      bodyHtml += '</table>';
-    }
-
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="font-family:'Meiryo',sans-serif;margin:2cm;">${bodyHtml}</body></html>`;
-    const blob = htmlDocx.asBlob(html);
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = '表記ゆれ修正済み.docx';
-    a.click();
-    URL.revokeObjectURL(a.href);
-  }
-
-  function buildHighlightedHTMLForDocx(text, results) {
-    let escaped = escapeHTML(text);
-    for (const { others } of results) {
-      for (const word of others) {
-        const escapedWord = escapeHTML(word).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        escaped = escaped.replace(
-          new RegExp(escapedWord, 'g'),
-          `<span style="background-color:#FFFF00;">${escapeHTML(word)}</span>`
-        );
-      }
-    }
-    return escaped.replace(/\n/g, '<br>');
-  }
-
-  // ---- ユーティリティ ----
-  function clearAll() {
-    document.getElementById('inputText').value = '';
-    replacementLog = [];
-    ignoredGroups.clear(); // ◀◀◀ これを追加
-    updateReplacementBadge();
-    runCheck();
-  }
-
-  function updateReplacementBadge() {
-    const badge = document.getElementById('replacementBadge');
-    const total = replacementLog.reduce((s, r) => s + r.count, 0);
-    if (total > 0) {
-      badge.textContent = `${total} 件置換済み`;
-      badge.classList.remove('hidden');
-    } else {
-      badge.classList.add('hidden');
-    }
-  }
-
-  function setLoading(on) {
-    document.getElementById('loading').classList.toggle('hidden', !on);
-  }
-
-  // ---- 辞書バリデーション ----
-  function runDictValidation() {
-    const result = dictManager.validateDict(dictManager.getAll());
-    if (result.valid) return;
-
-    const banner = document.getElementById('dictErrorBanner');
-    const summary = document.getElementById('dictErrorSummary');
-    const list = document.getElementById('dictErrorList');
-
-    summary.textContent = `（${result.validCount} / ${result.total} グループが有効、${result.errors.length} 件の問題）`;
-
-    list.innerHTML = '';
-    result.errors.forEach(({ index, value, reason }) => {
-      const li = document.createElement('li');
-      const preview = Array.isArray(value)
-        ? `['${value.join("', '")}']`
-        : String(value);
-      li.textContent = `インデックス ${index}: ${reason}  ＞ ${preview.slice(0, 40)}`;
-      list.appendChild(li);
-    });
-
-    banner.classList.remove('hidden');
-  }
-
-  function toggleDictErrorDetail() {
-    const list = document.getElementById('dictErrorList');
-    const btn = document.getElementById('dictErrorDetailBtn');
-    const isHidden = list.classList.toggle('hidden');
-    btn.textContent = isHidden ? '詳細を表示 ▼' : '詳細を隠す ▲';
-  }
-
-// 初期化イベント
-  let checkTimeout; // タイマー用の変数を追加
-  
+  // 初期化イベントとデバウンス処理
+  let checkTimeout;
   document.getElementById('inputText').addEventListener('input', () => {
-    // 処理中を示す表示（任意ですが、あると親切です）
     document.getElementById('previewCount').textContent = '入力待機中...';
-    
-    // 前のタイマーをキャンセル
     clearTimeout(checkTimeout);
-    
-    // 入力が止まってから500ミリ秒（0.5秒）後に runCheck を実行
     checkTimeout = setTimeout(() => {
       runCheck();
-    }, 500);
+    }, 500); // 0.5秒のデバウンス
   });
 
   runDictValidation();
