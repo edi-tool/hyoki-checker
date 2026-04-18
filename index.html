@@ -1,757 +1,1076 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>表記ゆれさん</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/build/kuromoji.js"></script>
-  <script src="js/defaultDict.js"></script>
-  <script src="js/dictManager.js"></script>
-  <script src="js/analyzer.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>edu-tool — 学びを加速する、軽量な教育プラットフォーム</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --bg: #FAFAF7;
+    --bg-2: #F3F2EC;
+    --ink: #131313;
+    --ink-2: #3A3A36;
+    --muted: #757570;
+    --line: #E4E2D8;
+    --line-2: #D3D1C5;
+    --yellow: #FFD60A;
+    --yellow-soft: #FFF4B0;
+    --orange: #FF6B1A;
+    --orange-deep: #E5520A;
+    --white: #FFFFFF;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);font-family:"Inter",system-ui,sans-serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  .mono{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.02em;text-transform:uppercase;color:var(--muted)}
+  .serif{font-family:"Instrument Serif",serif;font-weight:400;letter-spacing:-.01em}
+  .container{max-width:1240px;margin:0 auto;padding:0 32px}
+  @media (max-width:720px){.container{padding:0 20px}}
 
-  <style>
-    /* Typography & Visual Theme */
-    body {
-        font-family: noto-sans, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, arial, sans-serif;
-        background-color: #f8f6f2;
-        color: #0f0f0f;
-        line-height: 1.5;
-        letter-spacing: -0.4px;
-        font-feature-settings: "liga";
-        word-break: break-all;
-        overflow-wrap: break-word;
-        line-break: strict;
-        
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-height: 100vh;
-        margin: 0;
-        padding: 24px 16px;
-        box-sizing: border-box;
-    }
+  /* ---------- NAV ---------- */
+  .nav{position:sticky;top:0;z-index:50;background:rgba(250,250,247,.85);backdrop-filter:saturate(1.2) blur(10px);border-bottom:1px solid var(--line)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:600;font-size:17px;letter-spacing:-.01em}
+  .logo-mark{width:24px;height:24px;background:var(--ink);position:relative;border-radius:4px;overflow:hidden}
+  .logo-mark::before{content:"";position:absolute;inset:4px 4px auto auto;width:8px;height:8px;background:var(--yellow);border-radius:50%}
+  .logo-mark::after{content:"";position:absolute;left:5px;bottom:5px;width:10px;height:2px;background:var(--orange)}
+  .nav-links{display:flex;gap:28px;font-size:14px;color:var(--ink-2)}
+  .nav-links a{position:relative;padding:4px 0;transition:color .15s}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-links a:hover::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:6px;background:var(--yellow);z-index:-1;opacity:.7}
+  .nav-cta{display:flex;gap:10px;align-items:center}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:500;padding:9px 16px;border-radius:6px;border:1px solid transparent;cursor:pointer;transition:all .15s;background:transparent;color:var(--ink);font-family:inherit}
+  .btn-ghost{border-color:var(--line-2)}
+  .btn-ghost:hover{background:var(--bg-2);border-color:var(--ink-2)}
+  .btn-primary{background:var(--ink);color:var(--white)}
+  .btn-primary:hover{background:#000}
+  .btn-accent{background:var(--orange);color:var(--white)}
+  .btn-accent:hover{background:var(--orange-deep)}
+  .btn .arrow{transition:transform .2s}
+  .btn:hover .arrow{transform:translateX(2px)}
+  @media (max-width:900px){.nav-links{display:none}}
 
-    /* Cards Component (App Container) */
-    .app-container {
-        background-color: #fff;
-        border: 1px solid #e0e0e0;
-        border-radius: 12px;
-        padding: 28px 32px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        width: 100%;
-        max-width: 1300px; /* 2ペインのUIを維持するために幅を広めに設定 */
-        height: calc(100vh - 48px);
-        display: flex;
-        flex-direction: column;
-        box-sizing: border-box;
-    }
+  /* ---------- HERO ---------- */
+  .hero{padding:80px 0 60px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+  .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:64px;align-items:end}
+  @media (max-width:960px){.hero-grid{grid-template-columns:1fr;gap:48px}}
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;padding:6px 12px;border:1px solid var(--line-2);border-radius:999px;background:var(--white);font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink-2)}
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--orange);box-shadow:0 0 0 0 rgba(255,107,26,.6);animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,107,26,.6)}70%{box-shadow:0 0 0 8px rgba(255,107,26,0)}100%{box-shadow:0 0 0 0 rgba(255,107,26,0)}}
+  h1.display{font-family:"Inter",sans-serif;font-weight:600;font-size:clamp(44px, 6.2vw, 88px);line-height:.98;letter-spacing:-.035em;margin:24px 0 0}
+  h1.display .mark{background:linear-gradient(180deg,transparent 60%, var(--yellow) 60%);padding:0 .05em}
+  h1.display .it{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400;color:var(--orange);letter-spacing:-.01em}
+  .hero p.lead{font-size:19px;line-height:1.5;color:var(--ink-2);max-width:520px;margin-top:28px}
+  .hero-cta{display:flex;gap:12px;margin-top:36px;flex-wrap:wrap}
+  .hero-meta{display:flex;gap:32px;margin-top:44px;padding-top:24px;border-top:1px dashed var(--line-2)}
+  .hero-meta div{display:flex;flex-direction:column;gap:4px}
+  .hero-meta .num{font-family:"Instrument Serif",serif;font-size:32px;letter-spacing:-.02em}
+  .hero-meta .num .acc{color:var(--orange)}
+  .hero-meta .lbl{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--muted);text-transform:uppercase}
 
-    /* Headings */
-    h1 { 
-        margin-top: 0; 
-        margin-bottom: 2px;
-        font-size: 24px;
-        font-weight: 700;
-        color: #0f0f0f; 
-    }
-    .subtitle {
-        font-size: 13px;
-        color: #757575;
-        display: block;
-    }
+  /* Hero card - course preview */
+  .preview{background:var(--white);border:1px solid var(--line-2);border-radius:12px;overflow:hidden;box-shadow:0 1px 0 rgba(0,0,0,.02), 0 20px 40px -24px rgba(0,0,0,.12)}
+  .preview-top{background:var(--bg-2);border-bottom:1px solid var(--line);padding:10px 14px;display:flex;align-items:center;gap:10px}
+  .preview-top .dots{display:flex;gap:6px}
+  .preview-top .dots span{width:10px;height:10px;border-radius:50%;background:var(--line-2)}
+  .preview-top .path{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--muted);margin-left:8px}
+  .preview-body{padding:20px 22px 22px}
+  .lesson-label{display:flex;justify-content:space-between;align-items:center;font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--muted);text-transform:uppercase}
+  .lesson-label .chap{color:var(--orange);font-weight:500}
+  .lesson-title{font-family:"Instrument Serif",serif;font-size:28px;line-height:1.1;margin:10px 0 14px;letter-spacing:-.01em}
+  .progress{height:6px;background:var(--bg-2);border-radius:99px;overflow:hidden;position:relative;margin-bottom:18px}
+  .progress::after{content:"";position:absolute;inset:0;width:62%;background:linear-gradient(90deg, var(--orange), var(--yellow));border-radius:99px}
+  .lesson-list{list-style:none;display:flex;flex-direction:column;gap:2px}
+  .lesson-list li{display:flex;align-items:center;gap:12px;padding:10px 10px;border-radius:6px;font-size:14px;color:var(--ink-2);position:relative}
+  .lesson-list li .tick{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line-2);flex:none;display:grid;place-items:center;font-size:10px;color:transparent}
+  .lesson-list li.done{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line-2)}
+  .lesson-list li.done .tick{background:var(--ink);border-color:var(--ink);color:var(--yellow)}
+  .lesson-list li.active{background:var(--yellow-soft);color:var(--ink);font-weight:500}
+  .lesson-list li.active .tick{border-color:var(--orange)}
+  .lesson-list li .t{flex:1}
+  .lesson-list li .dur{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--muted)}
+  .lesson-list li.active .dur{color:var(--orange-deep)}
+  .preview-cta{margin-top:18px;display:flex;gap:8px;align-items:center;justify-content:space-between;padding-top:16px;border-top:1px dashed var(--line-2)}
+  .preview-cta .play{display:inline-flex;align-items:center;gap:8px;color:var(--ink);font-weight:500;font-size:14px;cursor:pointer}
+  .preview-cta .play .playbtn{width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--yellow);display:grid;place-items:center;font-size:10px}
 
-    /* File Input & Dropzone Styling */
-    .drop-zone {
-        border: 2px dashed #d4d4d4;
-        background-color: #fafafa;
-        transition: all 0.2s ease;
-    }
-    .drop-zone:hover, .drop-zone.dragover {
-        border-color: #118e9e;
-        background-color: #f0fbfc;
-    }
+  /* Sticker */
+  .sticker{position:absolute;right:-10px;top:-14px;transform:rotate(6deg);background:var(--yellow);border:1.5px solid var(--ink);padding:8px 12px;border-radius:4px;font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.02em;box-shadow:3px 3px 0 var(--ink)}
 
-    /* Buttons */
-    .btn-primary {
-        background-color: #118e9e;
-        color: white;
-        transition: background-color 0.2s;
-        border: none;
-    }
-    .btn-primary:hover {
-        background-color: #0e7784;
-    }
-    .btn-success {
-        background-color: #43a047;
-        color: white;
-        transition: background-color 0.2s;
-        border: none;
-    }
-    .btn-success:hover {
-        background-color: #388e3c;
-    }
+  /* ---------- MARQUEE ---------- */
+  .marquee-wrap{border-bottom:1px solid var(--line);background:var(--bg);padding:18px 0;overflow:hidden;position:relative}
+  .marquee-wrap::before,.marquee-wrap::after{content:"";position:absolute;top:0;bottom:0;width:80px;z-index:2;pointer-events:none}
+  .marquee-wrap::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
+  .marquee-wrap::after{right:0;background:linear-gradient(270deg,var(--bg),transparent)}
+  .marquee{display:flex;gap:40px;white-space:nowrap;animation:scroll 40s linear infinite;width:max-content}
+  .marquee span{font-family:"Instrument Serif",serif;font-size:22px;color:var(--ink-2);display:inline-flex;align-items:center;gap:40px}
+  .marquee span::after{content:"";width:6px;height:6px;background:var(--orange);border-radius:50%}
+  @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-    /* Tabs Styling */
-    .tabs {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        border-bottom: 2px solid #e0e0e0;
-    }
-    .tab-btn {
-        padding: 12px 18px;
-        border: 1px solid transparent;
-        background-color: transparent;
-        color: #757575;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 600;
-        transition: all 0.2s;
-        border-bottom: 3px solid transparent;
-        margin-bottom: -2px; /* border-bottomに重ねる */
-        border-radius: 8px 8px 0 0;
-        font-family: inherit;
-    }
-    .tab-btn:hover {
-        color: #0f0f0f;
-        background-color: #f5f5f5;
-    }
-    .tab-btn.active {
-        color: #118e9e;
-        border-bottom: 3px solid #118e9e;
-        background-color: #fff;
-    }
+  /* ---------- SECTION HEAD ---------- */
+  section{padding:100px 0;border-bottom:1px solid var(--line)}
+  .sec-head{display:grid;grid-template-columns:1fr 1.4fr;gap:48px;align-items:end;margin-bottom:56px}
+  @media (max-width:860px){.sec-head{grid-template-columns:1fr;gap:16px;margin-bottom:40px}}
+  .sec-num{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:10px}
+  .sec-num::before{content:"";width:24px;height:1px;background:var(--ink-2)}
+  .sec-title{font-family:"Inter",sans-serif;font-size:clamp(32px,4vw,52px);letter-spacing:-.025em;line-height:1.05;font-weight:600;margin-top:12px}
+  .sec-title em{font-family:"Instrument Serif",serif;font-style:italic;color:var(--orange);font-weight:400}
+  .sec-desc{color:var(--ink-2);font-size:17px;max-width:560px;line-height:1.55}
 
-    /* Highlight Override (analyzer.jsの出力スタイルを上書き) */
-    #preview span[style*="background-color"], .highlight {
-        font-weight: bold !important;
-        padding: 0 2px !important;
-        border-radius: 2px !important;
-        color: #000 !important;
-        background-color: #fff59d !important;
-    }
+  /* ---------- FEATURES ---------- */
+  .features{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+  .feat{grid-column:span 4;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:28px;min-height:260px;display:flex;flex-direction:column;position:relative;overflow:hidden;transition:all .2s}
+  .feat:hover{border-color:var(--ink);transform:translateY(-2px)}
+  .feat.wide{grid-column:span 8}
+  .feat.accent{background:var(--ink);color:var(--white);border-color:var(--ink)}
+  .feat.accent .feat-num,.feat.accent .feat-desc{color:#9a9a96}
+  .feat-num{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--muted);margin-bottom:24px}
+  .feat-icon{width:44px;height:44px;border-radius:8px;display:grid;place-items:center;margin-bottom:20px;background:var(--yellow-soft);color:var(--ink)}
+  .feat.accent .feat-icon{background:var(--orange);color:var(--white)}
+  .feat-title{font-size:20px;font-weight:600;letter-spacing:-.015em;margin-bottom:10px;line-height:1.25}
+  .feat-desc{font-size:14.5px;color:var(--ink-2);line-height:1.55;flex:1}
+  .feat-link{margin-top:18px;font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--orange);text-transform:uppercase;display:inline-flex;gap:6px;align-items:center}
+  .feat-viz{margin-top:20px;height:120px;border-radius:6px;background:var(--bg-2);position:relative;overflow:hidden}
+  @media (max-width:860px){.feat,.feat.wide{grid-column:span 12}}
 
-    /* Scrollbars */
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-  </style>
+  /* Viz: code-like block */
+  .viz-code{padding:14px;font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--ink-2);line-height:1.7}
+  .viz-code .k{color:var(--orange)}
+  .viz-code .s{color:#0a6b3a}
+  .viz-code .c{color:var(--muted)}
+  .viz-code .hl{background:var(--yellow);padding:0 2px}
+
+  /* Viz: chart */
+  .viz-chart{display:flex;align-items:flex-end;gap:6px;padding:14px;height:100%}
+  .viz-chart .bar{flex:1;background:var(--ink);border-radius:2px 2px 0 0;position:relative;transition:height .6s}
+  .viz-chart .bar.y{background:var(--yellow)}
+  .viz-chart .bar.o{background:var(--orange)}
+
+  /* ---------- COURSES ---------- */
+  .courses{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  @media (max-width:960px){.courses{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:640px){.courses{grid-template-columns:1fr}}
+  .course{background:var(--white);border:1px solid var(--line);border-radius:10px;overflow:hidden;transition:all .2s;display:flex;flex-direction:column;cursor:pointer}
+  .course:hover{border-color:var(--ink);transform:translateY(-2px)}
+  .course-cover{aspect-ratio:16/10;position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+  .course-cover .stripe{position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,transparent 0 10px,rgba(0,0,0,.04) 10px 11px)}
+  .course-cover .badge{position:absolute;top:14px;left:14px;font-family:"JetBrains Mono",monospace;font-size:10px;text-transform:uppercase;background:var(--white);border:1px solid var(--line-2);padding:4px 8px;border-radius:4px}
+  .course-cover .dur{position:absolute;bottom:14px;right:14px;font-family:"JetBrains Mono",monospace;font-size:11px;background:var(--ink);color:var(--white);padding:4px 8px;border-radius:4px}
+  .c1{background:linear-gradient(135deg,#FFF4B0,#FFD60A)}
+  .c2{background:linear-gradient(135deg,#FFE0CC,#FF6B1A)}
+  .c3{background:linear-gradient(135deg,#E4E2D8,#F3F2EC)}
+  .c4{background:var(--ink);color:var(--yellow)}
+  .course-cover .glyph{position:absolute;inset:0;display:grid;place-items:center;font-family:"Instrument Serif",serif;font-size:64px;font-style:italic;letter-spacing:-.02em}
+  .c4 .glyph{color:var(--yellow)}
+  .course-body{padding:20px;flex:1;display:flex;flex-direction:column}
+  .course-cat{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .course-title{font-size:18px;font-weight:600;letter-spacing:-.01em;line-height:1.3;margin:8px 0 10px}
+  .course-meta{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:16px;border-top:1px dashed var(--line-2);font-size:13px;color:var(--ink-2)}
+  .course-meta .price{font-family:"Instrument Serif",serif;font-size:20px;color:var(--ink)}
+  .course-meta .price .free{color:var(--orange)}
+
+  /* ---------- HOW IT WORKS ---------- */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+  @media (max-width:860px){.steps{grid-template-columns:repeat(2,1fr)}}
+  .step{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:28px;min-height:220px;display:flex;flex-direction:column;position:relative;background:var(--white);transition:background .2s}
+  .step:hover{background:var(--yellow-soft)}
+  .step .num{font-family:"Instrument Serif",serif;font-size:44px;letter-spacing:-.02em;line-height:1;color:var(--orange)}
+  .step .t{font-size:17px;font-weight:600;letter-spacing:-.01em;margin-top:24px}
+  .step .d{font-size:13.5px;color:var(--ink-2);margin-top:8px;flex:1}
+  .step .tag{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--muted);text-transform:uppercase}
+
+  /* ---------- STATS / HIGHLIGHT STRIP ---------- */
+  .strip{background:var(--ink);color:var(--white);padding:72px 0;border-bottom:1px solid var(--line)}
+  .strip-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:64px;align-items:center}
+  @media (max-width:860px){.strip-grid{grid-template-columns:1fr;gap:40px}}
+  .strip h2{font-size:clamp(32px,4vw,52px);letter-spacing:-.025em;line-height:1.05;font-weight:600}
+  .strip h2 em{font-family:"Instrument Serif",serif;font-style:italic;color:var(--yellow);font-weight:400}
+  .strip p{color:#b9b9b3;margin-top:20px;max-width:500px;font-size:17px}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  .stat{border-top:1px solid #2a2a28;padding-top:18px}
+  .stat .n{font-family:"Instrument Serif",serif;font-size:56px;letter-spacing:-.02em;line-height:1}
+  .stat .n .pct{color:var(--orange)}
+  .stat .n .sm{font-size:28px;color:var(--yellow)}
+  .stat .l{font-family:"JetBrains Mono",monospace;font-size:11px;color:#8a8a84;text-transform:uppercase;margin-top:10px}
+
+  /* ---------- TESTIMONIAL ---------- */
+  .quote-block{display:grid;grid-template-columns:1fr 1fr;gap:64px}
+  @media (max-width:860px){.quote-block{grid-template-columns:1fr;gap:32px}}
+  .quote{font-family:"Instrument Serif",serif;font-size:clamp(28px,3.2vw,40px);line-height:1.25;letter-spacing:-.01em;color:var(--ink)}
+  .quote .h{background:var(--yellow);padding:0 4px}
+  .quote-author{margin-top:32px;display:flex;align-items:center;gap:14px}
+  .quote-avatar{width:48px;height:48px;border-radius:50%;background:var(--orange);color:var(--white);display:grid;place-items:center;font-weight:600}
+  .quote-author .name{font-weight:500;font-size:15px}
+  .quote-author .role{font-size:13px;color:var(--muted)}
+  .quote-list{display:flex;flex-direction:column;gap:14px}
+  .q-item{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:22px;cursor:pointer;transition:all .15s}
+  .q-item:hover,.q-item.active{border-color:var(--ink)}
+  .q-item.active{background:var(--bg-2)}
+  .q-item .t{font-size:15px;color:var(--ink-2);line-height:1.55}
+  .q-item .who{margin-top:12px;display:flex;justify-content:space-between;align-items:center;font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--muted);text-transform:uppercase}
+  .q-item .who .star{color:var(--orange)}
+
+  /* ---------- PRICING ---------- */
+  .prices{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--white)}
+  @media (max-width:860px){.prices{grid-template-columns:1fr}}
+  .price-col{padding:32px;border-right:1px solid var(--line);display:flex;flex-direction:column;position:relative}
+  .price-col:last-child{border-right:none}
+  .price-col.featured{background:var(--ink);color:var(--white)}
+  .price-col.featured .muted,.price-col.featured .ptitle small{color:#9a9a96}
+  .price-col.featured .check{color:var(--yellow)}
+  .price-col .tag{position:absolute;top:20px;right:20px;font-family:"JetBrains Mono",monospace;font-size:10px;background:var(--yellow);color:var(--ink);padding:4px 8px;border-radius:4px;text-transform:uppercase;font-weight:500}
+  .ptitle{font-family:"Instrument Serif",serif;font-size:32px;letter-spacing:-.01em;line-height:1}
+  .ptitle small{display:block;font-family:"Inter",sans-serif;font-size:13px;color:var(--muted);font-weight:400;margin-top:6px;letter-spacing:0}
+  .pamount{margin-top:28px;display:flex;align-items:baseline;gap:6px}
+  .pamount .n{font-family:"Instrument Serif",serif;font-size:56px;letter-spacing:-.02em;line-height:1}
+  .pamount .u{font-size:13px;color:var(--muted)}
+  .pamount .p{color:var(--orange)}
+  .pfeats{list-style:none;margin:28px 0;display:flex;flex-direction:column;gap:12px;flex:1}
+  .pfeats li{font-size:14px;color:var(--ink-2);display:flex;gap:10px;line-height:1.5}
+  .price-col.featured .pfeats li{color:#e0e0dc}
+  .check{color:var(--orange);flex:none;font-weight:600}
+
+  /* ---------- FAQ ---------- */
+  .faqs{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+  .faq{border-bottom:1px solid var(--line);padding:22px 0;cursor:pointer}
+  .faq summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:24px;font-size:18px;font-weight:500;letter-spacing:-.01em;color:var(--ink)}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary .plus{width:28px;height:28px;border:1px solid var(--line-2);border-radius:50%;display:grid;place-items:center;color:var(--ink);font-size:16px;flex:none;transition:all .2s}
+  .faq[open] summary .plus{background:var(--orange);color:var(--white);border-color:var(--orange);transform:rotate(45deg)}
+  .faq .a{margin-top:14px;color:var(--ink-2);font-size:15px;line-height:1.65;max-width:700px}
+
+  /* ---------- CTA ---------- */
+  .cta{background:var(--yellow);border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+  .cta::before{content:"";position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:var(--orange);border-radius:50%;opacity:.9}
+  .cta::after{content:"";position:absolute;bottom:-80px;left:30%;width:300px;height:300px;background:var(--ink);border-radius:50%;opacity:.08}
+  .cta-inner{padding:100px 0;position:relative;z-index:1;display:grid;grid-template-columns:1.3fr .7fr;gap:48px;align-items:center}
+  @media (max-width:860px){.cta-inner{grid-template-columns:1fr}}
+  .cta h2{font-size:clamp(40px,5vw,72px);line-height:1;letter-spacing:-.03em;font-weight:600}
+  .cta h2 em{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400}
+  .cta p{margin-top:20px;font-size:18px;color:var(--ink);max-width:500px}
+  .cta-form{display:flex;gap:8px;background:var(--white);border:1.5px solid var(--ink);border-radius:8px;padding:6px;max-width:460px;margin-top:32px}
+  .cta-form input{flex:1;border:0;outline:0;padding:10px 12px;font-family:inherit;font-size:15px;background:transparent}
+  .cta-form button{background:var(--ink);color:var(--yellow);border:0;border-radius:4px;padding:10px 18px;font-weight:500;cursor:pointer;font-family:inherit}
+  .cta-aside{background:var(--white);border:1.5px solid var(--ink);border-radius:10px;padding:22px;position:relative;z-index:1}
+  .cta-aside .mono{color:var(--orange);margin-bottom:8px}
+  .cta-aside ul{list-style:none;margin-top:10px;display:flex;flex-direction:column;gap:10px}
+  .cta-aside li{font-size:14px;display:flex;gap:10px;align-items:flex-start;color:var(--ink-2)}
+  .cta-aside li::before{content:"→";color:var(--orange);font-weight:600}
+
+  /* ---------- FOOTER ---------- */
+  footer{background:var(--bg);padding:64px 0 32px}
+  .foot-grid{display:grid;grid-template-columns:1.5fr repeat(3,1fr);gap:48px;margin-bottom:48px}
+  @media (max-width:780px){.foot-grid{grid-template-columns:1fr 1fr;gap:32px}}
+  .foot-brand p{color:var(--ink-2);font-size:14px;margin-top:16px;max-width:320px;line-height:1.6}
+  .foot-col h5{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:500;margin-bottom:16px;letter-spacing:.04em}
+  .foot-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+  .foot-col a{font-size:14px;color:var(--ink-2);transition:color .15s}
+  .foot-col a:hover{color:var(--orange)}
+  .foot-bottom{border-top:1px solid var(--line);padding-top:24px;display:flex;justify-content:space-between;align-items:center;font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--muted);text-transform:uppercase;flex-wrap:wrap;gap:12px}
+  .foot-bottom a:hover{color:var(--ink)}
+
+  /* ---------- FLOATING STATUS ---------- */
+  .status{position:fixed;bottom:20px;right:20px;background:var(--ink);color:var(--white);padding:10px 14px;border-radius:999px;font-family:"JetBrains Mono",monospace;font-size:11px;text-transform:uppercase;display:flex;align-items:center;gap:8px;z-index:40;box-shadow:0 8px 24px -8px rgba(0,0,0,.25)}
+  .status .dot{width:8px;height:8px;background:#2ecc71;border-radius:50%;animation:pulse 2s infinite}
+  @media (max-width:640px){.status{display:none}}
+</style>
 </head>
 <body>
 
-<div id="dictErrorBanner" class="hidden w-full max-w-[1300px] bg-[#fef2f2] border border-[#f87171] rounded-xl px-5 py-3 mb-4 shadow-sm">
-  <div class="flex items-start justify-between gap-4">
-    <div class="flex-1">
-      <div class="flex items-center gap-2 mb-1">
-        <span class="text-red-700 font-bold text-sm">⚠ 辞書に問題が見つかりました</span>
-        <span id="dictErrorSummary" class="text-xs text-red-500 font-medium"></span>
-      </div>
-      <ul id="dictErrorList" class="text-xs text-red-600 space-y-1 list-disc list-inside hidden mt-2 bg-white/50 p-2 rounded"></ul>
-      <button onclick="toggleDictErrorDetail()"
-              id="dictErrorDetailBtn"
-              class="text-xs text-red-500 font-semibold underline mt-1 hover:text-red-700">詳細を表示 ▼</button>
+<!-- NAV -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="logo" href="#">
+      <span class="logo-mark"></span>
+      <span>edu-tool</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features">機能</a>
+      <a href="#courses">コース</a>
+      <a href="#how">使い方</a>
+      <a href="#pricing">料金</a>
+      <a href="#faq">FAQ</a>
     </div>
-    <button onclick="document.getElementById('dictErrorBanner').classList.add('hidden')"
-            class="text-red-400 hover:text-red-600 text-xl font-bold leading-none flex-shrink-0">×</button>
+    <div class="nav-cta">
+      <a href="#" class="btn btn-ghost">ログイン</a>
+      <a href="#cta" class="btn btn-accent">無料で始める <span class="arrow">→</span></a>
+    </div>
   </div>
-</div>
+</nav>
 
-<div class="app-container">
-  
-  <header class="flex items-center gap-4 border-b border-[#e0e0e0] pb-5 mb-5 flex-shrink-0">
-    <div class="text-4xl">📝</div>
+<!-- HERO -->
+<header class="hero">
+  <div class="container hero-grid">
     <div>
-      <h1>表記ゆれさん</h1>
-      <span class="subtitle">文章中の表記ゆれを検出・統一します</span>
-    </div>
-  </header>
+      <span class="eyebrow"><span class="dot"></span> v2.4 — 新しい学習モードが登場</span>
+      <h1 class="display">
 
-  <div class="flex gap-6 min-h-0 flex-1">
-
-    <div class="flex-[1.8] flex flex-col gap-4 min-w-0 h-full">
-
-      <div id="dropZone"
-           class="drop-zone rounded-xl p-5 text-center cursor-pointer flex-shrink-0 shadow-sm"
-           onclick="document.getElementById('fileInput').click()">
-        <div class="text-3xl mb-2">📂</div>
-        <div class="text-sm font-bold text-gray-700">Word / PDF をドロップ、またはクリックして選択</div>
-        <div class="text-xs text-gray-400 mt-1.5 font-medium">.docx / .pdf 形式に対応</div>
-        <input id="fileInput" type="file" accept=".docx,.pdf" class="hidden">
+      </h1>
+      <p class="lead">
+        edu-tool は、学習者と教育者のための軽量・高速な静的プラットフォーム。Markdown で書いて、そのまま公開。余計な機能は一切なし。
+      </p>
+      <div class="hero-cta">
+        <a href="#cta" class="btn btn-primary">今すぐ試す <span class="arrow">→</span></a>
+        <a href="#how" class="btn btn-ghost">使い方を見る</a>
       </div>
-
-      <div id="loading" class="hidden text-center text-sm text-[#118e9e] font-bold py-1 bg-[#f0fbfc] rounded-lg">
-        <span class="animate-pulse">⏳ 読み込み中...</span>
-      </div>
-
-      <div class="flex items-center gap-3 flex-shrink-0 bg-[#fafafa] p-2 rounded-lg border border-[#e0e0e0]">
-        <button onclick="downloadCorrectedDocx()"
-                class="flex items-center gap-1.5 text-sm btn-success rounded-md px-4 py-2 font-bold shadow-sm">
-          📄 修正済みWordを出力
-        </button>
-        <div class="flex-1"></div>
-        <span id="replacementBadge" class="hidden text-xs text-[#2e7d32] bg-[#e8f5e9] border border-[#a5d6a7] rounded-full px-3 py-1 font-bold"></span>
-        <button onclick="clearAll()" class="text-sm font-bold text-gray-400 hover:text-red-500 transition-colors px-2">クリア</button>
-      </div>
-
-      <div class="flex-1 flex flex-col gap-5 min-h-0">
-        
-        <div class="flex-1 flex flex-col gap-2 min-h-0">
-          <label class="text-[15px] font-bold text-[#0f0f0f] border-l-4 border-[#118e9e] pl-2 leading-none">入力テキスト</label>
-          <textarea id="inputText"
-                    class="flex-1 w-full border border-[#e0e0e0] rounded-xl p-4 text-[15px] resize-none focus:outline-none focus:border-[#118e9e] focus:ring-2 focus:ring-[#118e9e]/20 transition-shadow bg-white shadow-inner leading-relaxed"
-                    placeholder="ここにテキストを入力、またはファイルをドロップしてください..."></textarea>
+      <div class="hero-meta">
+        <div>
+          <span class="num"><span class="acc">24</span>ms</span>
+          <span class="lbl">平均ページ応答</span>
         </div>
-
-        <div class="flex-1 flex flex-col gap-2 min-h-0">
-          <div class="flex items-center justify-between">
-            <label class="text-[15px] font-bold text-[#0f0f0f] border-l-4 border-[#e53935] pl-2 leading-none">プレビュー（ハイライト）</label>
-            <span id="previewCount" class="text-xs font-bold text-gray-500 bg-gray-100 border border-gray-200 px-2 py-0.5 rounded-full"></span>
-          </div>
-          <div id="preview"
-               class="flex-1 overflow-y-auto border border-[#e0e0e0] rounded-xl p-4 text-[15px] bg-[#fafafa] leading-relaxed whitespace-pre-wrap break-words text-gray-800 shadow-inner">
-            <span class="text-gray-400">ここにハイライト表示されます</span>
-          </div>
+        <div>
+          <span class="num">98<span class="acc">.2</span></span>
+          <span class="lbl">Lighthouse スコア</span>
         </div>
-
+        <div>
+          <span class="num">2k<span class="acc">+</span></span>
+          <span class="lbl">アクティブ学習者</span>
+        </div>
       </div>
     </div>
 
-    <div class="w-[400px] flex flex-col flex-shrink-0 bg-white border border-[#e0e0e0] rounded-xl shadow-sm h-full overflow-hidden">
-
-      <div class="tabs px-2 pt-2 bg-[#fafafa] border-b border-[#e0e0e0]">
-        <button id="tabBtn-results" class="tab-btn active flex items-center gap-1.5" onclick="switchTab('results')">
-          検知結果 <span id="resultCount" class="text-[11px] bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full font-bold">0 件</span>
-        </button>
-        <button id="tabBtn-kuromoji" class="tab-btn" onclick="switchTab('kuromoji')">活用形</button>
-        <button id="tabBtn-fuzzy" class="tab-btn" onclick="switchTab('fuzzy')">ファジー</button>
-        <button id="tabBtn-dict" class="tab-btn" onclick="switchTab('dict')">辞書設定</button>
-      </div>
-
-      <div class="flex-1 overflow-y-auto bg-white p-4">
-
-        <div id="tab-results" class="tab-pane flex flex-col">
-          <div id="results" class="flex flex-col gap-3">
-            <p class="text-sm text-gray-400 text-center py-10 font-medium">ゆらぎは検知されていません</p>
+    <div style="position:relative">
+      <div class="sticker">FAST · STATIC · FREE</div>
+      <div class="preview">
+        <div class="preview-top">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <span class="path">/courses/algorithms/ch03-graphs.md</span>
+        </div>
+        <div class="preview-body">
+          <div class="lesson-label">
+            <span>Chapter 03</span>
+            <span class="chap">62% 完了</span>
+          </div>
+          <div class="lesson-title">グラフ理論と探索アルゴリズム</div>
+          <div class="progress"></div>
+          <ul class="lesson-list">
+            <li class="done"><span class="tick">✓</span><span class="t">01. グラフの定義と表現</span><span class="dur">08:12</span></li>
+            <li class="done"><span class="tick">✓</span><span class="t">02. 隣接リストと行列</span><span class="dur">11:40</span></li>
+            <li class="active"><span class="tick">▶</span><span class="t">03. 幅優先探索 (BFS)</span><span class="dur">14:05</span></li>
+            <li><span class="tick"></span><span class="t">04. 深さ優先探索 (DFS)</span><span class="dur">12:30</span></li>
+            <li><span class="tick"></span><span class="t">05. 演習：最短経路問題</span><span class="dur">20:00</span></li>
+          </ul>
+          <div class="preview-cta">
+            <span class="play"><span class="playbtn">▶</span> 続きから再生</span>
+            <span class="mono">⌘ + K で検索</span>
           </div>
         </div>
-
-        <div id="tab-kuromoji" class="tab-pane hidden flex-col gap-4">
-          <div class="bg-[#f0fbfc] border border-[#b2ebf2] p-3 rounded-lg text-sm text-[#0e7784] leading-relaxed">
-            「みて / 見て」のような活用形ゆれを、形態素解析を用いて検出します。<br>
-            <span class="text-xs opacity-80">※初回のみ辞書ファイル（約7MB）の取得が必要です。</span>
-          </div>
-          
-          <div id="kuromojiStatus" class="text-sm font-bold text-gray-500 flex items-center gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
-            <span class="inline-block w-3 h-3 rounded-full bg-gray-300"></span>未初期化
-          </div>
-          
-          <button id="kuromojiInitBtn" onclick="initAndRunKuromoji()"
-                  class="btn-primary text-sm rounded-lg px-4 py-3 font-bold w-full shadow-sm">
-            Kuromoji を初期化して解析
-          </button>
-          
-          <button id="kuromojiRunBtn" onclick="runKuromojiAnalysis()" class="hidden border-2 border-[#118e9e] text-[#118e9e] hover:bg-[#f0fbfc] text-sm rounded-lg px-4 py-2.5 font-bold transition-colors w-full">
-            再解析を実行
-          </button>
-          
-          <div id="kuromojiResults" class="flex flex-col gap-3 mt-2"></div>
-        </div>
-
-        <div id="tab-fuzzy" class="tab-pane hidden flex-col gap-4">
-          <div class="bg-[#f3e5f5] border border-[#ce93d8] p-3 rounded-lg text-sm text-[#6a1b9a] leading-relaxed">
-            辞書に近い（ただし完全一致しない）表記をスキャンします。誤字や異体字の発見に有効です。
-          </div>
-          
-          <div class="flex flex-col gap-3 bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <div class="flex items-center justify-between text-sm text-gray-800 font-bold">
-              <label>許容する編集距離</label>
-              <span id="fuzzyDistLabel" class="text-[#118e9e] bg-[#f0fbfc] px-2 py-0.5 rounded border border-[#b2ebf2]">1（厳格）</span>
-            </div>
-            <input type="range" id="fuzzyThreshold" min="1" max="2" value="1"
-                   class="w-full accent-[#118e9e] mt-1 cursor-pointer"
-                   oninput="document.getElementById('fuzzyDistLabel').textContent = this.value == 1 ? '1（厳格）' : '2（緩やか）'">
-          </div>
-          
-          <button onclick="runFuzzyCheck()"
-                  class="btn-primary text-sm rounded-lg px-4 py-3 font-bold w-full shadow-sm">
-            ファジーチェックを実行
-          </button>
-          
-          <div id="fuzzyLoading" class="hidden text-sm text-[#118e9e] font-bold text-center animate-pulse py-2">⏳ 解析中...</div>
-          <div id="fuzzyResults" class="flex flex-col gap-3 mt-2"></div>
-        </div>
-
-        <div id="tab-dict" class="tab-pane hidden flex-col gap-6">
-          
-          <div class="flex flex-col gap-2 bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <label class="text-sm font-bold text-gray-800">新しいゆらぎグループを追加</label>
-            <p class="text-xs text-gray-500 mb-1">対象とする単語をカンマ区切りで入力してください。</p>
-            <input id="newRuleInput" type="text"
-                   class="border border-[#e0e0e0] rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[#118e9e] focus:ring-2 focus:ring-[#118e9e]/20 bg-white"
-                   placeholder="例: ウェブ,ウエブ,Web"
-                   onkeydown="if(event.key==='Enter') addCustomRule()">
-            <button onclick="addCustomRule()"
-                    class="btn-primary text-sm rounded-md px-4 py-2 font-bold mt-1">
-              追加する
-            </button>
-          </div>
-
-          <div class="flex flex-col gap-3">
-            <p class="text-sm font-bold text-gray-800 border-b border-gray-200 pb-2">一括データ操作</p>
-            
-            <div class="grid grid-cols-2 gap-2">
-              <label class="block text-center text-sm font-bold text-[#118e9e] border-2 border-[#118e9e] rounded-lg px-2 py-2 hover:bg-[#f0fbfc] cursor-pointer transition-colors bg-white">
-                📥 CSV/TSV 読込
-                <input type="file" accept=".tsv,.csv,.txt" class="hidden" onchange="importTSVCSV(event)">
-              </label>
-              <label class="block text-center text-sm font-bold text-gray-600 border-2 border-gray-300 rounded-lg px-2 py-2 hover:bg-gray-50 cursor-pointer transition-colors bg-white">
-                📁 JSON 読込
-                <input type="file" accept=".json" class="hidden" onchange="importCustomDict(event)">
-              </label>
-            </div>
-            
-            <button onclick="dictManager.exportJSON()"
-                    class="w-full text-sm font-bold text-gray-600 border-2 border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors bg-white mt-1">
-              📤 現在の辞書を JSON で書き出し
-            </button>
-          </div>
-
-          <div class="flex flex-col min-h-0">
-            <p class="text-sm font-bold text-gray-800 mb-2">登録済みカスタム辞書</p>
-            <div id="customDictList" class="flex flex-col gap-2 max-h-[25vh] overflow-y-auto border border-gray-200 rounded-lg p-2 bg-[#fafafa]"></div>
-          </div>
-        </div>
-
       </div>
     </div>
   </div>
+</header>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee">
+    <span>アルゴリズム</span><span>統計学入門</span><span>Web 開発</span><span>機械学習</span><span>デザイン思考</span><span>英語ライティング</span><span>数学の基礎</span><span>データベース</span>
+    <span>アルゴリズム</span><span>統計学入門</span><span>Web 開発</span><span>機械学習</span><span>デザイン思考</span><span>英語ライティング</span><span>数学の基礎</span><span>データベース</span>
+  </div>
 </div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="container">
+    <div class="sec-head">
+      <div>
+        <div class="sec-num">01 — Features</div>
+        <h2 class="sec-title">必要なものだけ。<br><em>余計なものは、何もない。</em></h2>
+      </div>
+      <p class="sec-desc">
+        静的サイトとして生成され、ほぼ瞬時に配信される。著者は Markdown を書き、学習者はブラウザで読む。その間に、余分な JavaScript もトラッキングも置かない。
+      </p>
+    </div>
+
+    <div class="features">
+
+      <article class="feat wide">
+        <div class="feat-num">F / 01</div>
+        <div class="feat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
+        </div>
+        <h3 class="feat-title">Markdown で書いて、そのまま公開</h3>
+        <p class="feat-desc">YAML フロントマターでメタ情報を、本文で教材を。ビルド後は純粋な HTML として配信される。依存関係はゼロに近い。</p>
+        <div class="feat-viz">
+          <pre class="viz-code"><span class="c">--- course.md ---</span>
+<span class="k">title:</span>  <span class="s">"アルゴリズム入門"</span>
+<span class="k">level:</span>  <span class="s">"beginner"</span>
+<span class="k">tags:</span>   <span class="s">[cs, algorithms]</span>
+<span class="c">---</span>
+
+# <span class="hl">Chapter 01</span> — 計算量の記法</pre>
+        </div>
+      </article>
+
+      <article class="feat accent">
+        <div class="feat-num">F / 02</div>
+        <div class="feat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <h3 class="feat-title">本能的に、速い。</h3>
+        <p class="feat-desc">静的生成 + エッジ配信。100KB 未満のページ、初回描画 100ms 以下を標準とする。</p>
+        <a class="feat-link" href="#">ベンチマークを見る →</a>
+      </article>
+
+      <article class="feat">
+        <div class="feat-num">F / 03</div>
+        <div class="feat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3zM9 9h6v6H9z"/></svg>
+        </div>
+        <h3 class="feat-title">進捗の可視化</h3>
+        <p class="feat-desc">ローカルストレージで学習の進み具合を記録。ログイン不要でも続きから再開できる。</p>
+        <div class="feat-viz viz-chart">
+          <div class="bar" style="height:30%"></div>
+          <div class="bar" style="height:55%"></div>
+          <div class="bar y" style="height:40%"></div>
+          <div class="bar" style="height:70%"></div>
+          <div class="bar o" style="height:85%"></div>
+          <div class="bar" style="height:60%"></div>
+          <div class="bar y" style="height:45%"></div>
+          <div class="bar" style="height:75%"></div>
+        </div>
+      </article>
+
+      <article class="feat">
+        <div class="feat-num">F / 04</div>
+        <div class="feat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+        </div>
+        <h3 class="feat-title">横断検索</h3>
+        <p class="feat-desc">⌘ + K で、章・用語・コード片を横断的に検索。インデックスはビルド時に生成される。</p>
+        <a class="feat-link" href="#">使い方を読む →</a>
+      </article>
+
+      <article class="feat">
+        <div class="feat-num">F / 05</div>
+        <div class="feat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M4 6h16M4 18h10"/></svg>
+        </div>
+        <h3 class="feat-title">段階的な難易度</h3>
+        <p class="feat-desc">beginner / intermediate / advanced の 3 段階。各章末の演習で理解度をその場で確認できる。</p>
+        <a class="feat-link" href="#">カリキュラムを見る →</a>
+      </article>
+
+      <article class="feat">
+        <div class="feat-num">F / 06</div>
+        <div class="feat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-6 4 2 8-6-5-6 5 2-8-6-4h7z"/></svg>
+        </div>
+        <h3 class="feat-title">オープンソース</h3>
+        <p class="feat-desc">コア部分は MIT ライセンスで公開。教材は GitHub で pull request として貢献できる。</p>
+        <a class="feat-link" href="#">リポジトリを見る →</a>
+      </article>
+
+      <article class="feat">
+        <div class="feat-num">F / 07</div>
+        <div class="feat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        </div>
+        <h3 class="feat-title">注釈とメモ</h3>
+        <p class="feat-desc">本文の任意の段落にコメントを残せる。自分用のメモ、他の学習者との議論、どちらにも。</p>
+        <a class="feat-link" href="#">デモを試す →</a>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- COURSES -->
+<section id="courses" style="background:var(--bg-2)">
+  <div class="container">
+    <div class="sec-head">
+      <div>
+        <div class="sec-num">02 — Catalog</div>
+        <h2 class="sec-title">注目のコース、<br><em>全 137 本。</em></h2>
+      </div>
+      <p class="sec-desc">
+        コンピュータサイエンスからリベラルアーツまで。すべてのコースは完走した学習者が監修している。読み切れる密度と、やり直せる深度で。
+      </p>
+    </div>
+
+    <div class="courses">
+      <article class="course">
+        <div class="course-cover c1">
+          <div class="stripe"></div>
+          <span class="badge">算法 · ALGO</span>
+          <div class="glyph">Σ</div>
+          <span class="dur">06時間 · 14章</span>
+        </div>
+        <div class="course-body">
+          <div class="course-cat">Computer Science</div>
+          <div class="course-title">アルゴリズムとデータ構造、その本質</div>
+          <div class="course-meta"><span>Lv. Beginner</span><span class="price"><span class="free">無料</span></span></div>
+        </div>
+      </article>
+
+      <article class="course">
+        <div class="course-cover c2">
+          <div class="stripe"></div>
+          <span class="badge">統計 · STAT</span>
+          <div class="glyph">μ</div>
+          <span class="dur">04時間 · 09章</span>
+        </div>
+        <div class="course-body">
+          <div class="course-cat">Mathematics</div>
+          <div class="course-title">ベイズ統計、はじめの一歩</div>
+          <div class="course-meta"><span>Lv. Intermediate</span><span class="price">¥2,800</span></div>
+        </div>
+      </article>
+
+      <article class="course">
+        <div class="course-cover c4">
+          <span class="badge" style="background:transparent;color:var(--yellow);border-color:var(--yellow)">新着 · NEW</span>
+          <div class="glyph">{ }</div>
+          <span class="dur">12時間 · 24章</span>
+        </div>
+        <div class="course-body">
+          <div class="course-cat">Web Development</div>
+          <div class="course-title">静的サイトで作る、個人のための教材</div>
+          <div class="course-meta"><span>Lv. Advanced</span><span class="price">¥4,800</span></div>
+        </div>
+      </article>
+
+      <article class="course">
+        <div class="course-cover c3">
+          <div class="stripe"></div>
+          <span class="badge">言語 · LANG</span>
+          <div class="glyph">A</div>
+          <span class="dur">03時間 · 12章</span>
+        </div>
+        <div class="course-body">
+          <div class="course-cat">Humanities</div>
+          <div class="course-title">英語論文を読むための、7 つの型</div>
+          <div class="course-meta"><span>Lv. Beginner</span><span class="price"><span class="free">無料</span></span></div>
+        </div>
+      </article>
+
+      <article class="course">
+        <div class="course-cover c1">
+          <div class="stripe"></div>
+          <span class="badge">設計 · DSGN</span>
+          <div class="glyph" style="color:var(--orange)">◆</div>
+          <span class="dur">05時間 · 10章</span>
+        </div>
+        <div class="course-body">
+          <div class="course-cat">Design</div>
+          <div class="course-title">タイポグラフィと情報設計の原則</div>
+          <div class="course-meta"><span>Lv. Intermediate</span><span class="price">¥3,200</span></div>
+        </div>
+      </article>
+
+      <article class="course">
+        <div class="course-cover c2">
+          <div class="stripe"></div>
+          <span class="badge">機械 · ML</span>
+          <div class="glyph">∇</div>
+          <span class="dur">10時間 · 18章</span>
+        </div>
+        <div class="course-body">
+          <div class="course-cat">Machine Learning</div>
+          <div class="course-title">勾配降下法を、数式から実装まで</div>
+          <div class="course-meta"><span>Lv. Advanced</span><span class="price">¥5,600</span></div>
+        </div>
+      </article>
+    </div>
+
+    <div style="text-align:center;margin-top:48px">
+      <a href="#" class="btn btn-ghost">すべてのコースを見る <span class="arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="container">
+    <div class="sec-head">
+      <div>
+        <div class="sec-num">03 — Workflow</div>
+        <h2 class="sec-title">4 つのステップで、<br><em>学びが走り出す。</em></h2>
+      </div>
+      <p class="sec-desc">
+        会員登録は不要。ブラウザを開いてから、最初のチャプターを読み終えるまで、90 秒もかからない。
+      </p>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <span class="num">01</span>
+        <span class="t">コースを選ぶ</span>
+        <span class="d">137 本のカタログから、関心のあるトピックを見つける。タグ検索とレベル絞り込み付き。</span>
+        <span class="tag">browse_catalog()</span>
+      </div>
+      <div class="step">
+        <span class="num">02</span>
+        <span class="t">章を開く</span>
+        <span class="d">ブラウザで即座に表示。オフラインでも読めるよう、Service Worker がキャッシュする。</span>
+        <span class="tag">open_chapter()</span>
+      </div>
+      <div class="step">
+        <span class="num">03</span>
+        <span class="t">演習を解く</span>
+        <span class="d">章末にはインタラクティブな演習。回答はローカルに保存され、正答率が可視化される。</span>
+        <span class="tag">run_exercise()</span>
+      </div>
+      <div class="step">
+        <span class="num">04</span>
+        <span class="t">証跡を残す</span>
+        <span class="d">完了した章はローカルとクラウドの両方で記録。次に開いた時も、続きから再開できる。</span>
+        <span class="tag">save_progress()</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STRIP -->
+<section class="strip">
+  <div class="container strip-grid">
+    <div>
+      <h2>数字は、<em>静かに語る。</em></h2>
+      <p>派手な約束はしない。ただ、使ってくれている学習者と、共有したい数字がある。</p>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <div class="n">12,400<span class="sm">+</span></div>
+        <div class="l">月間アクティブ学習者</div>
+      </div>
+      <div class="stat">
+        <div class="n">96<span class="pct">%</span></div>
+        <div class="l">章の完走率</div>
+      </div>
+      <div class="stat">
+        <div class="n">137</div>
+        <div class="l">公開コース数</div>
+      </div>
+      <div class="stat">
+        <div class="n">24<span class="sm">ms</span></div>
+        <div class="l">平均応答時間</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<section id="voices" style="background:var(--bg-2)">
+  <div class="container">
+    <div class="sec-head">
+      <div>
+        <div class="sec-num">04 — Voices</div>
+        <h2 class="sec-title">使った人が、<br><em>一番よく知っている。</em></h2>
+      </div>
+      <p class="sec-desc">
+        学生、独学者、現場の教員。edu-tool を日々の学びに組み込んでいる人たちの声を、そのまま。
+      </p>
+    </div>
+
+    <div class="quote-block">
+      <div>
+        <p class="quote" id="main-quote">
+          "授業の資料を Markdown で書くだけで公開できるのが、<span class="h">とにかく楽</span>。学生はスマホでも読むし、印刷にもちゃんと耐える。余計な UI がないから、内容に集中できる。"
+        </p>
+        <div class="quote-author">
+          <div class="quote-avatar" id="q-avatar">H</div>
+          <div>
+            <div class="name" id="q-name">畠山 奈緒</div>
+            <div class="role" id="q-role">私立大学 情報学部 / 准教授</div>
+          </div>
+        </div>
+      </div>
+      <div class="quote-list" id="qlist">
+        <div class="q-item active" data-q="0" data-name="畠山 奈緒" data-role="私立大学 情報学部 / 准教授" data-avatar="H" data-text=""授業の資料を Markdown で書くだけで公開できるのが、<span class='h'>とにかく楽</span>。学生はスマホでも読むし、印刷にもちゃんと耐える。余計な UI がないから、内容に集中できる。"">
+          <p class="t">授業の資料を Markdown で書くだけで公開できるのが、とにかく楽。</p>
+          <div class="who"><span>畠山 奈緒 · 准教授</span><span class="star">★★★★★</span></div>
+        </div>
+        <div class="q-item" data-q="1" data-name="R. Tanaka" data-role="独学 / ソフトウェアエンジニア" data-avatar="R" data-text=""通勤の 30 分で一章読み切れる。<span class='h'>軽さがそのまま継続力</span>になっている。他のプラットフォームで挫折した統計学を、ここで初めて最後まで通った。"">
+          <p class="t">通勤の 30 分で一章読み切れる。軽さがそのまま継続力になっている。</p>
+          <div class="who"><span>R. Tanaka · エンジニア</span><span class="star">★★★★★</span></div>
+        </div>
+        <div class="q-item" data-q="2" data-name="Miyu K." data-role="高校 3 年 / 東京都" data-avatar="M" data-text=""無料のコースだけでも、<span class='h'>教科書より深く</span>理解できた。演習がその場で採点されるのがありがたい。受験前の復習に一番使ってます。"">
+          <p class="t">無料のコースだけでも、教科書より深く理解できた。</p>
+          <div class="who"><span>Miyu K. · 高校生</span><span class="star">★★★★★</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="container">
+    <div class="sec-head">
+      <div>
+        <div class="sec-num">05 — Pricing</div>
+        <h2 class="sec-title">正直な価格。<br><em>隠れたものは、なし。</em></h2>
+      </div>
+      <p class="sec-desc">
+        学習コンテンツの大半は無料。Pro と Team は、進捗同期やチーム機能を必要とする人のためのもの。
+      </p>
+    </div>
+
+    <div class="prices">
+      <div class="price-col">
+        <div class="ptitle">Free <small>個人・学習者向け</small></div>
+        <div class="pamount"><span class="n">¥0</span><span class="u">/ 永年</span></div>
+        <ul class="pfeats">
+          <li><span class="check">✓</span>全ての無料コース(80 本以上)</li>
+          <li><span class="check">✓</span>章末演習と即時採点</li>
+          <li><span class="check">✓</span>ローカル進捗保存</li>
+          <li><span class="check">✓</span>オフライン読み込み</li>
+        </ul>
+        <a href="#cta" class="btn btn-ghost" style="width:100%;justify-content:center">始める</a>
+      </div>
+
+      <div class="price-col featured">
+        <span class="tag">Most popular</span>
+        <div class="ptitle">Pro <small style="color:#9a9a96">本気の学習者向け</small></div>
+        <div class="pamount"><span class="n"><span class="p">¥980</span></span><span class="u" style="color:#9a9a96">/ 月</span></div>
+        <ul class="pfeats">
+          <li><span class="check">✓</span>有料コース 57 本すべて</li>
+          <li><span class="check">✓</span>進捗のクラウド同期</li>
+          <li><span class="check">✓</span>AI による演習解説</li>
+          <li><span class="check">✓</span>証明書の発行</li>
+          <li><span class="check">✓</span>優先サポート</li>
+        </ul>
+        <a href="#cta" class="btn" style="background:var(--yellow);color:var(--ink);width:100%;justify-content:center">Pro を選ぶ</a>
+      </div>
+
+      <div class="price-col">
+        <div class="ptitle">Team <small>教育機関・企業向け</small></div>
+        <div class="pamount"><span class="n">¥480</span><span class="u">/ 人 / 月</span></div>
+        <ul class="pfeats">
+          <li><span class="check">✓</span>Pro の全機能</li>
+          <li><span class="check">✓</span>最大 500 人までの管理画面</li>
+          <li><span class="check">✓</span>独自コースの限定公開</li>
+          <li><span class="check">✓</span>SSO / SAML 対応</li>
+          <li><span class="check">✓</span>専任オンボーディング</li>
+        </ul>
+        <a href="#cta" class="btn btn-ghost" style="width:100%;justify-content:center">相談する</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" style="background:var(--bg-2)">
+  <div class="container">
+    <div class="sec-head">
+      <div>
+        <div class="sec-num">06 — FAQ</div>
+        <h2 class="sec-title">よくある、<br><em>短い質問。</em></h2>
+      </div>
+      <p class="sec-desc">
+        ここに載っていない質問は、いつでも hello@edu-tool.dev まで。基本は 24 時間以内に返事しています。
+      </p>
+    </div>
+
+    <div class="faqs">
+      <details class="faq" open>
+        <summary>登録しなくても使えますか? <span class="plus">+</span></summary>
+        <div class="a">はい。無料コースはアカウント作成なしで全て閲覧できます。進捗はブラウザのローカルストレージに保存されるため、同じ端末であれば続きから再開できます。複数端末で同期したい場合は Pro プランをご検討ください。</div>
+      </details>
+      <details class="faq">
+        <summary>コースを自分で作って公開できますか? <span class="plus">+</span></summary>
+        <div class="a">Team プランでは独自コースを限定公開できます。オープンに公開したい場合は、edu-tool-courses リポジトリへ pull request を送ってください。レビュー後、公式カタログに掲載されます。</div>
+      </details>
+      <details class="faq">
+        <summary>モバイルアプリはありますか? <span class="plus">+</span></summary>
+        <div class="a">専用アプリは提供していません。edu-tool は PWA として動作するため、ブラウザからホーム画面に追加するだけでアプリのように使えます。オフラインでの閲覧も可能です。</div>
+      </details>
+      <details class="faq">
+        <summary>個人情報はどう扱っていますか? <span class="plus">+</span></summary>
+        <div class="a">最小限の原則で運用しています。無料プランではアカウントすら不要で、サーバーに送られる情報は匿名のアクセスログのみ。Pro 以上で同期される進捗データは、すべて AES-256 で暗号化されています。</div>
+      </details>
+      <details class="faq">
+        <summary>返金はできますか? <span class="plus">+</span></summary>
+        <div class="a">はい、Pro プラン購入後 14 日以内であれば、理由を問わず全額返金します。サポートにメッセージを送ってください。</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta" class="cta" style="padding:0">
+  <div class="container cta-inner">
+    <div>
+      <h2>今日から、<em>読みはじめる。</em></h2>
+      <p>メールアドレスだけで、無料で始められます。アカウント登録は任意。まずは最初の一章を、どうぞ。</p>
+      <form class="cta-form" onsubmit="event.preventDefault();this.querySelector('button').textContent='登録しました ✓'">
+        <input type="email" placeholder="you@example.com" required>
+        <button type="submit">登録する</button>
+      </form>
+    </div>
+    <div class="cta-aside">
+      <div class="mono">登録で手に入る</div>
+      <ul>
+        <li>最初の 5 コースを即時アンロック</li>
+        <li>新着コースの月イチ通知(任意)</li>
+        <li>学習リマインダー(任意)</li>
+        <li>いつでも 1 クリックで解除可能</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="logo" href="#"><span class="logo-mark"></span><span>edu-tool</span></a>
+        <p>軽量で高速な、静的サイトベースの教育プラットフォーム。Markdown で書かれ、全ての人に開かれている。</p>
+      </div>
+      <div class="foot-col">
+        <h5>Product</h5>
+        <ul>
+          <li><a href="#features">機能</a></li>
+          <li><a href="#courses">コース</a></li>
+          <li><a href="#pricing">料金</a></li>
+          <li><a href="#">ロードマップ</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h5>Resources</h5>
+        <ul>
+          <li><a href="#">ドキュメント</a></li>
+          <li><a href="#">ブログ</a></li>
+          <li><a href="#">変更履歴</a></li>
+          <li><a href="#">ステータス</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#">運営について</a></li>
+          <li><a href="#">お問い合わせ</a></li>
+          <li><a href="#">プライバシー</a></li>
+          <li><a href="#">GitHub ↗</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 edu-tool · MIT licensed core</span>
+      <span>Built in Tokyo · Deployed on the edge</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Floating status -->
+<div class="status" id="status"><span class="dot"></span> All systems operational · 24ms</div>
+
+<!-- Tweaks panel -->
+<div id="tweaks" style="display:none"></div>
+
+<style id="tweak-style"></style>
 
 <script>
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+  // ===== TWEAKS =====
+  const TWEAKS = {
+    "accent": "yellow",
+    "density": "comfy",
+    "showMarquee": false,
+    "showStats": false,
+    "showTestimonials": false,
+    "showSticker": false,
+    "flatCards": false,
+    "headline": "no-headline"
+  };
 
-  const dictManager = new DictionaryManager();
-  let currentText = '';
-  let replacementLog = [];
+  const tweakStyle = document.getElementById('tweak-style');
+  const tweaksEl = document.getElementById('tweaks');
 
-  // ---- タブ切り替え処理 ----
-  function switchTab(tabId) {
-    document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
-    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-    
-    document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-    document.getElementById(`tabBtn-${tabId}`).classList.add('active');
-    
-    if (tabId === 'dict') renderCustomDictList();
-  }
+  function applyTweaks(t){
+    let css = '';
+    const accentMap = {
+      orange: ['#FF6B1A','#E5520A','#FFD60A','#FFF4B0'],
+      yellow: ['#E5A800','#C48A00','#FFD60A','#FFF4B0'],
+      mono:   ['#131313','#000000','#E4E2D8','#F3F2EC']
+    };
+    const [o, od, y, ys] = accentMap[t.accent] || accentMap.orange;
+    css += `:root{--orange:${o};--orange-deep:${od};--yellow:${y};--yellow-soft:${ys};}`;
 
-  // ---- ファイル読み込み ----
-  const dropZone = document.getElementById('dropZone');
-  const fileInput = document.getElementById('fileInput');
+    if (t.density === 'tight') {
+      css += `section{padding:64px 0}.hero{padding:56px 0 40px}.sec-head{margin-bottom:36px}.feat{padding:22px;min-height:220px}.step{padding:22px;min-height:180px}`;
+    } else if (t.density === 'airy') {
+      css += `section{padding:140px 0}.hero{padding:120px 0 80px}`;
+    }
 
-  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
-  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-  dropZone.addEventListener('drop', e => {
-    e.preventDefault();
-    dropZone.classList.remove('dragover');
-    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
-  });
-  fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
+    if (!t.showMarquee) css += `.marquee-wrap{display:none}`;
+    if (!t.showStats) css += `.strip{display:none}`;
+    if (!t.showTestimonials) css += `#voices{display:none}`;
+    if (!t.showSticker) css += `.sticker{display:none}`;
 
-  async function handleFile(file) {
-    setLoading(true);
-    try {
-      const arrayBuffer = await file.arrayBuffer();
-      const name = file.name.toLowerCase();
-      let text = '';
+    if (t.flatCards) {
+      css += `.feat,.course,.preview,.cta-aside,.prices{box-shadow:none!important;border-radius:0!important}.feat:hover,.course:hover{transform:none}.feat-viz{display:none}.course-cover .stripe{display:none}.preview{border-radius:0}`;
+    }
 
-      if (name.endsWith('.pdf') || file.type === 'application/pdf') {
-        text = await extractPDF(arrayBuffer);
-      } else if (name.endsWith('.docx')) {
-        const result = await mammoth.extractRawText({ arrayBuffer });
-        text = result.value;
+    const h = document.querySelector('h1.display');
+    if (h) {
+      if (t.headline === 'simple') {
+        h.innerHTML = '軽く、速く、<span class="it">学ぶ。</span>';
+      } else if (t.headline === 'playful') {
+        h.innerHTML = '学びを、<span class="mark">軽やかに</span>。<br>思考を、<span class="it">深く</span>。';
       } else {
-        alert('対応形式: .docx / .pdf');
-        return;
+        h.innerHTML = '';
       }
-
-      replacementLog = [];
-      document.getElementById('inputText').value = text;
-      runCheck();
-    } catch (e) {
-      alert('読み込みエラー: ' + e.message);
-    } finally {
-      setLoading(false);
-      fileInput.value = '';
-    }
-  }
-
-  async function extractPDF(arrayBuffer) {
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-    let text = '';
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      text += content.items.map(item => item.str).join('') + '\n';
-    }
-    return text;
-  }
-
-  // ---- チェック処理 ----
-  function runCheck() {
-    currentText = document.getElementById('inputText').value;
-    const results = analyze(currentText, dictManager.getAll());
-    renderResults(results);
-    renderPreview(results);
-  }
-
-  function renderResults(results) {
-    const container = document.getElementById('results');
-    const countEl = document.getElementById('resultCount');
-
-    if (results.length === 0) {
-      container.innerHTML = '<p class="text-sm text-gray-400 text-center py-10 font-medium">ゆらぎは検知されていません</p>';
-      countEl.textContent = '0 件';
-      return;
     }
 
-    countEl.textContent = results.length + ' 件';
-    container.innerHTML = '';
-
-    results.forEach(({ group, recommended, counts, others }) => {
-      const card = document.createElement('div');
-      card.className = 'p-4 border border-[#f0f0f0] rounded-xl bg-[#fcfcfc] shadow-sm flex flex-col gap-3';
-
-      const countsHtml = counts.map(c =>
-        `<span class="${c.word === recommended ? 'text-[#43a047] font-bold' : 'text-[#e53935] font-bold'}">${escapeHTML(c.word)}<span class="text-gray-400 font-normal text-xs ml-1">(${c.count})</span></span>`
-      ).join('<span class="text-gray-300 mx-1.5">|</span>');
-
-      card.innerHTML = `
-        <div class="flex flex-wrap items-center text-[15px] leading-relaxed bg-white p-2 border border-gray-100 rounded-lg">${countsHtml}</div>
-        <div class="text-sm text-gray-600 font-bold">推奨：<span class="text-[#43a047]">${escapeHTML(recommended)}</span></div>
-        <button class="btn-success text-sm rounded-lg px-4 py-2 font-bold shadow-sm self-start">
-          「${escapeHTML(recommended)}」に統一する
-        </button>
-      `;
-
-      card.querySelector('button').addEventListener('click', () => {
-        const ta = document.getElementById('inputText');
-        const oldText = ta.value;
-
-        // 置換ログ記録
-        for (const word of others) {
-          const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          const count = (oldText.match(new RegExp(escaped, 'g')) || []).length;
-          if (count > 0) replacementLog.push({ original: word, replacement: recommended, count });
-        }
-        updateReplacementBadge();
-
-        ta.value = replaceGroup(ta.value, group, recommended);
-        runCheck();
-      });
-
-      container.appendChild(card);
-    });
+    tweakStyle.textContent = css;
   }
 
-  function renderPreview(results) {
-    const preview = document.getElementById('preview');
-    const countEl = document.getElementById('previewCount');
+  function renderTweaksPanel(){
+    tweaksEl.innerHTML = `
+      <style>
+        #tweaks-panel{position:fixed;bottom:20px;right:20px;width:280px;background:var(--white);border:1px solid var(--ink);border-radius:10px;padding:16px;z-index:100;font-family:"Inter",sans-serif;font-size:13px;box-shadow:0 20px 40px -20px rgba(0,0,0,.3);max-height:80vh;overflow:auto}
+        #tweaks-panel h4{font-family:"JetBrains Mono",monospace;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink);margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+        #tweaks-panel h4 .dot{width:6px;height:6px;border-radius:50%;background:var(--orange)}
+        #tweaks-panel .row{margin-bottom:12px}
+        #tweaks-panel label{display:block;font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;letter-spacing:.04em}
+        #tweaks-panel .seg{display:flex;border:1px solid var(--line-2);border-radius:6px;overflow:hidden}
+        #tweaks-panel .seg button{flex:1;padding:7px 6px;font-size:12px;border:0;background:transparent;cursor:pointer;font-family:inherit;color:var(--ink-2);border-right:1px solid var(--line-2)}
+        #tweaks-panel .seg button:last-child{border-right:0}
+        #tweaks-panel .seg button.on{background:var(--ink);color:var(--yellow)}
+        #tweaks-panel .tog{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:12.5px;color:var(--ink-2)}
+        #tweaks-panel .tog input{width:32px;height:18px;appearance:none;background:var(--line-2);border-radius:99px;position:relative;cursor:pointer;transition:all .2s;margin:0}
+        #tweaks-panel .tog input:checked{background:var(--orange)}
+        #tweaks-panel .tog input::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:all .2s}
+        #tweaks-panel .tog input:checked::after{left:16px}
+        #tweaks-panel hr{border:0;border-top:1px dashed var(--line-2);margin:12px 0}
+        #tweaks-panel .foot{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--muted);text-transform:uppercase;margin-top:10px;text-align:center}
+      </style>
+      <div id="tweaks-panel">
+        <h4><span>Tweaks</span><span class="dot"></span></h4>
 
-    if (!currentText) {
-      preview.innerHTML = '<span class="text-gray-400">ここにハイライト表示されます</span>';
-      countEl.textContent = '';
-      return;
-    }
-
-    const totalHighlights = results.reduce((sum, r) => sum + r.others.length, 0);
-    countEl.textContent = totalHighlights > 0 ? `⚠ ${totalHighlights} 種類のゆらぎ` : '✓ ゆらぎなし';
-    preview.innerHTML = buildHighlightedHTML(currentText, results);
-  }
-
-  // ---- Kuromoji 活用形解析 ----
-  async function initAndRunKuromoji() {
-    const btn = document.getElementById('kuromojiInitBtn');
-    const status = document.getElementById('kuromojiStatus');
-    btn.disabled = true;
-    btn.textContent = '読み込み中...';
-    setKuromojiStatus('loading', '辞書ファイルを取得中...');
-    try {
-      await initKuromoji();
-      setKuromojiStatus('ready', '準備完了');
-      btn.classList.add('hidden');
-      document.getElementById('kuromojiRunBtn').classList.remove('hidden');
-      runKuromojiAnalysis();
-    } catch (e) {
-      setKuromojiStatus('error', '初期化失敗: ' + e.message);
-      btn.disabled = false;
-      btn.textContent = 'Kuromoji を初期化して解析';
-    }
-  }
-
-  function runKuromojiAnalysis() {
-    if (!isKuromojiReady()) return;
-    const results = kuromojiAnalyze(currentText, dictManager.getAll());
-    renderKuromojiResults(results);
-  }
-
-  function renderKuromojiResults(results) {
-    const container = document.getElementById('kuromojiResults');
-    if (!currentText.trim()) {
-      container.innerHTML = '<p class="text-sm text-gray-400 text-center py-4 font-medium">テキストを入力してください</p>';
-      return;
-    }
-    if (results.length === 0) {
-      container.innerHTML = '<p class="text-sm text-gray-400 text-center py-4 font-medium">活用形のゆれは検出されませんでした</p>';
-      return;
-    }
-    container.innerHTML = '';
-    results.forEach(({ recommendedWord, foundBases }) => {
-      const card = document.createElement('div');
-      card.className = 'p-3 border border-[#e0e0e0] bg-white rounded-xl shadow-sm flex flex-col gap-2.5';
-      const basesHtml = foundBases.map(({ word, count, surfaces }, i) => {
-        const tag = i === 0
-          ? '<span class="text-[#118e9e] font-bold text-xs bg-[#f0fbfc] px-1.5 py-0.5 rounded border border-[#b2ebf2]">推奨</span>'
-          : '<span class="text-red-500 font-bold text-xs bg-red-50 px-1.5 py-0.5 rounded border border-red-200">非推奨</span>';
-        const surfaceList = surfaces.map(s => `<code class="bg-gray-100 text-gray-700 rounded px-1.5 py-0.5 text-xs border border-gray-200">${escapeHTML(s)}</code>`).join(' ');
-        return `<div class="flex items-start gap-2 text-sm leading-tight">${tag}<span class="text-gray-800 font-bold">${escapeHTML(word)}系 <span class="text-gray-400 font-normal text-xs">(${count}回)</span></span><div class="flex flex-wrap gap-1 ml-auto">${surfaceList}</div></div>`;
-      }).join('');
-      card.innerHTML = `
-        <div class="text-sm font-bold text-[#0f0f0f] border-b border-gray-100 pb-2">推奨：${escapeHTML(recommendedWord)}</div>
-        <div class="flex flex-col gap-2 pt-1">${basesHtml}</div>
-      `;
-      container.appendChild(card);
-    });
-  }
-
-  function setKuromojiStatus(state, text) {
-    const el = document.getElementById('kuromojiStatus');
-    const colors = { loading: 'bg-yellow-400', ready: 'bg-[#43a047]', error: 'bg-red-500' };
-    el.innerHTML = `<span class="inline-block w-3 h-3 rounded-full ${colors[state] || 'bg-gray-300'}"></span>${escapeHTML(text)}`;
-  }
-
-  // ---- ファジーチェック ----
-  async function runFuzzyCheck() {
-    const loadingEl = document.getElementById('fuzzyLoading');
-    const resultsEl = document.getElementById('fuzzyResults');
-    const maxDist = parseInt(document.getElementById('fuzzyThreshold').value);
-
-    if (!currentText.trim()) {
-      resultsEl.innerHTML = '<p class="text-sm text-gray-400 text-center py-4 font-medium">テキストを入力してください</p>';
-      return;
-    }
-
-    loadingEl.classList.remove('hidden');
-    resultsEl.innerHTML = '';
-
-    await new Promise(r => setTimeout(r, 20));
-
-    const fuzzResults = fuzzyAnalyze(currentText, dictManager.getAll(), maxDist);
-
-    loadingEl.classList.add('hidden');
-
-    if (fuzzResults.length === 0) {
-      resultsEl.innerHTML = '<p class="text-sm text-gray-400 text-center py-4 font-medium">ファジーマッチは検出されませんでした</p>';
-      return;
-    }
-
-    resultsEl.innerHTML = '';
-    fuzzResults.forEach(({ dictWord, group, candidates }) => {
-      const card = document.createElement('div');
-      card.className = 'p-3 border border-[#e0e0e0] bg-white rounded-xl shadow-sm flex flex-col gap-1.5';
-      card.innerHTML = `
-        <div class="text-sm font-bold text-[#0f0f0f]">「${escapeHTML(dictWord)}」に類似</div>
-        <div class="text-sm text-gray-600 flex flex-wrap gap-1.5 mt-1">
-          ${candidates.map(c => `<code class="bg-gray-100 text-gray-700 rounded px-1.5 py-0.5 border border-gray-200 font-bold">${escapeHTML(c)}</code>`).join('')}
+        <div class="row">
+          <label>Accent</label>
+          <div class="seg" data-key="accent">
+            <button data-v="orange">Orange</button>
+            <button data-v="yellow">Yellow</button>
+            <button data-v="mono">Mono</button>
+          </div>
         </div>
-      `;
-      resultsEl.appendChild(card);
-    });
-  }
 
-  // ---- カスタム辞書UI ----
-  function addCustomRule() {
-    const input = document.getElementById('newRuleInput');
-    const words = input.value.split(',').map(w => w.trim()).filter(Boolean);
-    if (words.length < 2) { alert('2語以上をカンマ区切りで入力してください'); return; }
-    dictManager.addCustomGroup(words);
-    input.value = '';
-    renderCustomDictList();
-    runCheck();
-  }
+        <div class="row">
+          <label>Density</label>
+          <div class="seg" data-key="density">
+            <button data-v="tight">Tight</button>
+            <button data-v="comfy">Comfy</button>
+            <button data-v="airy">Airy</button>
+          </div>
+        </div>
 
-  function renderCustomDictList() {
-    const container = document.getElementById('customDictList');
-    const custom = dictManager.getCustom();
+        <div class="row">
+          <label>Headline</label>
+          <div class="seg" data-key="headline">
+            <button data-v="no-headline">なし</button>
+            <button data-v="simple">Simple</button>
+            <button data-v="playful">Playful</button>
+          </div>
+        </div>
 
-    if (custom.length === 0) {
-      container.innerHTML = '<p class="text-sm text-gray-400 text-center py-4 font-medium">カスタム辞書は空です</p>';
-      return;
-    }
+        <hr>
 
-    container.innerHTML = '';
-    custom.forEach((group, idx) => {
-      const row = document.createElement('div');
-      row.className = 'flex items-center justify-between text-[13px] bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-sm';
-      row.innerHTML = `
-        <span class="text-gray-700 font-bold truncate flex-1">${group.map(w => escapeHTML(w)).join(' <span class="text-gray-300 mx-1 font-normal">/</span> ')}</span>
-        <button class="ml-3 text-gray-300 hover:text-red-500 transition-colors flex-shrink-0 text-base leading-none" title="削除">×</button>
-      `;
-      row.querySelector('button').addEventListener('click', () => {
-        dictManager.removeCustomGroup(idx);
-        renderCustomDictList();
-        runCheck();
+        <label class="tog"><span>マーキー表示</span><input type="checkbox" data-key="showMarquee"></label>
+        <label class="tog"><span>統計セクション</span><input type="checkbox" data-key="showStats"></label>
+        <label class="tog"><span>推薦の声</span><input type="checkbox" data-key="showTestimonials"></label>
+        <label class="tog"><span>ヒーローのステッカー</span><input type="checkbox" data-key="showSticker"></label>
+        <label class="tog"><span>フラットカード(簡素化)</span><input type="checkbox" data-key="flatCards"></label>
+
+        <div class="foot">edit-mode active</div>
+      </div>
+    `;
+    syncUI();
+    tweaksEl.querySelectorAll('.seg').forEach(seg => {
+      const key = seg.dataset.key;
+      seg.querySelectorAll('button').forEach(b => {
+        b.addEventListener('click', () => {
+          TWEAKS[key] = b.dataset.v;
+          applyTweaks(TWEAKS); syncUI(); persist({[key]: b.dataset.v});
+        });
       });
-      container.appendChild(row);
+    });
+    tweaksEl.querySelectorAll('input[type=checkbox]').forEach(inp => {
+      inp.addEventListener('change', () => {
+        TWEAKS[inp.dataset.key] = inp.checked;
+        applyTweaks(TWEAKS); persist({[inp.dataset.key]: inp.checked});
+      });
     });
   }
 
-  async function importCustomDict(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    try {
-      await dictManager.importJSON(file);
-      renderCustomDictList();
-      runCheck();
-    } catch (e) {
-      alert('インポートエラー: ' + e.message);
-    }
-    event.target.value = '';
-  }
-
-  async function importTSVCSV(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    try {
-      const text = await file.text();
-      const sep = file.name.endsWith('.csv') ? ',' : '\t';
-      const count = dictManager.importDelimited(text, sep);
-      alert(`${count} グループをインポートしました`);
-      renderCustomDictList();
-      runCheck();
-    } catch (e) {
-      alert('インポートエラー: ' + e.message);
-    }
-    event.target.value = '';
-  }
-
-  // ---- Word 出力 ----
-  function downloadCorrectedDocx() {
-    if (!currentText.trim()) { alert('テキストを入力してください'); return; }
-
-    const results = analyze(currentText, dictManager.getAll());
-
-    let bodyHtml = '<h2 style="font-size:14pt;margin-bottom:6pt;">本文</h2>';
-    bodyHtml += `<p style="white-space:pre-wrap;font-size:11pt;line-height:1.8;">${buildHighlightedHTMLForDocx(currentText, results)}</p>`;
-
-    if (replacementLog.length > 0) {
-      bodyHtml += '<h2 style="font-size:14pt;margin-top:18pt;margin-bottom:6pt;">置換ログ</h2>';
-      bodyHtml += '<table border="1" cellpadding="6" style="border-collapse:collapse;font-size:10pt;width:100%;">';
-      bodyHtml += '<tr style="background:#f0f0f0;"><th>元の語</th><th>置換後</th><th>件数</th></tr>';
-      for (const { original, replacement, count } of replacementLog) {
-        bodyHtml += `<tr><td>${escapeHTML(original)}</td><td>${escapeHTML(replacement)}</td><td style="text-align:center;">${count}</td></tr>`;
-      }
-      bodyHtml += '</table>';
-    }
-
-    if (results.length > 0) {
-      bodyHtml += '<h2 style="font-size:14pt;margin-top:18pt;margin-bottom:6pt;">未解決のゆらぎ</h2>';
-      bodyHtml += '<table border="1" cellpadding="6" style="border-collapse:collapse;font-size:10pt;width:100%;">';
-      bodyHtml += '<tr style="background:#f0f0f0;"><th>推奨</th><th>混在語（出現数）</th></tr>';
-      for (const { recommended, counts } of results) {
-        const others = counts.filter(c => c.word !== recommended);
-        bodyHtml += `<tr><td style="color:#1a7a3a;font-weight:bold;">${escapeHTML(recommended)}</td><td>${others.map(c => `${escapeHTML(c.word)}(${c.count})`).join('、')}</td></tr>`;
-      }
-      bodyHtml += '</table>';
-    }
-
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="font-family:'Meiryo',sans-serif;margin:2cm;">${bodyHtml}</body></html>`;
-    const blob = htmlDocx.asBlob(html);
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = '表記ゆれ修正済み.docx';
-    a.click();
-    URL.revokeObjectURL(a.href);
-  }
-
-  function buildHighlightedHTMLForDocx(text, results) {
-    let escaped = escapeHTML(text);
-    for (const { others } of results) {
-      for (const word of others) {
-        const escapedWord = escapeHTML(word).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        escaped = escaped.replace(
-          new RegExp(escapedWord, 'g'),
-          `<span style="background-color:#FFFF00;">${escapeHTML(word)}</span>`
-        );
-      }
-    }
-    return escaped.replace(/\n/g, '<br>');
-  }
-
-  // ---- ユーティリティ ----
-  function clearAll() {
-    document.getElementById('inputText').value = '';
-    replacementLog = [];
-    updateReplacementBadge();
-    runCheck();
-  }
-
-  function updateReplacementBadge() {
-    const badge = document.getElementById('replacementBadge');
-    const total = replacementLog.reduce((s, r) => s + r.count, 0);
-    if (total > 0) {
-      badge.textContent = `${total} 件置換済み`;
-      badge.classList.remove('hidden');
-    } else {
-      badge.classList.add('hidden');
-    }
-  }
-
-  function setLoading(on) {
-    document.getElementById('loading').classList.toggle('hidden', !on);
-  }
-
-  // ---- 辞書バリデーション ----
-  function runDictValidation() {
-    const result = dictManager.validateDict(dictManager.getAll());
-    if (result.valid) return;
-
-    const banner = document.getElementById('dictErrorBanner');
-    const summary = document.getElementById('dictErrorSummary');
-    const list = document.getElementById('dictErrorList');
-
-    summary.textContent = `（${result.validCount} / ${result.total} グループが有効、${result.errors.length} 件の問題）`;
-
-    list.innerHTML = '';
-    result.errors.forEach(({ index, value, reason }) => {
-      const li = document.createElement('li');
-      const preview = Array.isArray(value)
-        ? `['${value.join("', '")}']`
-        : String(value);
-      li.textContent = `インデックス ${index}: ${reason}  ＞ ${preview.slice(0, 40)}`;
-      list.appendChild(li);
+  function syncUI(){
+    tweaksEl.querySelectorAll('.seg').forEach(seg => {
+      const key = seg.dataset.key;
+      seg.querySelectorAll('button').forEach(b => {
+        b.classList.toggle('on', b.dataset.v === TWEAKS[key]);
+      });
     });
-
-    banner.classList.remove('hidden');
+    tweaksEl.querySelectorAll('input[type=checkbox]').forEach(inp => {
+      inp.checked = !!TWEAKS[inp.dataset.key];
+    });
   }
 
-  function toggleDictErrorDetail() {
-    const list = document.getElementById('dictErrorList');
-    const btn = document.getElementById('dictErrorDetailBtn');
-    const isHidden = list.classList.toggle('hidden');
-    btn.textContent = isHidden ? '詳細を表示 ▼' : '詳細を隠す ▲';
+  function persist(edits){
+    try { window.parent.postMessage({type:'__edit_mode_set_keys', edits}, '*'); } catch(e){}
   }
 
-  // 初期化イベント
-  document.getElementById('inputText').addEventListener('input', runCheck);
-  runDictValidation();
-  runCheck();
+  applyTweaks(TWEAKS);
+
+  window.addEventListener('message', (e) => {
+    const d = e.data || {};
+    if (d.type === '__activate_edit_mode') {
+      tweaksEl.style.display = 'block';
+      renderTweaksPanel();
+    } else if (d.type === '__deactivate_edit_mode') {
+      tweaksEl.style.display = 'none';
+      tweaksEl.innerHTML = '';
+    }
+  });
+  try { window.parent.postMessage({type:'__edit_mode_available'}, '*'); } catch(e){}
+
+  // Quote switcher
+  const items = document.querySelectorAll('.q-item');
+  const mainQuote = document.getElementById('main-quote');
+  const qName = document.getElementById('q-name');
+  const qRole = document.getElementById('q-role');
+  const qAvatar = document.getElementById('q-avatar');
+  items.forEach(it => {
+    it.addEventListener('click', () => {
+      items.forEach(i => i.classList.remove('active'));
+      it.classList.add('active');
+      mainQuote.innerHTML = it.dataset.text;
+      qName.textContent = it.dataset.name;
+      qRole.textContent = it.dataset.role;
+      qAvatar.textContent = it.dataset.avatar;
+    });
+  });
+
+  // Animate chart bars on scroll into view
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('.bar').forEach((b,i) => {
+          const h = b.style.height;
+          b.style.height = '0%';
+          setTimeout(() => b.style.height = h, 80*i);
+        });
+        obs.unobserve(e.target);
+      }
+    });
+  }, {threshold: .3});
+  document.querySelectorAll('.viz-chart').forEach(c => obs.observe(c));
+
+  // Smooth anchor scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const id = a.getAttribute('href');
+      if (id.length > 1) {
+        const el = document.querySelector(id);
+        if (el) { e.preventDefault(); window.scrollTo({top: el.offsetTop - 72, behavior: 'smooth'}); }
+      }
+    });
+  });
 </script>
+
 </body>
 </html>
