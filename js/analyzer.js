@@ -215,14 +215,12 @@ async function analyzeAsync(text, dict, chunkSize = 50) {
 
 let _tokenizer = null;
 
-/**
- * Kuromoji トークナイザーを初期化する（CDNから辞書を取得、約7MB）
- * @returns {Promise<void>}
- */
 function initKuromoji() {
   return new Promise((resolve, reject) => {
     kuromoji
-      .builder({ dicPath: './dict/' })
+      // ※注意: Workerから見た相対パス、または絶対URLを指定します。
+      // うまく動かない場合は 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/' を指定してください。
+      .builder({ dicPath: '../dict/' }) 
       .build((err, tokenizer) => {
         if (err) reject(err);
         else { _tokenizer = tokenizer; resolve(); }
