@@ -339,6 +339,7 @@
   const dictManager = new DictionaryManager();
   let currentText = '';
   let replacementLog = [];
+  let ignoredGroups = new Set(); //
 
   // ---- タブ切り替え処理 ----
   function switchTab(tabId) {
@@ -406,12 +407,16 @@
   // ---- チェック処理 ----
   function runCheck() {
     currentText = document.getElementById('inputText').value;
-    const results = analyze(currentText, dictManager.getAll());
+    
+    // ◀◀◀ 以下の2行を修正（無視リストに含まれない結果だけを抽出）
+    const results = analyze(currentText, dictManager.getAll())
+                      .filter(r => !ignoredGroups.has(r.group.join(',')));
+                      
     renderResults(results);
     renderPreview(results);
   }
 
-  function renderResults(results) {
+function renderResults(results) {
     const container = document.getElementById('results');
     const countEl = document.getElementById('resultCount');
 
@@ -432,27 +437,50 @@
         `<span class="${c.word === recommended ? 'text-[#43a047] font-bold' : 'text-[#e53935] font-bold'}">${escapeHTML(c.word)}<span class="text-gray-400 font-normal text-xs ml-1">(${c.count})</span></span>`
       ).join('<span class="text-gray-300 mx-1.5">|</span>');
 
+      // 無視機能用のグループID
+      const groupId = group.join(',');
+
+      // 検知された各単語に対する「統一する」ボタンを生成
+      const replaceButtonsHtml = counts.map(c => `
+        <button class="replace-btn btn-success text-sm rounded-lg px-3 py-1.5 font-bold shadow-sm" data-word="${escapeHTML(c.word)}">
+          「${escapeHTML(c.word)}」に統一
+        </button>
+      `).join('');
+
       card.innerHTML = `
         <div class="flex flex-wrap items-center text-[15px] leading-relaxed bg-white p-2 border border-gray-100 rounded-lg">${countsHtml}</div>
-        <div class="text-sm text-gray-600 font-bold">推奨：<span class="text-[#43a047]">${escapeHTML(recommended)}</span></div>
-        <button class="btn-success text-sm rounded-lg px-4 py-2 font-bold shadow-sm self-start">
-          「${escapeHTML(recommended)}」に統一する
-        </button>
+        <div class="flex flex-wrap gap-2 mt-1">
+          ${replaceButtonsHtml}
+          <button class="ignore-btn border border-gray-300 text-gray-500 hover:bg-gray-100 text-sm rounded-lg px-3 py-1.5 font-bold shadow-sm ml-auto transition-colors">
+            無視する
+          </button>
+        </div>
       `;
 
-      card.querySelector('button').addEventListener('click', () => {
-        const ta = document.getElementById('inputText');
-        const oldText = ta.value;
+      // 「統一する」ボタンの処理
+      card.querySelectorAll('.replace-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const targetWord = e.target.getAttribute('data-word');
+          const ta = document.getElementById('inputText');
+          const oldText = ta.value;
 
-        // 置換ログ記録
-        for (const word of others) {
-          const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          const count = (oldText.match(new RegExp(escaped, 'g')) || []).length;
-          if (count > 0) replacementLog.push({ original: word, replacement: recommended, count });
-        }
-        updateReplacementBadge();
+          // 選択された単語以外の出現回数をカウントしてログに記録
+          const othersToLog = counts.map(c => c.word).filter(w => w !== targetWord);
+          for (const word of othersToLog) {
+            const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const count = (oldText.match(new RegExp(escaped, 'g')) || []).length;
+            if (count > 0) replacementLog.push({ original: word, replacement: targetWord, count });
+          }
+          updateReplacementBadge();
 
-        ta.value = replaceGroup(ta.value, group, recommended);
+          ta.value = replaceGroup(ta.value, group, targetWord);
+          runCheck();
+        });
+      });
+
+      // 「無視する」ボタンの処理
+      card.querySelector('.ignore-btn').addEventListener('click', () => {
+        ignoredGroups.add(groupId);
         runCheck();
       });
 
@@ -709,6 +737,7 @@
   function clearAll() {
     document.getElementById('inputText').value = '';
     replacementLog = [];
+    ignoredGroups.clear(); // ◀◀◀ これを追加
     updateReplacementBadge();
     runCheck();
   }
