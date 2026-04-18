@@ -5,42 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>表記ゆれさん</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/build/kuromoji.js"></script>
-  <script src="js/defaultDict.js"></script>
-  <script src="js/dictManager.js"></script>
-  <script src="js/analyzer.js"></script>
+  
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
+  
+  <script defer src="js/defaultDict.js"></script>
+  <script defer src="js/dictManager.js"></script>
+  <script defer src="js/analyzer.js"></script>
+
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./js/sw.js');
     }
-  
-// ページ読み込み後にバックグラウンドで初期化開始
+
+    // ページ読み込み後にバックグラウンドで初期化開始（Web Workerに依頼する形に変更）
     window.addEventListener('load', () => {
-      setTimeout(async () => {
-        if (typeof initKuromoji === 'function') {
-          try {
-            await initKuromoji();
-            // UIの状態だけ静かに更新しておく
-            const btn = document.getElementById('kuromojiInitBtn');
-            const runBtn = document.getElementById('kuromojiRunBtn');
-            const statusEl = document.getElementById('kuromojiStatus');
-            
-            if (btn && runBtn && statusEl) {
-              statusEl.innerHTML = `<span class="inline-block w-3 h-3 rounded-full bg-[#43a047]"></span>準備完了（自動読込済）`;
-              btn.classList.add('hidden');
-              runBtn.classList.remove('hidden');
-            }
-          } catch(e) {
-            console.warn("Kuromojiのバックグラウンド初期化をスキップしました", e);
-          }
+      setTimeout(() => {
+        // worker変数が存在し、まだ初期化ボタンが押されていなければWorkerに初期化を指示する
+        const btn = document.getElementById('kuromojiInitBtn');
+        if (btn && !btn.classList.contains('hidden') && typeof postToWorker === 'function') {
+           // initAndRunKuromoji() を直接呼んで、Worker側でのみ初期化させる
+           initAndRunKuromoji().catch(e => console.warn("バックグラウンド初期化スキップ:", e));
         }
       }, 2000); 
     });
   </script>
+  
   <style>
+
     /* Typography & Visual Theme */
     body {
         font-family: noto-sans, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, arial, sans-serif;
