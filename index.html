@@ -586,20 +586,6 @@
     }
   }
 
-    resultsEl.innerHTML = '';
-    fuzzResults.forEach(({ dictWord, group, candidates }) => {
-      const card = document.createElement('div');
-      card.className = 'p-3 border border-[#e0e0e0] bg-white rounded-xl shadow-sm flex flex-col gap-1.5';
-      card.innerHTML = `
-        <div class="text-sm font-bold text-[#0f0f0f]">「${escapeHTML(dictWord)}」に類似</div>
-        <div class="text-sm text-gray-600 flex flex-wrap gap-1.5 mt-1">
-          ${candidates.map(c => `<code class="bg-gray-100 text-gray-700 rounded px-1.5 py-0.5 border border-gray-200 font-bold">${escapeHTML(c)}</code>`).join('')}
-        </div>
-      `;
-      resultsEl.appendChild(card);
-    });
-  }
-
   // ---- カスタム辞書UI ----
   function addCustomRule() {
     const input = document.getElementById('newRuleInput');
