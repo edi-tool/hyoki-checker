@@ -277,9 +277,9 @@
                    oninput="document.getElementById('fuzzyDistLabel').textContent = this.value == 1 ? '1（厳格）' : '2（緩やか）'">
           </div>
           
-          <button onclick="runFuzzyCheck()"
-                  class="btn-primary text-sm rounded-lg px-4 py-3 font-bold w-full shadow-sm">
-            ファジーチェックを実行
+          <button onclick="runFuzzyCheck(event)"
+          class="btn-primary text-sm rounded-lg px-4 py-3 font-bold w-full shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+          ファジーチェックを実行
           </button>
           
           <div id="fuzzyLoading" class="hidden text-sm text-[#118e9e] font-bold text-center animate-pulse py-2">⏳ 解析中...</div>
@@ -536,10 +536,11 @@
     el.innerHTML = `<span class="inline-block w-3 h-3 rounded-full ${colors[state] || 'bg-gray-300'}"></span>${escapeHTML(text)}`;
   }
 
-  // ---- ファジーチェック ----
-  async function runFuzzyCheck() {
+// ---- ファジーチェック ----
+  async function runFuzzyCheck(event) {
     const loadingEl = document.getElementById('fuzzyLoading');
     const resultsEl = document.getElementById('fuzzyResults');
+    const btn = event ? event.currentTarget : null; // クリックされたボタン
     const maxDist = parseInt(document.getElementById('fuzzyThreshold').value);
 
     if (!currentText.trim()) {
@@ -547,19 +548,43 @@
       return;
     }
 
+    // 1. UIを「解析中」状態にする
+    if (btn) btn.disabled = true;
     loadingEl.classList.remove('hidden');
     resultsEl.innerHTML = '';
 
-    await new Promise(r => setTimeout(r, 20));
+    // 2. ブラウザに描画の隙を与えるために少し待機
+    await new Promise(r => setTimeout(r, 100));
 
-    const fuzzResults = fuzzyAnalyze(currentText, dictManager.getAll(), maxDist);
+    try {
+      // 3. 解析実行（最適化されたアルゴリズム）
+      const fuzzResults = fuzzyAnalyze(currentText, dictManager.getAll(), maxDist);
 
-    loadingEl.classList.add('hidden');
-
-    if (fuzzResults.length === 0) {
-      resultsEl.innerHTML = '<p class="text-sm text-gray-400 text-center py-4 font-medium">ファジーマッチは検出されませんでした</p>';
-      return;
+      // 4. 結果の描画
+      if (fuzzResults.length === 0) {
+        resultsEl.innerHTML = '<p class="text-sm text-gray-400 text-center py-4 font-medium">ファジーマッチは検出されませんでした</p>';
+      } else {
+        fuzzResults.forEach(({ dictWord, group, candidates }) => {
+          const card = document.createElement('div');
+          card.className = 'p-3 border border-[#e0e0e0] bg-white rounded-xl shadow-sm flex flex-col gap-1.5';
+          card.innerHTML = `
+            <div class="text-sm font-bold text-[#0f0f0f]">「${escapeHTML(dictWord)}」に類似</div>
+            <div class="text-sm text-gray-600 flex flex-wrap gap-1.5 mt-1">
+              ${candidates.map(c => `<code class="bg-yellow-50 text-red-600 rounded px-1.5 py-0.5 border border-red-100 font-bold">${escapeHTML(c)}</code>`).join('')}
+            </div>
+          `;
+          resultsEl.appendChild(card);
+        });
+      }
+    } catch (e) {
+      console.error(e);
+      alert("解析中にエラーが発生しました。");
+    } finally {
+      // 5. UIを元に戻す
+      loadingEl.classList.add('hidden');
+      if (btn) btn.disabled = false;
     }
+  }
 
     resultsEl.innerHTML = '';
     fuzzResults.forEach(({ dictWord, group, candidates }) => {
