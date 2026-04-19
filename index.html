@@ -282,7 +282,7 @@
 
       <div id="dropZone"
            class="drop-zone rounded-xl p-5 text-center cursor-pointer flex-shrink-0 shadow-sm"
-           onclick="document.getElementById('fileInput').click()">
+           onclick="if(event.isTrusted) document.getElementById('fileInput').click()">
         <div class="text-3xl mb-2">📂</div>
         <div class="text-sm font-bold text-gray-700">Word / PDF をドロップ、またはクリックして選択</div>
         <div class="text-xs text-gray-400 mt-1.5 font-medium">.docx / .pdf 形式に対応</div>
