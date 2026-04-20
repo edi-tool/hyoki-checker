@@ -8,7 +8,7 @@ const dictManager = new DictionaryManager();
 let currentText = '';
 let replacementLog = [];
 let ignoredGroups = new Set();
-let isKuromojiReady = false;
+let _kuromojiInitialized = false;
 
 // ---- Worker 通信 ----
 const worker = new Worker('js/worker.js');
@@ -191,7 +191,7 @@ async function initAndRunKuromoji() {
   setKuromojiStatus('loading', '辞書ファイルを取得中...');
   try {
     await postToWorker('INIT_KUROMOJI', {});
-    isKuromojiReady = true;
+    _kuromojiInitialized = true;
     setKuromojiStatus('ready', '準備完了');
     if (btn) btn.classList.add('hidden');
     const runBtn = document.getElementById('kuromojiRunBtn');
@@ -207,7 +207,7 @@ async function initAndRunKuromoji() {
 }
 
 async function runKuromojiAnalysis() {
-  if (!isKuromojiReady) return;
+  if (!_kuromojiInitialized) return;
   try {
     const results = await postToWorker('KUROMOJI_ANALYZE', {
       text: currentText,
