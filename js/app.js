@@ -105,6 +105,15 @@ async function extractPDF(arrayBuffer) {
 async function runCheck() {
   currentText = document.getElementById('inputText').value;
   const previewCountEl = document.getElementById('previewCount');
+
+  // 【修正】テキストが空の場合は早期リターンして無駄な処理を省く
+  if (!currentText.trim()) {
+    if (previewCountEl) previewCountEl.textContent = '';
+    renderResults([]);
+    renderPreview([]);
+    return;
+  }
+
   if (previewCountEl) previewCountEl.textContent = '⏳ 解析中...';
 
   try {
@@ -208,6 +217,15 @@ async function initAndRunKuromoji() {
 
 async function runKuromojiAnalysis() {
   if (!_kuromojiInitialized) return;
+
+  // 【修正】安全装置：文字数制限（形態素解析の負荷軽減）
+  if (currentText.length > 10000) {
+    alert('【Beta機能制限】\n活用形解析は処理負荷が高いため、現在は10,000文字以下のテキストのみ対応しています。（現在の文字数: ' + currentText.length + '文字）');
+    const el = document.getElementById('kuromojiResults');
+    if (el) el.innerHTML = '<p class="text-sm text-red-500 text-center py-4 font-bold">文字数制限を超過したため解析をスキップしました。</p>';
+    return;
+  }
+
   try {
     const results = await postToWorker('KUROMOJI_ANALYZE', {
       text: currentText,
@@ -216,6 +234,8 @@ async function runKuromojiAnalysis() {
     renderKuromojiResults(results);
   } catch (e) {
     console.error(e);
+    const el = document.getElementById('kuromojiResults');
+    if (el) el.innerHTML = '<p class="text-sm text-red-500 text-center py-4 font-bold">解析中にエラーが発生しました。</p>';
   }
 }
 
@@ -256,6 +276,13 @@ async function runFuzzyCheck(event) {
     return;
   }
 
+  // 【修正】安全装置：文字数制限（計算量爆発を防ぐ）
+  if (currentText.length > 5000) {
+    alert('【Beta機能制限】\nファジーチェックは計算量が大きいため、現在は5,000文字以下のテキストのみ対応しています。（現在の文字数: ' + currentText.length + '文字）');
+    resultsEl.innerHTML = '<p class="text-sm text-red-500 text-center py-4 font-bold">文字数制限を超過したため解析をスキップしました。</p>';
+    return;
+  }
+
   if (btn) btn.disabled = true;
   loadingEl.classList.remove('hidden');
   resultsEl.innerHTML = '';
@@ -285,6 +312,7 @@ async function runFuzzyCheck(event) {
   } catch (e) {
     console.error(e);
     alert('解析中にエラーが発生しました。');
+    resultsEl.innerHTML = '<p class="text-sm text-red-500 text-center py-4 font-bold">解析中にエラーが発生しました。</p>';
   } finally {
     loadingEl.classList.add('hidden');
     if (btn) btn.disabled = false;
