@@ -9,8 +9,11 @@
   <script defer src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
 
   <script>
+    // 旧 Service Worker が残っていれば全て撤去（新規登録はしない）
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./js/sw.js');
+      navigator.serviceWorker.getRegistrations().then((regs) => {
+        regs.forEach((r) => r.unregister());
+      }).catch(() => {});
     }
 
     // ページ読み込み後にバックグラウンドで初期化開始（Web Workerに依頼する形に変更）
@@ -21,7 +24,7 @@
            // Worker側でのみ初期化させる
            initAndRunKuromoji().catch(e => console.warn("バックグラウンド初期化スキップ:", e));
         }
-      }, 2000); 
+      }, 2000);
     });
   </script>
   
@@ -290,7 +293,7 @@
       </div>
 
       <div id="loading" class="hidden text-center text-sm text-[#118e9e] font-bold py-1 bg-[#f0fbfc] rounded-lg">
-        <span class="animate-pulse">⏳ 読み込み中...</span>
+        <span class="animate-pulse">⏳ <span id="loadingPhase">読み込み中...</span></span>
       </div>
 
       <div class="flex items-center gap-3 flex-shrink-0 bg-[#fafafa] p-2 rounded-lg border border-[#e0e0e0]">
@@ -443,14 +446,12 @@
 
 <script>
   window.addEventListener('load', () => {
-    // 依存スクリプト(pdf.jsなど)がロードされるのを待つため初期化タイミングを少しずらす
-    setTimeout(() => {
-      if (typeof pdfjsLib !== 'undefined') {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-      }
-      runDictValidation();
-      if (document.getElementById('inputText').value.trim()) runCheck();
-    }, 100);
+    // pdf.js の workerSrc は遅延させず即時設定（defer で pdfjsLib は読込済み）
+    if (typeof pdfjsLib !== 'undefined') {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    }
+    runDictValidation();
+    if (document.getElementById('inputText').value.trim()) runCheck();
   });
 
   const dictManager = new DictionaryManager();
@@ -458,10 +459,12 @@
   let replacementLog = [];
   let ignoredGroups = new Set();
 
-  function setLoading(isLoading) {
+  function setLoading(isLoading, phase) {
     const loadingEl = document.getElementById('loading');
+    const phaseEl = document.getElementById('loadingPhase');
     if (!loadingEl) return;
     if (isLoading) {
+      if (phaseEl && phase) phaseEl.textContent = phase;
       loadingEl.classList.remove('hidden');
     } else {
       loadingEl.classList.add('hidden');
@@ -539,15 +542,24 @@
   fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
 
   async function handleFile(file) {
-    setLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 50)); 
+    console.log('[handleFile] start:', file.name, file.size, 'bytes');
+    setLoading(true, 'ファイル読み込み中...');
+    await new Promise(resolve => setTimeout(resolve, 50));
     try {
       const arrayBuffer = await file.arrayBuffer();
       const name = file.name.toLowerCase();
       let text = '';
       if (name.endsWith('.pdf') || file.type === 'application/pdf') {
+        console.log('[handleFile] extracting PDF...');
+        setLoading(true, 'PDFからテキスト抽出中...');
+        if (typeof pdfjsLib === 'undefined') {
+          alert('PDF処理ライブラリの読み込みに失敗しました。ページを再読み込みしてください。');
+          return;
+        }
         text = await extractPDF(arrayBuffer);
       } else if (name.endsWith('.docx')) {
+        console.log('[handleFile] extracting DOCX...');
+        setLoading(true, 'Wordからテキスト抽出中...');
         if (typeof mammoth === 'undefined') {
           alert('Word処理ライブラリの読み込みに失敗しました。ページを再読み込みしてください。');
           return;
@@ -561,6 +573,7 @@
         alert('対応形式: .docx / .pdf');
         return;
       }
+      console.log('[handleFile] text extracted, length=', text.length);
       if (!text.trim()) {
         alert('テキストを抽出できませんでした。スキャンPDFや画像ベースのファイルは非対応です。');
         return;
@@ -569,6 +582,9 @@
       document.getElementById('inputText').value = text;
       await runCheck();
     } catch (e) {
+      console.error('[handleFile] error:', e);
+      const resultsEl = document.getElementById('results');
+      if (resultsEl) resultsEl.innerHTML = `<p class="text-sm text-red-500 text-center py-10 font-medium">読み込みエラー: ${e.message}</p>`;
       alert('読み込みエラー: ' + e.message);
     } finally {
       setLoading(false);
@@ -592,13 +608,16 @@
     currentText = document.getElementById('inputText').value;
     const previewCountEl = document.getElementById('previewCount');
     if (previewCountEl) previewCountEl.textContent = '⏳ 解析中...';
-    
+    setLoading(true, '解析中...');
+    console.log('[runCheck] analyzing, text length=', currentText.length);
+
     try {
-      let results = await postToWorker('ANALYZE', { 
-        text: currentText, 
-        dict: dictManager.getAll() 
+      let results = await postToWorker('ANALYZE', {
+        text: currentText,
+        dict: dictManager.getAll()
       });
-      
+      console.log('[runCheck] analyze done, groups=', results.length);
+
       results = results.filter(r => !ignoredGroups.has(r.group.join(',')));
       renderResults(results);
       renderPreview(results);
@@ -607,6 +626,8 @@
       if (previewCountEl) previewCountEl.textContent = '⚠ エラー';
       const resultsEl = document.getElementById('results');
       if (resultsEl) resultsEl.innerHTML = `<p class="text-sm text-red-500 text-center py-10 font-medium">解析エラー: ${e.message}</p>`;
+    } finally {
+      setLoading(false);
     }
   }
 
