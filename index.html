@@ -1,70 +1,781 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>高度表記揺れチェッカー (Notation Consistency Checker)</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>表記ゆれさん</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
+  
+  <script defer src="js/defaultDict.js"></script>
+  <script defer src="js/dictManager.js"></script>
+  <script defer src="js/analyzer.js"></script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./js/sw.js');
+    }
+
+    // ページ読み込み後にバックグラウンドで初期化開始（Web Workerに依頼する形に変更）
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const btn = document.getElementById('kuromojiInitBtn');
+        if (btn && !btn.classList.contains('hidden') && typeof postToWorker === 'function') {
+           // Worker側でのみ初期化させる
+           initAndRunKuromoji().catch(e => console.warn("バックグラウンド初期化スキップ:", e));
+        }
+      }, 2000); 
+    });
+  </script>
+  
+  <style>
+    /* Typography & Visual Theme */
+    body {
+        font-family: noto-sans, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, arial, sans-serif;
+        background-color: #f8f6f2;
+        color: #0f0f0f;
+        line-height: 1.5;
+        letter-spacing: -0.4px;
+        font-feature-settings: "liga";
+        word-break: break-all;
+        overflow-wrap: break-word;
+        line-break: strict;
+        
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 24px 16px;
+        box-sizing: border-box;
+    }
+
+    /* Cards Component (App Container) */
+    .app-container {
+        background-color: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 28px 32px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        width: 100%;
+        max-width: 1300px;
+        height: calc(100vh - 48px);
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+    }
+
+    /* Headings */
+    h1 { 
+        margin-top: 0; 
+        margin-bottom: 2px;
+        font-size: 24px;
+        font-weight: 700;
+        color: #0f0f0f; 
+    }
+    .subtitle {
+        font-size: 13px;
+        color: #757575;
+        display: block;
+    }
+
+    /* File Input & Dropzone Styling */
+    .drop-zone {
+        border: 2px dashed #d4d4d4;
+        background-color: #fafafa;
+        transition: all 0.2s ease;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+        border-color: #118e9e;
+        background-color: #f0fbfc;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background-color: #118e9e;
+        color: white;
+        transition: background-color 0.2s;
+        border: none;
+    }
+    .btn-primary:hover {
+        background-color: #0e7784;
+    }
+    .btn-success {
+        background-color: #43a047;
+        color: white;
+        transition: background-color 0.2s;
+        border: none;
+    }
+    .btn-success:hover {
+        background-color: #388e3c;
+    }
+
+    /* Tabs Styling */
+    .tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    .tab-btn {
+        padding: 12px 18px;
+        border: 1px solid transparent;
+        background-color: transparent;
+        color: #757575;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.2s;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -2px;
+        border-radius: 8px 8px 0 0;
+        font-family: inherit;
+    }
+    .tab-btn:hover {
+        color: #0f0f0f;
+        background-color: #f5f5f5;
+    }
+    .tab-btn.active {
+        color: #118e9e;
+        border-bottom: 3px solid #118e9e;
+        background-color: #fff;
+    }
+
+    /* Highlight Override */
+    #preview span[style*="background-color"], .highlight, mark {
+        font-weight: bold !important;
+        padding: 0 2px !important;
+        border-radius: 2px !important;
+        color: #000 !important;
+        background-color: #fff59d !important;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>高度表記揺れチェッカー</h1>
-            <p>Word (.docx) または PDF 原稿の表記の揺れをクライアントサイドで高速に確認します。</p>
-        </header>
 
-        <main>
-            <section class="control-panel">
-                <div class="file-input-wrapper">
-                    <label for="file-upload" class="custom-file-upload">
-                        ファイルを選択 (.docx /.pdf)
-                    </label>
-                    <input id="file-upload" type="file" accept=".docx,.pdf, application/pdf, application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
-                    <span id="file-name">選択されていません</span>
-                </div>
+<div id="dictErrorBanner" class="hidden w-full max-w-[1300px] bg-[#fef2f2] border border-[#f87171] rounded-xl px-5 py-3 mb-4 shadow-sm">
+  <div class="flex items-start justify-between gap-4">
+    <div class="flex-1">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-red-700 font-bold text-sm">⚠ 辞書に問題が見つかりました</span>
+        <span id="dictErrorSummary" class="text-xs text-red-500 font-medium"></span>
+      </div>
+      <ul id="dictErrorList" class="text-xs text-red-600 space-y-1 list-disc list-inside hidden mt-2 bg-white/50 p-2 rounded"></ul>
+      <button onclick="toggleDictErrorDetail()"
+              id="dictErrorDetailBtn"
+              class="text-xs text-red-500 font-semibold underline mt-1 hover:text-red-700">詳細を表示 ▼</button>
+    </div>
+    <button onclick="document.getElementById('dictErrorBanner').classList.add('hidden')"
+            class="text-red-400 hover:text-red-600 text-xl font-bold leading-none flex-shrink-0">×</button>
+  </div>
+</div>
 
-                <div class="settings">
-                    <label class="beta-feature" title="ルールベースの接尾辞展開を用いた簡易検知">
-                        <input type="checkbox" id="enable-inflection">
-                        活用形チェックを有効にする (Beta/開発中)
-                    </label>
-                    <label class="beta-feature" title="NFKC正規化と長音符除去による簡易検知">
-                        <input type="checkbox" id="enable-fuzzy">
-                        ファジー検索を有効にする (Beta/開発中)
-                    </label>
-                </div>
+<div class="app-container">
+  
+  <header class="flex items-center gap-4 border-b border-[#e0e0e0] pb-5 mb-5 flex-shrink-0">
+    <div class="text-4xl">📝</div>
+    <div>
+      <h1>表記ゆれさん</h1>
+      <span class="subtitle">文章中の表記ゆれを検出・統一します</span>
+    </div>
+  </header>
 
-                <button id="start-analysis" disabled>検知開始</button>
-            </section>
+  <div class="flex gap-6 min-h-0 flex-1">
 
-            <section class="status-panel">
-                <div id="loading-indicator" class="hidden">
-                    <div class="spinner"></div>
-                    <span id="status-text">バックグラウンドワーカーを初期化中...</span>
-                </div>
-            </section>
+    <div class="flex-[1.8] flex flex-col gap-4 min-w-0 h-full">
 
-            <section class="results-panel">
-                <h2>検知結果一覧 <span id="match-count" class="badge">0</span></h2>
-                <div class="table-container">
-                    <table id="results-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 15%;">検知タイプ</th>
-                                <th style="width: 20%;">対象キーワード</th>
-                                <th style="width: 50%;">周辺テキスト (コンテキスト)</th>
-                                <th style="width: 15%;">文字位置</th>
-                            </tr>
-                        </thead>
-                        <tbody id="results-body">
-                            </tbody>
-                    </table>
-                </div>
-            </section>
-        </main>
+      <div id="dropZone"
+           class="drop-zone rounded-xl p-5 text-center cursor-pointer flex-shrink-0 shadow-sm"
+           onclick="document.getElementById('fileInput').click()">
+        <div class="text-3xl mb-2">📂</div>
+        <div class="text-sm font-bold text-gray-700">Word / PDF をドロップ、またはクリックして選択</div>
+        <div class="text-xs text-gray-400 mt-1.5 font-medium">.docx / .pdf 形式に対応</div>
+        <input id="fileInput" type="file" accept=".docx,.pdf" class="hidden">
+      </div>
+
+      <div id="loading" class="hidden text-center text-sm text-[#118e9e] font-bold py-1 bg-[#f0fbfc] rounded-lg">
+        <span class="animate-pulse">⏳ 読み込み中...</span>
+      </div>
+
+      <div class="flex items-center gap-3 flex-shrink-0 bg-[#fafafa] p-2 rounded-lg border border-[#e0e0e0]">
+        <button onclick="downloadCorrectedDocx()"
+                class="flex items-center gap-1.5 text-sm btn-success rounded-md px-4 py-2 font-bold shadow-sm">
+          📄 修正済みWordを出力
+        </button>
+        <div class="flex-1"></div>
+        <span id="replacementBadge" class="hidden text-xs text-[#2e7d32] bg-[#e8f5e9] border border-[#a5d6a7] rounded-full px-3 py-1 font-bold"></span>
+        <button onclick="clearAll()" class="text-sm font-bold text-gray-400 hover:text-red-500 transition-colors px-2">クリア</button>
+      </div>
+
+      <div class="flex-1 flex flex-col gap-5 min-h-0">
+        
+        <div class="flex-1 flex flex-col gap-2 min-h-0">
+          <label class="text-[15px] font-bold text-[#0f0f0f] border-l-4 border-[#118e9e] pl-2 leading-none">入力テキスト</label>
+          <textarea id="inputText"
+                    class="flex-1 w-full border border-[#e0e0e0] rounded-xl p-4 text-[15px] resize-none focus:outline-none focus:border-[#118e9e] focus:ring-2 focus:ring-[#118e9e]/20 transition-shadow bg-white shadow-inner leading-relaxed"
+                    placeholder="ここにテキストを入力、またはファイルをドロップしてください..."></textarea>
+        </div>
+
+        <div class="flex-1 flex flex-col gap-2 min-h-0">
+          <div class="flex items-center justify-between">
+            <label class="text-[15px] font-bold text-[#0f0f0f] border-l-4 border-[#e53935] pl-2 leading-none">プレビュー（ハイライト）</label>
+            <span id="previewCount" class="text-xs font-bold text-gray-500 bg-gray-100 border border-gray-200 px-2 py-0.5 rounded-full"></span>
+          </div>
+          <div id="preview"
+               class="flex-1 overflow-y-auto border border-[#e0e0e0] rounded-xl p-4 text-[15px] bg-[#fafafa] leading-relaxed whitespace-pre-wrap break-words text-gray-800 shadow-inner">
+            <span class="text-gray-400">ここにハイライト表示されます</span>
+          </div>
+        </div>
+
+      </div>
     </div>
 
-    <script src="js/defaultDict.js"></script>
-    <script src="js/main.js" defer></script>
+    <div class="w-[400px] flex flex-col flex-shrink-0 bg-white border border-[#e0e0e0] rounded-xl shadow-sm h-full overflow-hidden">
+
+      <div class="tabs px-2 pt-2 bg-[#fafafa] border-b border-[#e0e0e0]">
+        <button id="tabBtn-results" class="tab-btn active flex items-center gap-1.5" onclick="switchTab('results')">
+          検知結果 <span id="resultCount" class="text-[11px] bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full font-bold">0 件</span>
+        </button>
+        <button id="tabBtn-kuromoji" class="tab-btn" onclick="switchTab('kuromoji')">活用形</button>
+        <button id="tabBtn-fuzzy" class="tab-btn" onclick="switchTab('fuzzy')">ファジー</button>
+        <button id="tabBtn-dict" class="tab-btn" onclick="switchTab('dict')">辞書設定</button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto bg-white p-4">
+
+        <div id="tab-results" class="tab-pane flex flex-col">
+          <div id="results" class="flex flex-col gap-3">
+            <p class="text-sm text-gray-400 text-center py-10 font-medium">ゆらぎは検知されていません</p>
+          </div>
+        </div>
+
+        <div id="tab-kuromoji" class="tab-pane hidden flex-col gap-4">
+          <div class="bg-[#f0fbfc] border border-[#b2ebf2] p-3 rounded-lg text-sm text-[#0e7784] leading-relaxed">
+            「みて / 見て」のような活用形ゆれを、形態素解析を用いて検出します。<br>
+            <span class="text-xs opacity-80">※初回のみ辞書ファイル（約7MB）の取得が必要です。</span>
+          </div>
+          
+          <div id="kuromojiStatus" class="text-sm font-bold text-gray-500 flex items-center gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+            <span class="inline-block w-3 h-3 rounded-full bg-gray-300"></span>未初期化
+          </div>
+          
+          <button id="kuromojiInitBtn" onclick="initAndRunKuromoji()"
+                  class="btn-primary text-sm rounded-lg px-4 py-3 font-bold w-full shadow-sm">
+            Kuromoji を初期化して解析
+          </button>
+          
+          <button id="kuromojiRunBtn" onclick="runKuromojiAnalysis()" class="hidden border-2 border-[#118e9e] text-[#118e9e] hover:bg-[#f0fbfc] text-sm rounded-lg px-4 py-2.5 font-bold transition-colors w-full">
+            再解析を実行
+          </button>
+          
+          <div id="kuromojiResults" class="flex flex-col gap-3 mt-2"></div>
+        </div>
+
+        <div id="tab-fuzzy" class="tab-pane hidden flex-col gap-4">
+          <div class="bg-[#f3e5f5] border border-[#ce93d8] p-3 rounded-lg text-sm text-[#6a1b9a] leading-relaxed">
+            辞書に近い（ただし完全一致しない）表記をスキャンします。誤字や異体字の発見に有効です。
+          </div>
+          
+          <div class="flex flex-col gap-3 bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <div class="flex items-center justify-between text-sm text-gray-800 font-bold">
+              <label>許容する編集距離</label>
+              <span id="fuzzyDistLabel" class="text-[#118e9e] bg-[#f0fbfc] px-2 py-0.5 rounded border border-[#b2ebf2]">1（厳格）</span>
+            </div>
+            <input type="range" id="fuzzyThreshold" min="1" max="2" value="1"
+                   class="w-full accent-[#118e9e] mt-1 cursor-pointer"
+                   oninput="document.getElementById('fuzzyDistLabel').textContent = this.value == 1 ? '1（厳格）' : '2（緩やか）'">
+          </div>
+          
+          <button onclick="runFuzzyCheck(event)"
+          class="btn-primary text-sm rounded-lg px-4 py-3 font-bold w-full shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+          ファジーチェックを実行
+          </button>
+          
+          <div id="fuzzyLoading" class="hidden text-sm text-[#118e9e] font-bold text-center animate-pulse py-2">⏳ 解析中...</div>
+          <div id="fuzzyResults" class="flex flex-col gap-3 mt-2"></div>
+        </div>
+
+        <div id="tab-dict" class="tab-pane hidden flex-col gap-6">
+          
+          <div class="flex flex-col gap-2 bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <label class="text-sm font-bold text-gray-800">新しいゆらぎグループを追加</label>
+            <p class="text-xs text-gray-500 mb-1">対象とする単語をカンマ区切りで入力してください。</p>
+            <input id="newRuleInput" type="text"
+                   class="border border-[#e0e0e0] rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[#118e9e] focus:ring-2 focus:ring-[#118e9e]/20 bg-white"
+                   placeholder="例: ウェブ,ウエブ,Web"
+                   onkeydown="if(event.key==='Enter') addCustomRule()">
+            <button onclick="addCustomRule()"
+                    class="btn-primary text-sm rounded-md px-4 py-2 font-bold mt-1">
+              追加する
+            </button>
+          </div>
+
+          <div class="flex flex-col gap-3">
+            <p class="text-sm font-bold text-gray-800 border-b border-gray-200 pb-2">一括データ操作</p>
+            
+            <div class="grid grid-cols-2 gap-2">
+              <label class="block text-center text-sm font-bold text-[#118e9e] border-2 border-[#118e9e] rounded-lg px-2 py-2 hover:bg-[#f0fbfc] cursor-pointer transition-colors bg-white">
+                📥 CSV/TSV 読込
+                <input type="file" accept=".tsv,.csv,.txt" class="hidden" onchange="importTSVCSV(event)">
+              </label>
+              <label class="block text-center text-sm font-bold text-gray-600 border-2 border-gray-300 rounded-lg px-2 py-2 hover:bg-gray-50 cursor-pointer transition-colors bg-white">
+                📁 JSON 読込
+                <input type="file" accept=".json" class="hidden" onchange="importCustomDict(event)">
+              </label>
+            </div>
+            
+            <button onclick="dictManager.exportJSON()"
+                    class="w-full text-sm font-bold text-gray-600 border-2 border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors bg-white mt-1">
+              📤 現在の辞書を JSON で書き出し
+            </button>
+          </div>
+
+          <div class="flex flex-col min-h-0">
+            <p class="text-sm font-bold text-gray-800 mb-2">登録済みカスタム辞書</p>
+            <div id="customDictList" class="flex flex-col gap-2 max-h-[25vh] overflow-y-auto border border-gray-200 rounded-lg p-2 bg-[#fafafa]"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.addEventListener('load', () => {
+    // 依存スクリプト(pdf.jsなど)がロードされるのを待つため初期化タイミングを少しずらす
+    setTimeout(() => {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+      runDictValidation();
+      runCheck();
+    }, 100);
+  });
+
+  const dictManager = new DictionaryManager();
+  let currentText = '';
+  let replacementLog = [];
+  let ignoredGroups = new Set();
+
+  function setLoading(isLoading) {
+    const loadingEl = document.getElementById('loading');
+    if (!loadingEl) return;
+    if (isLoading) {
+      loadingEl.classList.remove('hidden');
+    } else {
+      loadingEl.classList.add('hidden');
+    }
+  }
+  
+  // Web Worker の初期化
+  const worker = new Worker('js/worker.js');
+  let workerCallbackMap = new Map();
+  let messageIdCounter = 0;
+
+  function postToWorker(type, payload) {
+    return new Promise((resolve, reject) => {
+      const id = ++messageIdCounter;
+      workerCallbackMap.set(id, { resolve, reject });
+      worker.postMessage({ id, type, payload });
+    });
+  }
+
+  worker.onmessage = function(e) {
+    const { id, type, results, message } = e.data;
+    const callbacks = workerCallbackMap.get(id);
+    if (!callbacks) return;
+    
+    if (type === 'ERROR') {
+      callbacks.reject(new Error(message));
+    } else {
+      callbacks.resolve(results);
+    }
+    workerCallbackMap.delete(id);
+  };
+
+  // ---- タブ切り替え処理 ----
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+    document.getElementById(`tabBtn-${tabId}`).classList.add('active');
+    if (tabId === 'dict') renderCustomDictList();
+  }
+
+  // ---- ファイル読み込み ----
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
+
+  async function handleFile(file) {
+    setLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 50)); 
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const name = file.name.toLowerCase();
+      let text = '';
+      if (name.endsWith('.pdf') || file.type === 'application/pdf') {
+        text = await extractPDF(arrayBuffer);
+      } else if (name.endsWith('.docx')) {
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        text = result.value;
+      } else {
+        alert('対応形式: .docx / .pdf');
+        return;
+      }
+      replacementLog = [];
+      document.getElementById('inputText').value = text;
+      await runCheck();
+    } catch (e) {
+      alert('読み込みエラー: ' + e.message);
+    } finally {
+      setLoading(false);
+      fileInput.value = '';
+    }
+  }
+
+  async function extractPDF(arrayBuffer) {
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let text = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      text += content.items.map(item => item.str).join('') + '\n';
+    }
+    return text;
+  }
+
+  // ---- チェック処理 (Worker利用) ----
+  async function runCheck() {
+    currentText = document.getElementById('inputText').value;
+    const previewCountEl = document.getElementById('previewCount');
+    if (previewCountEl) previewCountEl.textContent = '⏳ 解析中...';
+    
+    try {
+      let results = await postToWorker('ANALYZE', { 
+        text: currentText, 
+        dict: dictManager.getAll() 
+      });
+      
+      results = results.filter(r => !ignoredGroups.has(r.group.join(',')));
+      renderResults(results);
+      renderPreview(results);
+    } catch (e) {
+      console.error("解析エラー:", e);
+      if (previewCountEl) previewCountEl.textContent = '⚠ エラー';
+    }
+  }
+
+  // ---- UI 描画系の復元関数群 ----
+  function renderResults(results) {
+    const resultsEl = document.getElementById('results');
+    const countEl = document.getElementById('resultCount');
+    if (!results || results.length === 0) {
+      resultsEl.innerHTML = '<p class="text-sm text-gray-400 text-center py-10 font-medium">ゆらぎは検知されていません</p>';
+      countEl.textContent = '0 件';
+      return;
+    }
+    countEl.textContent = `${results.length} 件`;
+    
+    let html = '';
+    results.forEach((r) => {
+      const esc = typeof escapeHTML === 'function' ? escapeHTML : (s => s);
+      const groupLabel = r.group.map(esc).join(' ・ ');
+      let countsHtml = '';
+      if (r.counts && r.counts.length > 0) {
+        countsHtml = r.counts.map(({word, count}) =>
+          `<div class="flex justify-between text-xs py-0.5">
+            <span class="${word === r.recommended ? 'text-[#118e9e] font-bold' : 'text-gray-700'}">${esc(word)}</span>
+            <span class="font-bold text-gray-500 ml-4">${count}件</span>
+          </div>`
+        ).join('');
+      } else {
+        countsHtml = r.group.map(w =>
+          `<div class="text-xs text-gray-700 py-0.5">${esc(w)}</div>`
+        ).join('');
+      }
+      html += `<div class="p-3 border border-[#e0e0e0] bg-white rounded-xl shadow-sm flex flex-col gap-1.5">
+        <div class="text-sm font-bold text-[#0f0f0f]">${groupLabel}</div>
+        <div class="bg-gray-50 border border-gray-200 rounded p-2 flex flex-col">${countsHtml}</div>
+      </div>`;
+    });
+    resultsEl.innerHTML = html;
+  }
+
+  function renderPreview(results) {
+    const previewEl = document.getElementById('preview');
+    const countEl = document.getElementById('previewCount');
+    
+    if (!currentText) {
+      previewEl.innerHTML = '<span class="text-gray-400">ここにハイライト表示されます</span>';
+      countEl.textContent = '';
+      return;
+    }
+    if (results.length === 0) {
+      previewEl.innerHTML = typeof escapeHTML === 'function' ? escapeHTML(currentText).replace(/\n/g, '<br>') : currentText;
+      countEl.textContent = 'ゆらぎなし';
+      return;
+    }
+
+    if (typeof buildHighlightedHTML === 'function') {
+      previewEl.innerHTML = buildHighlightedHTML(currentText, results);
+    } else {
+      previewEl.textContent = currentText; // フォールバック
+    }
+    countEl.textContent = `${results.length}件のグループ`;
+  }
+
+  // ---- Kuromoji 活用形解析 (Worker利用) ----
+  let isKuromojiReady = false;
+
+  async function initAndRunKuromoji() {
+    const btn = document.getElementById('kuromojiInitBtn');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = '読み込み中...';
+    }
+    setKuromojiStatus('loading', '辞書ファイルを取得中...');
+    
+    try {
+      await postToWorker('INIT_KUROMOJI', {});
+      isKuromojiReady = true;
+      setKuromojiStatus('ready', '準備完了');
+      if (btn) btn.classList.add('hidden');
+      const runBtn = document.getElementById('kuromojiRunBtn');
+      if (runBtn) runBtn.classList.remove('hidden');
+      runKuromojiAnalysis();
+    } catch (e) {
+      setKuromojiStatus('error', '初期化失敗: ' + e.message);
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Kuromoji を初期化して解析';
+      }
+    }
+  }
+
+  async function runKuromojiAnalysis() {
+    if (!isKuromojiReady) return;
+    try {
+      const results = await postToWorker('KUROMOJI_ANALYZE', {
+        text: currentText,
+        dict: dictManager.getAll()
+      });
+      renderKuromojiResults(results);
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  function setKuromojiStatus(status, text) {
+    const el = document.getElementById('kuromojiStatus');
+    if (!el) return;
+    let colorClass = status === 'ready' ? 'bg-[#43a047]' : (status === 'error' ? 'bg-red-500' : 'bg-gray-300');
+    if (status === 'loading') colorClass = 'bg-yellow-400 animate-pulse';
+    el.innerHTML = `<span class="inline-block w-3 h-3 rounded-full ${colorClass}"></span>${text}`;
+  }
+
+  function renderKuromojiResults(results) {
+    const el = document.getElementById('kuromojiResults');
+    if (!el) return;
+    if (!results || results.length === 0) {
+      el.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">活用形のゆらぎは検知されませんでした</p>';
+      return;
+    }
+    let html = '';
+    results.forEach(r => {
+      const escRecommended = typeof escapeHTML === 'function' ? escapeHTML(r.recommendedWord) : r.recommendedWord;
+      html += `<div class="p-3 border border-[#b2ebf2] bg-white rounded-xl shadow-sm flex flex-col gap-1.5">
+        <div class="text-sm font-bold text-[#0f0f0f]">基本形: <span class="text-[#0e7784]">${escRecommended}</span></div>
+      </div>`;
+    });
+    el.innerHTML = html;
+  }
+
+  // ---- ファジーチェック (Worker利用) ----
+  async function runFuzzyCheck(event) {
+    const loadingEl = document.getElementById('fuzzyLoading');
+    const resultsEl = document.getElementById('fuzzyResults');
+    const btn = event ? event.currentTarget : null;
+    const maxDist = parseInt(document.getElementById('fuzzyThreshold').value);
+
+    if (!currentText.trim()) {
+      resultsEl.innerHTML = '<p class="text-sm text-gray-400 text-center py-4 font-medium">テキストを入力してください</p>';
+      return;
+    }
+
+    if (btn) btn.disabled = true;
+    loadingEl.classList.remove('hidden');
+    resultsEl.innerHTML = '';
+
+    try {
+      const fuzzResults = await postToWorker('FUZZY', {
+        text: currentText,
+        dict: dictManager.getAll(),
+        maxDistance: maxDist
+      });
+
+      if (fuzzResults.length === 0) {
+        resultsEl.innerHTML = '<p class="text-sm text-gray-400 text-center py-4 font-medium">ファジーマッチは検出されませんでした</p>';
+      } else {
+        fuzzResults.forEach(({ dictWord, group, candidates }) => {
+          const card = document.createElement('div');
+          card.className = 'p-3 border border-[#e0e0e0] bg-white rounded-xl shadow-sm flex flex-col gap-1.5';
+          const safeDict = typeof escapeHTML === 'function' ? escapeHTML(dictWord) : dictWord;
+          const safeCandidates = typeof escapeHTML === 'function' ? candidates.map(escapeHTML) : candidates;
+          card.innerHTML = `
+            <div class="text-sm font-bold text-[#0f0f0f]">「${safeDict}」に類似</div>
+            <div class="text-sm text-gray-600 flex flex-wrap gap-1.5 mt-1">
+              ${safeCandidates.map(c => `<code class="bg-yellow-50 text-red-600 rounded px-1.5 py-0.5 border border-red-100 font-bold">${c}</code>`).join('')}
+            </div>
+          `;
+          resultsEl.appendChild(card);
+        });
+      }
+    } catch (e) {
+      console.error(e);
+      alert("解析中にエラーが発生しました。");
+    } finally {
+      loadingEl.classList.add('hidden');
+      if (btn) btn.disabled = false;
+    }
+  }
+
+  // ---- ユーティリティ系UI処理の復元 ----
+  function clearAll() {
+    document.getElementById('inputText').value = '';
+    currentText = '';
+    document.getElementById('fileInput').value = '';
+    renderResults([]);
+    renderPreview([]);
+    const fuzzResults = document.getElementById('fuzzyResults');
+    if (fuzzResults) fuzzResults.innerHTML = '';
+    const kuroResults = document.getElementById('kuromojiResults');
+    if (kuroResults) kuroResults.innerHTML = '';
+  }
+
+  function downloadCorrectedDocx() {
+    if (!currentText) return alert('テキストがありません');
+    if (typeof htmlDocx === 'undefined') return alert('Word生成ライブラリが読み込まれていません');
+    
+    // ※今回は単純にテキストを段落分けしてWord化する簡易実装としています
+    const safeText = typeof escapeHTML === 'function' ? escapeHTML(currentText) : currentText;
+    const htmlContent = `<!DOCTYPE html><html><body><p>${safeText.replace(/\n/g, '<br>')}</p></body></html>`;
+    const converted = htmlDocx.asBlob(htmlContent);
+    
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(converted);
+    a.download = 'corrected.docx';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function runDictValidation() {
+    if (!dictManager || typeof dictManager.validateDict !== 'function') return;
+    const validation = dictManager.validateDict(dictManager.getAll());
+    const banner = document.getElementById('dictErrorBanner');
+    const summary = document.getElementById('dictErrorSummary');
+    const list = document.getElementById('dictErrorList');
+    
+    if (!validation.valid) {
+      banner.classList.remove('hidden');
+      summary.textContent = `エラー ${validation.errors.length} 件`;
+      list.innerHTML = validation.errors.map(err => `<li>インデックス ${err.index}: ${err.reason}</li>`).join('');
+    } else {
+      banner.classList.add('hidden');
+    }
+  }
+
+  function toggleDictErrorDetail() {
+    const list = document.getElementById('dictErrorList');
+    if (list) list.classList.toggle('hidden');
+  }
+
+  function addCustomRule() {
+    const input = document.getElementById('newRuleInput');
+    const val = input.value;
+    const words = val.split(',').map(s => s.trim()).filter(s => s);
+    if (words.length >= 2) {
+      dictManager.addCustomGroup(words);
+      input.value = '';
+      renderCustomDictList();
+      runCheck();
+    } else {
+      alert('カンマ区切りで2語以上入力してください（例: Web,ウェブ）');
+    }
+  }
+
+  function renderCustomDictList() {
+    const el = document.getElementById('customDictList');
+    if (!el) return;
+    const custom = dictManager.getCustom();
+    if(custom.length === 0) {
+      el.innerHTML = '<p class="text-xs text-gray-400 p-2">カスタム辞書はありません</p>';
+      return;
+    }
+    el.innerHTML = custom.map((g, i) => {
+      const safeGroup = typeof escapeHTML === 'function' ? escapeHTML(g.join(', ')) : g.join(', ');
+      return `<div class="flex justify-between items-center text-sm p-2 border-b border-gray-100 hover:bg-gray-50">
+        <span class="text-gray-700 font-medium">${safeGroup}</span>
+        <button onclick="dictManager.removeCustomGroup(${i}); renderCustomDictList(); runCheck();" class="text-red-400 hover:text-red-600 font-bold px-2 py-1 bg-red-50 rounded">削除</button>
+      </div>`;
+    }).join('');
+  }
+
+  async function importCustomDict(e) {
+    if (!e.target.files[0]) return;
+    try {
+      await dictManager.importJSON(e.target.files[0]);
+      renderCustomDictList();
+      runCheck();
+    } catch(err) {
+      alert('読み込み失敗: ' + err.message);
+    } finally {
+      e.target.value = '';
+    }
+  }
+
+  async function importTSVCSV(e) {
+    if (!e.target.files[0]) return;
+    try {
+      const text = await e.target.files[0].text();
+      const separator = e.target.files[0].name.toLowerCase().endsWith('.csv') ? ',' : '\t';
+      dictManager.importDelimited(text, separator);
+      renderCustomDictList();
+      runCheck();
+    } catch(err) {
+      alert('読み込み失敗: ' + err.message);
+    } finally {
+      e.target.value = '';
+    }
+  }
+
+  // 入力イベント（デバウンス処理）
+  let checkTimeout;
+  document.getElementById('inputText').addEventListener('input', () => {
+    const countEl = document.getElementById('previewCount');
+    if (countEl) countEl.textContent = '入力待機中...';
+    clearTimeout(checkTimeout);
+    checkTimeout = setTimeout(() => {
+      runCheck();
+    }, 500);
+  });
+
+</script>
 </body>
 </html>
