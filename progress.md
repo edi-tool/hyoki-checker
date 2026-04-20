@@ -1,61 +1,63 @@
-# 進捗: kenchikekka UI 機能復活 ✅
+# 進捗: Aho-Corasick + Web Worker アーキテクチャ移行 ✅
 
 ## 概要
-過去のバージョンで失われていた検知結果UIの2つの機能を復活：
-1. 各表記の**出現回数を数値表示**
-2. **表記統一ボタン**（クリックで本文一括置換）
-
-## 解決内容
-
-### 実装内容
-- **index.html:629** `renderResults()` 書き換え → 各表記をボタン化、出現回数バッジ付きで表示
-  - 推奨表記（最多出現）は `bg-[#f0fbfc] border-[#118e9e]` で強調
-  - インデックスベースのクリックハンドラで特殊文字エスケープ問題を回避
-  
-- **index.html:666** `unifyTo(groupIdx, wordIdx)` 新規実装
-  - グループ内の全単語を選択語に一括置換
-  - `replacementLog` に記録、再解析をトリガー
-  
-- **index.html:691** `updateReplacementBadge()` 新規実装
-  - 右上バッジに統一実行回数を表示
-  
-- **index.html:794** `clearAll()` 微修正
-  - replacementLog をリセット、バッジを非表示
-
-### 既存データの有効活用
-`js/analyzer.js:12-25` の `analyze()` は既に `counts: [{word, count}]` 配列を返していたため、データベースレイヤーはそのまま。UI層だけの修正で対応完了。
-
----
-
-## 前回の解決内容：ファイル選択後に分析が進まない問題 ✅
-
-### 実装した対策（plan: robust-snuggling-dongarra.md）
-1. **Service Worker 自己撤去** → 旧キャッシュ廃止、新修正が確実に配信される
-2. **pdf.js workerSrc 設定前倒し** → pdf.js読み込み直後に即設定、素早いPDF処理
-3. **進捗 UI 動的化** → 段階別メッセージ表示（ファイル読み込み中→テキスト抽出中→解析中）
-4. **診断ログ追加** → DevTools Console に実行フロー痕跡
-
-### 根本原因（事後判明）
-**kuromoji 自動初期化が Worker をブロック** → page load から 2 秒後に自動的に kuromoji.js + 多 MB 辞書をインポート → 単一スレッド Worker の message queue を 30 秒以上ブロック → ANALYZE メッセージが届かないまま timeout
-
-### 最終修正
-- `index.html` 行 17-25: setTimeout 自動初期化を廃止
-- `worker.js`, `analyzer.js`: 変更なし（設計正常）
-
-### 実装済みコミット
-- `ca1f3e1` favicon
-- `93d57ef` Fix duplicate isKuromojiReady identifier conflicting with analyzer.js
-- `5c69ef3` Add progress UI, remove stale service worker, fix pdf.js init race
-- `6fdc79a` Fix dropZone click event propagation loop blocking file picker
-- `53eb790` Stop auto-initializing kuromoji; it blocked ANALYZE on the single worker thread
-
-## 検証済み
-✅ .docx ファイル選択 → テキスト抽出成功 → 解析完了  
-✅ 進捗表示が画面に更新される  
-✅ DevTools に診断ログ出力  
-✅ エラー時は画面に赤字表示  
+他AIによる大規模リファクタリング（Aho-Corasick・Web Worker・Transferable Objects・DocumentFragment）の
+コード破損を修正し、正常動作を復元。
 
 ---
 
 ## 最新コミット
-`58992ee` Restore kenchikekka UI: display counts and unification buttons
+`dae590c` Fix broken syntax, path errors, and reconnect defaultDict from other AI refactor
+
+---
+
+## 解決した問題
+
+### 1. コード破損（他AIの出力フォーマット起因）
+- `[]` リテラルが全削除（`const variants =;` 等、7箇所以上）
+- `||` 演算子が改行で分断（main.js・worker.js 各2箇所）
+
+### 2. Aho-Corasick アルゴリズム全面修正
+- `this.trie[char]` → `this.trie[state][char]`（状態インデックス完全欠如）
+- `this.output` → `this.output[state]`
+- `this.fail` → `this.fail[state]`
+
+### 3. パス・参照エラー
+- `index.html`: `src="main.js"` → `src="js/main.js"`
+- `main.js`: `new Worker("worker.js")` → `new Worker("js/worker.js")`
+- Transferable Objects: `}, );` → `}, [arrayBuffer]);`
+- `event.target.files` → `event.target.files[0]`
+
+### 4. defaultDict.js 復元
+- 他AIが492エントリ辞書を8語ハードコードに差し替え
+- `index.html` に `<script src="js/defaultDict.js">` 追加
+- `main.js` に adapter関数 `buildDictionaryFromDefaultDict()` 実装
+
+---
+
+## 現在のアーキテクチャ
+
+| ファイル | 役割 |
+|---|---|
+| `index.html` | UIシェル |
+| `js/main.js` | UIコントローラ・Worker通信 |
+| `js/worker.js` | バックグラウンド処理（PDF/docx抽出・解析） |
+| `js/analyzer.js` | DocumentAnalyzerクラス（Aho-Corasick） |
+| `js/defaultDict.js` | 130+同義語グループ、492エントリ |
+| `js/dictManager.js` | カスタム辞書UI（現在未接続） |
+
+---
+
+## 保留事項（未着手）
+
+- [ ] `dictManager.js` を新アーキテクチャに再接続（カスタム辞書入力UI）
+- [ ] ブラウザ実機検証（`python3 -m http.server 8000` で確認）
+- [ ] 活用語尾展開・ファジーマッチのルール拡充
+- [ ] 外部JSONファイルからの辞書ロード対応
+
+---
+
+## 検証済み（Node.js）
+✅ Aho-Corasick: テスト文字列で6件正確ヒット  
+✅ defaultDict: 492エントリ読み込み確認  
+✅ 構文エラーなし（全4ファイル）

@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -m http.server 8080)",
+      "Bash(curl -s http://localhost:8080/)",
+      "Bash(curl -s http://localhost:8080/js/analyzer.js)",
+      "Bash(curl -s http://localhost:8080/js/worker.js)",
+      "Bash(node -e ' *)",
+      "Bash(git -C \"D:\\\\My Documents\\\\GitHub\\\\hyoki-checker\" branch -a)",
+      "Bash(git -C \"D:\\\\My Documents\\\\GitHub\\\\hyoki-checker\" show claude/dreamy-gauss-b45260:index.html)",
+      "Bash(git -C \"D:\\\\My Documents\\\\GitHub\\\\hyoki-checker\" show claude/wizardly-tu-dacbcb:index.html)",
+      "Bash(git -C \"D:\\\\My Documents\\\\GitHub\\\\hyoki-checker\" worktree list)",
+      "Bash(git -C \"D:\\\\My Documents\\\\GitHub\\\\hyoki-checker\" checkout claude/wizardly-tu-dacbcb -- index.html)",
+      "Bash(git -C \"D:\\\\My Documents\\\\GitHub\\\\hyoki-checker\" status)",
+      "Bash(git -C \"D:\\\\My Documents\\\\GitHub\\\\hyoki-checker\" diff --staged)",
+      "Bash(git -C \"D:\\\\My Documents\\\\GitHub\\\\hyoki-checker\" add index.html)",
+      "Bash(git -C \"D:\\\\My Documents\\\\GitHub\\\\hyoki-checker\" log --oneline -3)",
+      "Bash(git -C 'D:\\\\My Documents\\\\GitHub\\\\hyoki-checker' commit -m ' *)",
+      "Bash(git -C \"D:\\\\My Documents\\\\GitHub\\\\hyoki-checker\" push origin main)"
+    ]
+  }
+}
