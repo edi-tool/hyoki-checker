@@ -3,10 +3,16 @@
  * プロトコル: メインから {id, type, payload} を受信し {id, type, results} を返す
  */
 
-importScripts('https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/build/kuromoji.js');
 importScripts('analyzer.js');
 
 self.KUROMOJI_DIC_PATH = 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/';
+let _kuromojiLoaded = false;
+
+function ensureKuromojiLoaded() {
+  if (_kuromojiLoaded) return;
+  importScripts('https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/build/kuromoji.js');
+  _kuromojiLoaded = true;
+}
 
 function send(id, results) {
   self.postMessage({ id, type: 'RESULT', results });
@@ -30,11 +36,13 @@ self.onmessage = async function (e) {
         break;
       }
       case 'INIT_KUROMOJI': {
+        ensureKuromojiLoaded();
         await initKuromoji(self.KUROMOJI_DIC_PATH);
         send(id, true);
         break;
       }
       case 'KUROMOJI_ANALYZE': {
+        ensureKuromojiLoaded();
         const results = kuromojiAnalyze(payload.text || '', payload.dict || []);
         send(id, results);
         break;

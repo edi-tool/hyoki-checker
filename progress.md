@@ -1,63 +1,55 @@
-# 進捗: Aho-Corasick + Web Worker アーキテクチャ移行 ✅
-
-## 概要
-他AIによる大規模リファクタリング（Aho-Corasick・Web Worker・Transferable Objects・DocumentFragment）の
-コード破損を修正し、正常動作を復元。
-
----
-
-## 最新コミット
-`dae590c` Fix broken syntax, path errors, and reconnect defaultDict from other AI refactor
-
----
-
-## 解決した問題
-
-### 1. コード破損（他AIの出力フォーマット起因）
-- `[]` リテラルが全削除（`const variants =;` 等、7箇所以上）
-- `||` 演算子が改行で分断（main.js・worker.js 各2箇所）
-
-### 2. Aho-Corasick アルゴリズム全面修正
-- `this.trie[char]` → `this.trie[state][char]`（状態インデックス完全欠如）
-- `this.output` → `this.output[state]`
-- `this.fail` → `this.fail[state]`
-
-### 3. パス・参照エラー
-- `index.html`: `src="main.js"` → `src="js/main.js"`
-- `main.js`: `new Worker("worker.js")` → `new Worker("js/worker.js")`
-- Transferable Objects: `}, );` → `}, [arrayBuffer]);`
-- `event.target.files` → `event.target.files[0]`
-
-### 4. defaultDict.js 復元
-- 他AIが492エントリ辞書を8語ハードコードに差し替え
-- `index.html` に `<script src="js/defaultDict.js">` 追加
-- `main.js` に adapter関数 `buildDictionaryFromDefaultDict()` 実装
-
----
+# 進捗: Web Worker 経由の表記ゆれチェック ✅
 
 ## 現在のアーキテクチャ
 
 | ファイル | 役割 |
 |---|---|
-| `index.html` | UIシェル |
-| `js/main.js` | UIコントローラ・Worker通信 |
-| `js/worker.js` | バックグラウンド処理（PDF/docx抽出・解析） |
-| `js/analyzer.js` | DocumentAnalyzerクラス（Aho-Corasick） |
-| `js/defaultDict.js` | 130+同義語グループ、492エントリ |
-| `js/dictManager.js` | カスタム辞書UI（現在未接続） |
+| `index.html` | UIシェル・Worker通信・タブ切替・ハイライト描画 |
+| `js/worker.js` | Worker: `ANALYZE` / `FUZZY` / `INIT_KUROMOJI` / `KUROMOJI_ANALYZE` を処理 |
+| `js/analyzer.js` | `analyze` / `analyzeAsync` / `fuzzyAnalyze` / `kuromojiAnalyze` / `buildHighlightedHTML` / `escapeHTML` |
+| `js/defaultDict.js` | 同義語グループ辞書（492エントリ） |
+| `js/dictManager.js` | カスタム辞書管理（localStorage + JSON/TSV/CSV import） |
+
+※ `js/main.js` は旧アーキテクチャ用で現在 index.html からは参照されない（将来削除候補）。
 
 ---
 
-## 保留事項（未着手）
+## Worker プロトコル
 
-- [ ] `dictManager.js` を新アーキテクチャに再接続（カスタム辞書入力UI）
-- [ ] ブラウザ実機検証（`python3 -m http.server 8000` で確認）
-- [ ] 活用語尾展開・ファジーマッチのルール拡充
-- [ ] 外部JSONファイルからの辞書ロード対応
+送信: `{ id, type, payload }`
+受信: `{ id, type: 'RESULT', results }` または `{ id, type: 'ERROR', message }`
+
+| type | payload | 戻り値 |
+|---|---|---|
+| `ANALYZE` | `{ text, dict }` | `[{ group, recommended, counts[], others[] }]` |
+| `FUZZY` | `{ text, dict, maxDistance }` | `[{ dictWord, group, candidates[] }]` |
+| `INIT_KUROMOJI` | `{}` | `true` |
+| `KUROMOJI_ANALYZE` | `{ text, dict }` | `[{ group, recommendedWord, foundBases[] }]` |
+
+kuromoji は `INIT_KUROMOJI`/`KUROMOJI_ANALYZE` 呼び出し時に遅延 importScripts（CDN失敗時も ANALYZE/FUZZY は継続動作）。
 
 ---
 
-## 検証済み（Node.js）
-✅ Aho-Corasick: テスト文字列で6件正確ヒット  
-✅ defaultDict: 492エントリ読み込み確認  
-✅ 構文エラーなし（全4ファイル）
+## 表示フォーマット（検知結果タブ）
+
+グループ内の各バリアント＋出現件数を並べる形式:
+
+```
+ウェブ・web・ウエブ
+  ウェブ   2件
+  web     2件
+  ウエブ   1件
+```
+
+---
+
+## 検証済み
+
+- ✅ `analyze()` が `{group, recommended, counts, others}` を正しく返却（Node実測）
+- ✅ Worker プロトコルとの整合（index.html `postToWorker` ↔ worker.js `onmessage`）
+- ✅ kuromoji 遅延ロード（起動時 CDN 失敗でも通常解析は動作）
+
+## 保留事項
+
+- [ ] ブラウザ実機で全タブ（通常/活用形/ファジー/辞書管理）動作確認
+- [ ] `js/main.js` 削除（未使用）
