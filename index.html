@@ -682,7 +682,7 @@
   }
 
   // ---- Kuromoji 活用形解析 (Worker利用) ----
-  let isKuromojiReady = false;
+  let kuromojiInitialized = false;
 
   async function initAndRunKuromoji() {
     const btn = document.getElementById('kuromojiInitBtn');
@@ -694,7 +694,7 @@
     
     try {
       await postToWorker('INIT_KUROMOJI', {});
-      isKuromojiReady = true;
+      kuromojiInitialized = true;
       setKuromojiStatus('ready', '準備完了');
       if (btn) btn.classList.add('hidden');
       const runBtn = document.getElementById('kuromojiRunBtn');
@@ -710,7 +710,7 @@
   }
 
   async function runKuromojiAnalysis() {
-    if (!isKuromojiReady) return;
+    if (!kuromojiInitialized) return;
     try {
       const results = await postToWorker('KUROMOJI_ANALYZE', {
         text: currentText,
