@@ -49,9 +49,7 @@ self.onmessage = async function(e) {
             self.postMessage({ type: 'COMPLETE' });
 
         } catch (error) {
-            self.postMessage({ type: 'ERROR', text: error.message |
-
-| error.toString() });
+            self.postMessage({ type: 'ERROR', text: error.message || error.toString() });
         }
     }
 };
@@ -74,9 +72,7 @@ async function extractTextFromPDF(arrayBuffer) {
         fullText += pageText + "\n";
         
         // メインスレッドのUIを更新するための進捗通知
-        if (i % 5 === 0 |
-
-| i === pdf.numPages) {
+        if (i % 5 === 0 || i === pdf.numPages) {
             self.postMessage({ 
                 type: 'STATUS', 
                 text: `PDF読み込み中: ${i} / ${pdf.numPages} ページ` 

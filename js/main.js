@@ -15,21 +15,22 @@ document.addEventListener("DOMContentLoaded", () => {
     let worker = null;
     let totalMatches = 0;
 
-    // 検索対象の辞書定義（実際の運用では外部JSONファイルからの読み込みを推奨）
-    // [45, 46] のような外部JSON読み込みアーキテクチャに容易に拡張可能。
-    const dictionaryDefinition = {
-        // 基本となる完全一致のターゲット
-        exact: ["サーバ", "サーバー", "コンピュータ", "コンピューター", "ユーザー", "ユーザ", "行う", "行なう"],
-        // 活用形展開アルゴリズムのトリガーとなる動詞の基本形
-        verbs: ["行う", "認める", "分かる"], 
-        // 正規化レイヤーでファジーマッチングを試行するベース単語
-        fuzzy: ["シミュレーション", "インターフェース", "コミュニケーション"]
-    };
+    // defaultDict.js の DEFAULT_DICT（同義グループ配列）を新アーキテクチャ形式に変換
+    function buildDictionaryFromDefaultDict() {
+        const exact = [];
+        for (const group of DEFAULT_DICT) {
+            for (const word of group) {
+                if (!word.startsWith('～')) exact.push(word);
+            }
+        }
+        return { exact: [...new Set(exact)], verbs: [], fuzzy: [] };
+    }
+    const dictionaryDefinition = buildDictionaryFromDefaultDict();
 
     // ファイル選択イベント
     fileInput.addEventListener("change", (event) => {
         if (event.target.files.length > 0) {
-            selectedFile = event.target.files;
+            selectedFile = event.target.files[0];
             fileNameDisplay.textContent = `${selectedFile.name} (${(selectedFile.size / 1024 / 1024).toFixed(2)} MB)`;
             startButton.disabled = false;
         }
@@ -77,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // 以前のWorkerが存在する場合は安全に破棄し、メモリリークを防ぐ
         if (worker) worker.terminate();
 
-        worker = new Worker("worker.js");
+        worker = new Worker("js/worker.js");
 
         // Workerからのメッセージ受信ハンドラ
         worker.onmessage = (e) => {
@@ -115,7 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 inflection: enableInflection,
                 fuzzy: enableFuzzy
             }
-        },); 
+        }, [arrayBuffer]); 
     }
 
     /**
@@ -123,9 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
      * @param {Array} matches - 検知結果の配列
      */
     function renderResultsBatch(matches) {
-        if (!matches |
-
-| matches.length === 0) return;
+        if (!matches || matches.length === 0) return;
 
         // DocumentFragmentを利用して、DOMへのアクセスを1回にまとめる（Reflowの最小化） [41]
         const fragment = document.createDocumentFragment();
@@ -205,9 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 '>': '&gt;',
                 "'": '&#39;',
                 '"': '&quot;'
-            }[tag] |
-
-| tag)
+            }[tag] || tag)
         );
     }
 });
