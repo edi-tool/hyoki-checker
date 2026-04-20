@@ -626,7 +626,10 @@
   }
 
   // ---- UI 描画系の復元関数群 ----
+  let lastResults = [];
+
   function renderResults(results) {
+    lastResults = results || [];
     const resultsEl = document.getElementById('results');
     const countEl = document.getElementById('resultCount');
     if (!results || results.length === 0) {
@@ -635,21 +638,63 @@
       return;
     }
     countEl.textContent = `${results.length} 件`;
-    
+
     let html = '';
-    results.forEach((r) => {
-      // 外部ファイル analyzer.js 内の escapeHTML を使用
-      const recommended = typeof escapeHTML === 'function' ? escapeHTML(r.recommended) : r.recommended;
-      const others = typeof escapeHTML === 'function' ? r.others.map(escapeHTML).join(', ') : r.others.join(', ');
-      
-      html += `<div class="p-3 border border-[#e0e0e0] bg-white rounded-xl shadow-sm flex flex-col gap-1.5">
-        <div class="text-sm font-bold text-[#0f0f0f]">統一候補: <span class="text-[#118e9e]">${recommended}</span></div>
-        <div class="text-xs text-gray-600 bg-gray-50 p-2 rounded">
-          その他の表記: <strong>${others}</strong>
-        </div>
+    results.forEach((r, gi) => {
+      const buttons = r.counts.map((c, wi) => {
+        const w = typeof escapeHTML === 'function' ? escapeHTML(c.word) : c.word;
+        const isRec = c.word === r.recommended;
+        const cls = isRec
+          ? 'bg-[#f0fbfc] border-[#118e9e] text-[#0e7784]'
+          : 'bg-white border-[#e0e0e0] text-gray-700 hover:bg-gray-50';
+        return `<button type="button" onclick="unifyTo(${gi},${wi})"
+          class="flex items-center gap-1.5 border rounded-md px-2 py-1 text-xs font-bold transition-colors cursor-pointer ${cls}">
+          <span>${w}</span>
+          <span class="text-[11px] bg-gray-100 text-gray-600 rounded-full px-1.5 py-0.5 font-medium border border-gray-200">${c.count}</span>
+        </button>`;
+      }).join('');
+
+      html += `<div class="p-3 border border-[#e0e0e0] bg-white rounded-xl shadow-sm flex flex-col gap-2">
+        <div class="text-xs text-gray-500 font-medium">揃える表記を選択:</div>
+        <div class="flex flex-wrap gap-1.5">${buttons}</div>
       </div>`;
     });
     resultsEl.innerHTML = html;
+  }
+
+  // 指定グループを指定単語に統一
+  function unifyTo(groupIdx, wordIdx) {
+    const r = lastResults[groupIdx];
+    if (!r) return;
+    const target = r.counts[wordIdx]?.word;
+    if (!target) return;
+    const textarea = document.getElementById('inputText');
+    let text = textarea.value;
+    let replaced = 0;
+    for (const w of r.group) {
+      if (w === target) continue;
+      const esc = w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const before = text;
+      text = text.replace(new RegExp(esc, 'g'), target);
+      if (before !== text) replaced++;
+    }
+    if (replaced === 0) return;
+    textarea.value = text;
+    currentText = text;
+    replacementLog.push({ group: r.group.slice(), to: target });
+    updateReplacementBadge();
+    runCheck();
+  }
+
+  function updateReplacementBadge() {
+    const badge = document.getElementById('replacementBadge');
+    if (!badge) return;
+    if (replacementLog.length > 0) {
+      badge.classList.remove('hidden');
+      badge.textContent = `${replacementLog.length} 件の統一を実行`;
+    } else {
+      badge.classList.add('hidden');
+    }
   }
 
   function renderPreview(results) {
@@ -795,6 +840,8 @@
     document.getElementById('inputText').value = '';
     currentText = '';
     document.getElementById('fileInput').value = '';
+    replacementLog = [];
+    updateReplacementBadge();
     renderResults([]);
     renderPreview([]);
     const fuzzResults = document.getElementById('fuzzyResults');
