@@ -3,7 +3,8 @@
  * プロトコル: メインから {id, type, payload} を受信し {id, type, results} を返す
  */
 
-importScripts('analyzer.js');
+// GitHub Pages環境でのパス解決を安定させるため ./ を付与
+importScripts('./analyzer.js');
 
 self.KUROMOJI_DIC_PATH = 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/';
 let _kuromojiLoaded = false;
@@ -17,6 +18,7 @@ function ensureKuromojiLoaded() {
 function send(id, results) {
   self.postMessage({ id, type: 'RESULT', results });
 }
+
 function sendError(id, err) {
   self.postMessage({ id, type: 'ERROR', message: err && err.message ? err.message : String(err) });
 }
