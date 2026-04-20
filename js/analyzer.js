@@ -8,8 +8,13 @@ function analyze(text, dict) {
   const results = [];
 
   for (const group of dict) {
-    if (!Array.isArray(group) || group.length < 2) continue;
-    const counts = group.map(word => {
+    if (!Array.isArray(group)) continue;
+    
+    // 【修正】空文字や空白のみの単語を除外（正規表現の暴走を防止）
+    const validGroup = group.filter(w => typeof w === 'string' && w.trim().length > 0);
+    if (validGroup.length < 2) continue;
+
+    const counts = validGroup.map(word => {
       const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const matches = text.match(new RegExp(escaped, 'g'));
       return { word, count: matches ? matches.length : 0 };
@@ -22,7 +27,7 @@ function analyze(text, dict) {
     const recommended = found[0].word;
     const others = found.slice(1).map(c => c.word);
 
-    results.push({ group, recommended, counts: found, others });
+    results.push({ group: validGroup, recommended, counts: found, others });
   }
 
   return results;
@@ -30,24 +35,45 @@ function analyze(text, dict) {
 
 /**
  * テキスト中の非推奨単語をHTMLハイライトに変換する
+ * 【修正】HTMLタグ自身の置換による表示崩れを防ぐため、1パスで処理
  * @param {string} text
  * @param {{ others: string[] }[]} analysisResults
  * @returns {string} - ハイライト済みHTML文字列
  */
 function buildHighlightedHTML(text, analysisResults) {
-  let escaped = escapeHTML(text);
-
+  const words = [];
   for (const { others } of analysisResults) {
-    for (const word of others) {
-      const escapedWord = escapeHTML(word).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      escaped = escaped.replace(
-        new RegExp(escapedWord, 'g'),
-        `<mark class="bg-yellow-200 rounded px-0.5">${escapeHTML(word)}</mark>`
-      );
-    }
+    words.push(...others);
   }
 
-  return escaped.replace(/\n/g, '<br>');
+  // ゆらぎ対象がない場合は、そのままエスケープして返す
+  if (words.length === 0) {
+    return escapeHTML(text).replace(/\n/g, '<br>');
+  }
+
+  // 短い単語の誤爆を防ぐため、文字数の長い順にソート
+  words.sort((a, b) => b.length - a.length);
+
+  // 正規表現を構築（重複を排除）
+  const uniqueWords = [...new Set(words)];
+  const escapedWords = uniqueWords.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  const regex = new RegExp(`(${escapedWords.join('|')})`, 'g');
+
+  let result = '';
+  let lastIndex = 0;
+  let match;
+
+  // テキストを先頭から走査し、マッチした部分だけをタグで囲む
+  while ((match = regex.exec(text)) !== null) {
+    result += escapeHTML(text.substring(lastIndex, match.index));
+    result += `<mark class="bg-yellow-200 rounded px-0.5">${escapeHTML(match[0])}</mark>`;
+    lastIndex = regex.lastIndex;
+  }
+  
+  // 残りのテキストを追加
+  result += escapeHTML(text.substring(lastIndex));
+
+  return result.replace(/\n/g, '<br>');
 }
 
 /**
@@ -60,7 +86,7 @@ function buildHighlightedHTML(text, analysisResults) {
 function replaceGroup(text, group, recommended) {
   let result = text;
   for (const word of group) {
-    if (word === recommended) continue;
+    if (word === recommended || !word.trim()) continue;
     const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     result = result.replace(new RegExp(escaped, 'g'), recommended);
   }
@@ -76,10 +102,10 @@ function escapeHTML(str) {
     .replace(/"/g, '&quot;');
 }
 
-// ---- Fuzzy マッチング ----
+// ---- Fuzzy マッチング (Beta) ----
 
 /**
- * Levenshtein 編集距離（1次元DP、短い文字列向け最適化済み）
+ * Levenshtein 編集距離
  * @param {string} a
  * @param {string} b
  * @returns {number}
@@ -101,27 +127,24 @@ function levenshtein(a, b) {
   return dp[b.length];
 }
 
-// 句読点・空白のみの文字列を判定
 const _PUNCT_RE = /^[\s\n\r、。，．！？「」【】（）〔〕『』〈〉・…‥]+$/;
 
 /**
  * 高速化版ファジー解析
- * テキストをスキャンして辞書単語に近い（ただし完全一致しない）文字列を検出する
- * @param {string} text - 解析対象テキスト
- * @param {string[][]} dict - 辞書グループ配列
- * @param {number} maxDistance - 許容編集距離（1 or 2）
+ * @param {string} text
+ * @param {string[][]} dict
+ * @param {number} maxDistance
  * @returns {{ dictWord: string, group: string[], candidates: string[] }[]}
  */
 function fuzzyAnalyze(text, dict, maxDistance = 1) {
-  const exactSet = new Set(dict.flat());
+  const exactSet = new Set(dict.flat().filter(w => typeof w === 'string' && w.trim().length > 0));
   const candidateMap = new Map();
   
-  // 1. 辞書の最適化：3文字未満の短い単語はノイズが多いため除外
-  // また、高速化のために辞書語を文字セット(Set)化しておく
   const dictData = [];
   for (const group of dict) {
+    if (!Array.isArray(group)) continue;
     for (const word of group) {
-      if (word.length < 3) continue; // 短い単語はスキップ
+      if (typeof word !== 'string' || word.length < 3) continue;
       dictData.push({
         word,
         group,
@@ -133,43 +156,35 @@ function fuzzyAnalyze(text, dict, maxDistance = 1) {
 
   const textLen = text.length;
   
-  // 2. テキストのスキャン
   for (let i = 0; i < textLen; i++) {
-    // 単語の長さは辞書にあるものの範囲（概ね3〜15文字程度）に限定
     for (let l = 3 - maxDistance; l <= 15; l++) { 
       if (i + l > textLen) break;
       
       const candidate = text.slice(i, i + l);
       
-      // 完全一致するもの、記号のみ、既に検知済みはスキップ
       if (exactSet.has(candidate) || _PUNCT_RE.test(candidate)) continue;
       if (candidateMap.has(candidate)) continue;
 
       const candidateChars = new Set(candidate.split(''));
       
       for (const item of dictData) {
-        // 長さの差が編集距離を超えていたら即座にスキップ
         if (Math.abs(item.len - l) > maxDistance) continue;
 
-        // 【高速化の要】文字セットによる事前フィルタ
-        // 共通する文字が少なすぎる場合は、Levenshtein距離を計算するまでもなく不一致
         let commonCount = 0;
         for (let char of candidateChars) {
           if (item.chars.has(char)) commonCount++;
         }
         if (commonCount < Math.min(l, item.len) - maxDistance) continue;
 
-        // ここまで残った候補のみ精密な計算を行う
         const d = levenshtein(candidate, item.word);
         if (d > 0 && d <= maxDistance) {
           candidateMap.set(candidate, { dictWord: item.word, group: item.group });
-          break; // 1つの箇所に対して1つ見つかれば十分
+          break;
         }
       }
     }
   }
 
-  // 結果の整形（dictWordごとにまとめる）
   const resultMap = new Map();
   for (const [candidate, { dictWord, group }] of candidateMap) {
     if (!resultMap.has(dictWord)) {
@@ -193,30 +208,38 @@ async function analyzeAsync(text, dict, chunkSize = 50) {
   for (let i = 0; i < dict.length; i += chunkSize) {
     const chunk = dict.slice(i, i + chunkSize);
     for (const group of chunk) {
-      if (!Array.isArray(group) || group.length < 2) continue;
-      const counts = group.map(word => {
+      if (!Array.isArray(group)) continue;
+      
+      // 【修正】ここでも空文字や空白のみの単語を除外
+      const validGroup = group.filter(w => typeof w === 'string' && w.trim().length > 0);
+      if (validGroup.length < 2) continue;
+
+      const counts = validGroup.map(word => {
         const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const matches = text.match(new RegExp(escaped, 'g'));
         return { word, count: matches ? matches.length : 0 };
       });
+
       const found = counts.filter(c => c.count > 0);
       if (found.length < 2) continue;
+
       found.sort((a, b) => b.count - a.count);
       const recommended = found[0].word;
       const others = found.slice(1).map(c => c.word);
-      results.push({ group, recommended, counts: found, others });
+
+      results.push({ group: validGroup, recommended, counts: found, others });
     }
     await new Promise(r => setTimeout(r, 0));
   }
   return results;
 }
 
-// ---- Kuromoji 形態素解析 ----
+// ---- Kuromoji 形態素解析 (Beta) ----
 
 let _tokenizer = null;
 
 /**
- * Kuromoji トークナイザーを初期化する（CDNから辞書を取得、約7MB）
+ * Kuromoji トークナイザーを初期化する
  * @returns {Promise<void>}
  */
 function initKuromoji(dicPath) {
@@ -247,10 +270,14 @@ function kuromojiAnalyze(text, dict) {
   const results = [];
 
   for (const group of dict) {
-    if (!Array.isArray(group) || group.length < 2) continue;
+    if (!Array.isArray(group)) continue;
+    
+    // 【追加】安全対策：空文字を除外
+    const validGroup = group.filter(w => typeof w === 'string' && w.trim().length > 0);
+    if (validGroup.length < 2) continue;
 
     const baseToWord = new Map();
-    for (const word of group) {
+    for (const word of validGroup) {
       const wt = _tokenizer.tokenize(word);
       const bf = wt[0]?.basic_form;
       if (bf && bf !== '*' && !baseToWord.has(bf)) {
@@ -274,7 +301,7 @@ function kuromojiAnalyze(text, dict) {
     const sorted = [...foundBases.entries()].sort((a, b) => b[1].count - a[1].count);
 
     results.push({
-      group,
+      group: validGroup,
       recommendedWord: baseToWord.get(sorted[0][0]),
       foundBases: sorted.map(([bf, data]) => ({
         base: bf,
