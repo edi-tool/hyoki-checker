@@ -16,16 +16,10 @@
       }).catch(() => {});
     }
 
-    // ページ読み込み後にバックグラウンドで初期化開始（Web Workerに依頼する形に変更）
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        const btn = document.getElementById('kuromojiInitBtn');
-        if (btn && !btn.classList.contains('hidden') && typeof postToWorker === 'function') {
-           // Worker側でのみ初期化させる
-           initAndRunKuromoji().catch(e => console.warn("バックグラウンド初期化スキップ:", e));
-        }
-      }, 2000);
-    });
+    // Kuromoji 自動初期化は廃止。
+    // Worker は単一スレッドのため、kuromoji 初期化（CDNロード+辞書数MB）が
+    // ANALYZE メッセージをブロックしてタイムアウトさせていた。
+    // ユーザーが「活用形」タブで明示的にボタンを押したときだけ初期化する。
   </script>
   
   <style>
