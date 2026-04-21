@@ -1,7 +1,7 @@
 services:
   - type: web
     name: hyoki-checker-api
-    runtime: docker
+    env: docker
     dockerfilePath: ./Dockerfile
     plan: free
     envVars:
