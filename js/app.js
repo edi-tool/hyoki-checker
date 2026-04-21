@@ -148,7 +148,7 @@ function renderResults(results) {
     if (r.counts && r.counts.length > 0) {
       countsHtml = r.counts.map(({ word, count }) =>
         `<div class="flex justify-between text-xs py-0.5">
-          <span class="${word === r.recommended ? 'text-[#118e9e] font-bold' : 'text-gray-700'}">${esc(word)}</span>
+          <span class="${word === r.recommended ? 'text-[#f28c06] font-bold' : 'text-gray-700'}">${esc(word)}</span>
           <span class="font-bold text-gray-500 ml-4">${count}件</span>
         </div>`
       ).join('');
@@ -257,8 +257,8 @@ function renderKuromojiResults(results) {
   const esc = typeof escapeHTML === 'function' ? escapeHTML : (s => s);
   let html = '';
   results.forEach(r => {
-    html += `<div class="p-3 border border-[#b2ebf2] bg-white rounded-xl shadow-sm flex flex-col gap-1.5">
-      <div class="text-sm font-bold text-[#0f0f0f]">基本形: <span class="text-[#0e7784]">${esc(r.recommendedWord)}</span></div>
+    html += `<div class="p-3 border border-[#ffe0b2] bg-white rounded-xl shadow-sm flex flex-col gap-1.5">
+      <div class="text-sm font-bold text-[#0f0f0f]">基本形: <span class="text-[#d97706]">${esc(r.recommendedWord)}</span></div>
     </div>`;
   });
   el.innerHTML = html;
@@ -427,10 +427,6 @@ async function importTSVCSV(e) {
 
 // ---- 初期化 ----
 document.addEventListener('DOMContentLoaded', () => {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./js/sw.js').catch(e => console.warn('SW 登録失敗:', e));
-  }
-
   if (typeof pdfjsLib !== 'undefined') {
     pdfjsLib.GlobalWorkerOptions.workerSrc =
       'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';

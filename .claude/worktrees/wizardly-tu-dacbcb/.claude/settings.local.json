@@ -16,7 +16,11 @@
       "Bash(git -C \"D:\\\\My Documents\\\\GitHub\\\\hyoki-checker\" add index.html)",
       "Bash(git -C \"D:\\\\My Documents\\\\GitHub\\\\hyoki-checker\" log --oneline -3)",
       "Bash(git -C 'D:\\\\My Documents\\\\GitHub\\\\hyoki-checker' commit -m ' *)",
-      "Bash(git -C \"D:\\\\My Documents\\\\GitHub\\\\hyoki-checker\" push origin main)"
+      "Bash(git -C \"D:\\\\My Documents\\\\GitHub\\\\hyoki-checker\" push origin main)",
+      "Bash(python -c ' *)",
+      "Bash(node --check js/app.js)",
+      "Bash(node --check js/analyzer.js)",
+      "Bash(node --check js/worker.js)"
     ]
   }
 }
