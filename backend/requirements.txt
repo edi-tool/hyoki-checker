@@ -1,0 +1,8 @@
+fastapi>=0.111
+uvicorn[standard]>=0.29
+sudachipy>=0.6.7
+sudachidict-core>=20240409
+pyahocorasick>=2.0
+pdfminer.six>=20231228
+mammoth>=1.8
+python-multipart>=0.0.9

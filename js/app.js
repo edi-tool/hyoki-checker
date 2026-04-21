@@ -10,6 +10,21 @@ let replacementLog = [];
 let ignoredGroups = new Set();
 let _kuromojiInitialized = false;
 
+// ---- バックエンドAPI設定 ----
+const API_BASE = '';  // デプロイ時に 'https://your-api.fly.dev' を設定
+const BACKEND_THRESHOLD = 5000;  // この文字数超でバックエンドを使用
+
+async function fetchBackendAnalyze(text) {
+  const res = await fetch(`${API_BASE}/analyze`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text }),
+  });
+  if (!res.ok) throw new Error(`API error: ${res.status}`);
+  const data = await res.json();
+  return data.results;
+}
+
 // ---- Worker 通信 ----
 const worker = new Worker('js/worker.js');
 const workerCallbackMap = new Map();
@@ -117,10 +132,15 @@ async function runCheck() {
   if (previewCountEl) previewCountEl.textContent = '⏳ 解析中...';
 
   try {
-    let results = await postToWorker('ANALYZE', {
-      text: currentText,
-      dict: dictManager.getAll(),
-    });
+    let results;
+    if (API_BASE && currentText.length > BACKEND_THRESHOLD) {
+      results = await fetchBackendAnalyze(currentText);
+    } else {
+      results = await postToWorker('ANALYZE', {
+        text: currentText,
+        dict: dictManager.getAll(),
+      });
+    }
     results = results.filter(r => !ignoredGroups.has(r.group.join(',')));
     renderResults(results);
     renderPreview(results);
