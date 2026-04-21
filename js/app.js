@@ -8,6 +8,7 @@ const dictManager = new DictionaryManager();
 let currentText = '';
 let replacementLog = [];
 let ignoredGroups = new Set();
+let _checkVersion = 0;
 let _kuromojiInitialized = false;
 
 // ---- バックエンドAPI設定 ----
@@ -122,6 +123,7 @@ async function extractPDF(arrayBuffer) {
 
 // ---- 解析・描画 ----
 async function runCheck() {
+  const version = ++_checkVersion;
   currentText = document.getElementById('inputText').value;
   const previewCountEl = document.getElementById('previewCount');
 
@@ -146,6 +148,7 @@ async function runCheck() {
       });
     }
     results = results.filter(r => !ignoredGroups.has(r.group.join(',')));
+    if (version !== _checkVersion) return;
     renderResults(results);
     renderPreview(results);
   } catch (e) {
