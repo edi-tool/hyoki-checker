@@ -81,6 +81,32 @@ kuromoji は `INIT_KUROMOJI`/`KUROMOJI_ANALYZE` 呼び出し時に遅延 importS
 - `index.html`: インライン Tailwind クラスの色参照を一括置換（#118e9e/#0e7784/#f0fbfc/#b2ebf2 → オレンジ系）
 - `js/app.js`: 旧 Service Worker 登録コード3行削除（sw.js は削除専用スクリプトのため不要）
 
+## バックエンド実装（PR #10、2026-04-21）
+
+| ファイル | 内容 |
+|---|---|
+| `backend/main.py` | FastAPI v2（lifespan, CORS, /analyze, /dict/custom, /dict/info） |
+| `backend/analyzer.py` | Aho-Corasick + SudachiPy 自動検知 |
+| `backend/chunker.py` | テキスト分割 |
+| `backend/dict_manager.py` | 階層辞書管理 |
+| `backend/models.py` | Pydantic モデル |
+| `Dockerfile` | ルートに配置、絶対パス指定 |
+| `render.yaml` | `env: docker` で Render Blueprint 設定 |
+
+### Render デプロイ状況
+- Render サービス名: `hyoki-checker-api`
+- 3度のビルド失敗（requirements.txt パス問題）→ `env: docker` + 絶対パス指定で修正済み（コミット `f36ee65`）
+- ✅ デプロイ成功後に `js/app.js` の `API_BASE` を Render URL に更新予定
+
+### フロントエンド修正（2026-04-21）
+
+| 対応 | 内容 |
+|---|---|
+| favicon | `favicon.png` を `index.html` で参照（`<link rel="icon">`） |
+| PDF.js cMapUrl | `pdfjsLib.getDocument()` に `cMapUrl` / `cMapPacked` 追加（日本語PDF文字化け防止） |
+| Tailwind | CDN スクリプト除去 → CLI ビルド済み `style.dist.css` に移行 |
+
 ## 現在の状態
 
-✅ main ブランチ最新・PR #9 マージ済み
+✅ main ブランチ最新・PR #9・#10 マージ済み
+⏳ Render デプロイ確認待ち（コミット `f36ee65`）
