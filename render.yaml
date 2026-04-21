@@ -3,6 +3,7 @@ services:
     name: hyoki-checker-api
     runtime: docker
     dockerfilePath: backend/Dockerfile
+    dockerContext: .
     plan: free
     envVars:
       - key: PORT
