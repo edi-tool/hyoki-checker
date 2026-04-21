@@ -108,7 +108,7 @@ async function handleFile(file) {
 async function extractPDF(arrayBuffer) {
   const pdf = await pdfjsLib.getDocument({
     data: arrayBuffer,
-    cMapUrl: './cmaps/',
+    cMapUrl: new URL('./cmaps/', document.baseURI).href,
     cMapPacked: true,
   }).promise;
   let text = '';
