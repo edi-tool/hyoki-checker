@@ -1,8 +1,9 @@
 services:
   - type: web
     name: hyoki-checker-api
-    env: docker
-    dockerfilePath: ./Dockerfile
+    env: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
     plan: free
     envVars:
       - key: PORT
