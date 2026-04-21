@@ -99,19 +99,19 @@ main {
   transition: all 0.2s ease;
 }
 .drop-zone:hover, .drop-zone.dragover {
-  border-color: #118e9e;
-  background-color: #f0fbfc;
+  border-color: #f28c06;
+  background-color: #fff8f0;
 }
 
 /* Buttons */
 .btn-primary {
-  background-color: #118e9e;
+  background-color: #f28c06;
   color: white;
   transition: background-color 0.2s;
   border: none;
 }
 .btn-primary:hover {
-  background-color: #0e7784;
+  background-color: #d97706;
 }
 .btn-success {
   background-color: #43a047;
@@ -149,8 +149,8 @@ main {
   background-color: #f5f5f5;
 }
 .tab-btn.active {
-  color: #118e9e;
-  border-bottom: 3px solid #118e9e;
+  color: #f28c06;
+  border-bottom: 3px solid #f28c06;
   background-color: #fff;
 }
 

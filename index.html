@@ -58,7 +58,7 @@
             <input id="fileInput" type="file" accept=".docx,.pdf" class="hidden">
           </div>
 
-          <div id="loading" class="hidden text-center text-sm text-[#118e9e] font-bold py-1 bg-[#f0fbfc] rounded-lg">
+          <div id="loading" class="hidden text-center text-sm text-[#f28c06] font-bold py-1 bg-[#fff8f0] rounded-lg">
             <span class="animate-pulse">⏳ 読み込み中...</span>
           </div>
 
@@ -89,9 +89,9 @@
 
           <div class="flex-1 flex flex-col gap-5 min-h-0">
             <div class="flex-1 flex flex-col gap-2 min-h-0">
-              <label class="text-[15px] font-bold text-[#0f0f0f] border-l-4 border-[#118e9e] pl-2 leading-none">入力テキスト</label>
+              <label class="text-[15px] font-bold text-[#0f0f0f] border-l-4 border-[#f28c06] pl-2 leading-none">入力テキスト</label>
               <textarea id="inputText"
-                        class="flex-1 w-full border border-[#e0e0e0] rounded-xl p-4 text-[15px] resize-none focus:outline-none focus:border-[#118e9e] focus:ring-2 focus:ring-[#118e9e]/20 transition-shadow bg-white shadow-inner leading-relaxed"
+                        class="flex-1 w-full border border-[#e0e0e0] rounded-xl p-4 text-[15px] resize-none focus:outline-none focus:border-[#f28c06] focus:ring-2 focus:ring-[#f28c06]/20 transition-shadow bg-white shadow-inner leading-relaxed"
                         placeholder="ここにテキストを入力、またはファイルをドロップしてください..."></textarea>
             </div>
 
@@ -126,7 +126,7 @@
             </div>
 
             <div id="tab-kuromoji" class="tab-pane hidden flex-col gap-4">
-              <div class="bg-[#f0fbfc] border border-[#b2ebf2] p-3 rounded-lg text-sm text-[#0e7784] leading-relaxed">
+              <div class="bg-[#fff8f0] border border-[#ffe0b2] p-3 rounded-lg text-sm text-[#d97706] leading-relaxed">
                 「みて / 見て」のような活用形ゆれを、形態素解析を用いて検出します。<br>
                 <span class="text-xs opacity-80">※初回のみ辞書ファイル（約7MB）の取得が必要です。</span>
               </div>
@@ -140,7 +140,7 @@
                 Kuromoji を初期化して解析
               </button>
               
-              <button id="kuromojiRunBtn" onclick="runKuromojiAnalysis()" class="hidden border-2 border-[#118e9e] text-[#118e9e] hover:bg-[#f0fbfc] text-sm rounded-lg px-4 py-2.5 font-bold transition-colors w-full">
+              <button id="kuromojiRunBtn" onclick="runKuromojiAnalysis()" class="hidden border-2 border-[#f28c06] text-[#f28c06] hover:bg-[#fff8f0] text-sm rounded-lg px-4 py-2.5 font-bold transition-colors w-full">
                 再解析を実行
               </button>
               
@@ -155,10 +155,10 @@
               <div class="flex flex-col gap-3 bg-gray-50 p-4 rounded-lg border border-gray-200">
                 <div class="flex items-center justify-between text-sm text-gray-800 font-bold">
                   <label>許容する編集距離</label>
-                  <span id="fuzzyDistLabel" class="text-[#118e9e] bg-[#f0fbfc] px-2 py-0.5 rounded border border-[#b2ebf2]">1（厳格）</span>
+                  <span id="fuzzyDistLabel" class="text-[#f28c06] bg-[#fff8f0] px-2 py-0.5 rounded border border-[#ffe0b2]">1（厳格）</span>
                 </div>
                 <input type="range" id="fuzzyThreshold" min="1" max="2" value="1"
-                       class="w-full accent-[#118e9e] mt-1 cursor-pointer"
+                       class="w-full accent-[#f28c06] mt-1 cursor-pointer"
                        oninput="document.getElementById('fuzzyDistLabel').textContent = this.value == 1 ? '1（厳格）' : '2（緩やか）'">
               </div>
               
@@ -167,7 +167,7 @@
                 ファジーチェックを実行
               </button>
               
-              <div id="fuzzyLoading" class="hidden text-sm text-[#118e9e] font-bold text-center animate-pulse py-2">⏳ 解析中...</div>
+              <div id="fuzzyLoading" class="hidden text-sm text-[#f28c06] font-bold text-center animate-pulse py-2">⏳ 解析中...</div>
               <div id="fuzzyResults" class="flex flex-col gap-3 mt-2"></div>
             </div>
 
@@ -176,7 +176,7 @@
                 <label class="text-sm font-bold text-gray-800">新しいゆらぎグループを追加</label>
                 <p class="text-xs text-gray-500 mb-1">対象とする単語をカンマ区切りで入力してください。</p>
                 <input id="newRuleInput" type="text"
-                       class="border border-[#e0e0e0] rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[#118e9e] focus:ring-2 focus:ring-[#118e9e]/20 bg-white"
+                       class="border border-[#e0e0e0] rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[#f28c06] focus:ring-2 focus:ring-[#f28c06]/20 bg-white"
                        placeholder="例: ウェブ,ウエブ,Web"
                        onkeydown="if(event.key==='Enter') addCustomRule()">
                 <button onclick="addCustomRule()"
@@ -188,7 +188,7 @@
               <div class="flex flex-col gap-3">
                 <p class="text-sm font-bold text-gray-800 border-b border-gray-200 pb-2">一括データ操作</p>
                 <div class="grid grid-cols-2 gap-2">
-                  <label class="block text-center text-sm font-bold text-[#118e9e] border-2 border-[#118e9e] rounded-lg px-2 py-2 hover:bg-[#f0fbfc] cursor-pointer transition-colors bg-white">
+                  <label class="block text-center text-sm font-bold text-[#f28c06] border-2 border-[#f28c06] rounded-lg px-2 py-2 hover:bg-[#fff8f0] cursor-pointer transition-colors bg-white">
                     📥 CSV/TSV 読込
                     <input type="file" accept=".tsv,.csv,.txt" class="hidden" onchange="importTSVCSV(event)">
                   </label>
