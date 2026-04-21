@@ -6,12 +6,13 @@
 // GitHub Pages環境でのパス解決を安定させるため ./ を付与
 importScripts('./analyzer.js');
 
-self.KUROMOJI_DIC_PATH = 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/';
+// self.location.href を基準に解決することでサブパス配下でも正しく動作する
+self.KUROMOJI_DIC_PATH = new URL('../dict/', self.location.href).href;
 let _kuromojiLoaded = false;
 
 function ensureKuromojiLoaded() {
   if (_kuromojiLoaded) return;
-  importScripts('https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/build/kuromoji.js');
+  importScripts(new URL('./kuromoji.js', self.location.href).href);
   _kuromojiLoaded = true;
 }
 

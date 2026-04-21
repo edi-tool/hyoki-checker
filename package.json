@@ -23,6 +23,7 @@
     "tailwindcss": "^4.2.3"
   },
   "dependencies": {
+    "kuromoji": "^0.1.2",
     "pdfjs-dist": "^2.16.105"
   }
 }
