@@ -70,19 +70,17 @@ kuromoji は `INIT_KUROMOJI`/`KUROMOJI_ANALYZE` 呼び出し時に遅延 importS
 
 **構文検査:** `node --check js/app.js` 通過済み。
 
+## 整合性修正（2026-04-21）
+
+| コミット | 内容 |
+|---|---|
+| `fix: align primary color with DESIGN.md and remove stale SW registration` | PR [#9](https://github.com/edi-tool/hyoki-checker/pull/9) → main マージ済み |
+
+**修正内容:**
+- `style.css`: `.btn-primary`・`.tab-btn.active`・`.drop-zone:hover` の色 #118e9e（青）→ #f28c06（オレンジ）に統一（DESIGN.md 準拠）
+- `index.html`: インライン Tailwind クラスの色参照を一括置換（#118e9e/#0e7784/#f0fbfc/#b2ebf2 → オレンジ系）
+- `js/app.js`: 旧 Service Worker 登録コード3行削除（sw.js は削除専用スクリプトのため不要）
+
 ## 現在の状態
 
-⚠️ **アプリ実行時にも機能が動作しない** — 原因調査中。
-
-可能性:
-- Worker 内での analyzer.js ロード失敗
-- postToWorker メッセージが Worker に到達していない
-- DOMContentLoaded イベントが発火していない
-- 他のスクリプト読込エラー
-
-## 次ステップ
-
-- [ ] ブラウザ DevTools Console でエラー/警告を確認
-- [ ] Network タブで js/app.js 読込成功を確認
-- [ ] Worker から console.log でメッセージ受信状態を確認
-- [ ] runCheck() が呼ばれているか確認
+✅ main ブランチ最新・PR #9 マージ済み
