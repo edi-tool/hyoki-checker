@@ -27,7 +27,10 @@ async function fetchBackendAnalyze(text) {
 }
 
 // ---- Worker 通信 ----
-const worker = new Worker('js/worker.js');
+// JSを更新したら APP_VERSION を変更し、worker/importScripts のキャッシュを破棄する
+// （index.html のローカル<script>の ?v= とも揃えること）
+const APP_VERSION = '20260612';
+const worker = new Worker(`js/worker.js?v=${APP_VERSION}`);
 const workerCallbackMap = new Map();
 let messageIdCounter = 0;
 
@@ -145,6 +148,8 @@ async function runCheck() {
       results = await postToWorker('ANALYZE', {
         text: currentText,
         dict: dictManager.getAll(),
+        // Kuromoji初期化済みなら形態素境界で部分一致を除外し高精度化
+        boundaryAware: _kuromojiInitialized,
       });
     }
     results = results.filter(r => !ignoredGroups.has(r.group.join(',')));
@@ -233,6 +238,8 @@ async function initAndRunKuromoji() {
     const runBtn = document.getElementById('kuromojiRunBtn');
     if (runBtn) runBtn.classList.remove('hidden');
     runKuromojiAnalysis();
+    // 形態素境界が使えるようになったので本体の検知結果を高精度で再解析
+    runCheck();
   } catch (e) {
     setKuromojiStatus('error', '初期化失敗: ' + e.message);
     if (btn) {

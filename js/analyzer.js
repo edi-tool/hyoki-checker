@@ -6,31 +6,59 @@
  */
 function analyze(text, dict) {
   const results = [];
-
   for (const group of dict) {
-    if (!Array.isArray(group)) continue;
-    
-    // 【修正】空文字や空白のみの単語を除外（正規表現の暴走を防止）
-    const validGroup = group.filter(w => typeof w === 'string' && w.trim().length > 0);
-    if (validGroup.length < 2) continue;
+    const r = analyzeGroup(text, group);
+    if (r) results.push(r);
+  }
+  return results;
+}
 
-    const counts = validGroup.map(word => {
-      const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const matches = text.match(new RegExp(escaped, 'g'));
-      return { word, count: matches ? matches.length : 0 };
-    });
+/**
+ * 1グループ分の表記ゆれを解析する（analyze / analyzeAsync で共有）
+ *
+ * - 高精度：長い語を優先する交替パターンで1パス走査し一致文字を消費するため、
+ *   部分文字列の二重計上を防ぐ（例「サーバー」が「サーバ」に加算されない）。
+ * - 安定：出現数が同数の場合は辞書の先頭（＝正規表記）を推奨形に固定するので、
+ *   同じ入力に対して常に同じ結果を返す。
+ *
+ * @param {string} text - 解析対象テキスト
+ * @param {string[]} group - 辞書の1グループ
+ * @param {Set<number>|null} [boundarySet] - 形態素境界の文字オフセット集合。
+ *   渡された場合、語の前後が境界に整合する一致のみ数える（例「本州」内の「本」を除外）。
+ * @returns {null | { group: string[], recommended: string, counts: {word:string, count:number}[], others: string[] }}
+ */
+function analyzeGroup(text, group, boundarySet = null) {
+  if (!Array.isArray(group)) return null;
 
-    const found = counts.filter(c => c.count > 0);
-    if (found.length < 2) continue;
+  // 空文字・空白のみの単語を除外（正規表現の暴走を防止）
+  const validGroup = group.filter(w => typeof w === 'string' && w.trim().length > 0);
+  if (validGroup.length < 2) return null;
 
-    found.sort((a, b) => b.count - a.count);
-    const recommended = found[0].word;
-    const others = found.slice(1).map(c => c.word);
-
-    results.push({ group: validGroup, recommended, counts: found, others });
+  // 長い語を優先する交替パターンで1パス走査してカウント
+  const countMap = new Map(validGroup.map(w => [w, 0]));
+  const sortedWords = [...validGroup].sort((a, b) => b.length - a.length);
+  const escapedWords = sortedWords.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  const scanRegex = new RegExp(`(${escapedWords.join('|')})`, 'g');
+  let m;
+  while ((m = scanRegex.exec(text)) !== null) {
+    // 形態素境界が与えられた場合、語境界に整合しない部分一致を除外
+    if (boundarySet && !(boundarySet.has(m.index) && boundarySet.has(m.index + m[0].length))) continue;
+    countMap.set(m[0], countMap.get(m[0]) + 1);
   }
 
-  return results;
+  // 辞書順インデックス（同数時の決定的なタイブレークに使用）
+  const orderIndex = new Map(validGroup.map((w, i) => [w, i]));
+  const found = validGroup
+    .map(word => ({ word, count: countMap.get(word) }))
+    .filter(c => c.count > 0);
+  if (found.length < 2) return null;
+
+  // 出現数の多い順。同数なら辞書の先頭（正規表記）を優先して安定化
+  found.sort((a, b) => b.count - a.count || orderIndex.get(a.word) - orderIndex.get(b.word));
+  const recommended = found[0].word;
+  const others = found.slice(1).map(c => c.word);
+
+  return { group: validGroup, recommended, counts: found, others };
 }
 
 /**
@@ -127,58 +155,112 @@ function levenshtein(a, b) {
   return dp[b.length];
 }
 
-const _PUNCT_RE = /^[\s\n\r、。，．！？「」【】（）〔〕『』〈〉・…‥]+$/;
+/**
+ * 文字の種別を返す（セグメント分割用）。
+ * 句読点・空白・記号は 'sep'（語境界）として扱う。
+ * @param {string} ch - 1文字
+ * @returns {'kanji'|'hira'|'kata'|'latin'|'sep'}
+ */
+function _charClass(ch) {
+  const c = ch.codePointAt(0);
+  if ((c >= 0x4e00 && c <= 0x9faf) || (c >= 0x3400 && c <= 0x4dbf) || ch === '々') return 'kanji';
+  if (c >= 0x3040 && c <= 0x309f) return 'hira';
+  if ((c >= 0x30a0 && c <= 0x30ff) || c === 0xff70) return 'kata'; // 長音符ーを含む
+  if ((c >= 0x41 && c <= 0x5a) || (c >= 0x61 && c <= 0x7a) || (c >= 0x30 && c <= 0x39) ||
+      (c >= 0xff21 && c <= 0xff3a) || (c >= 0xff41 && c <= 0xff5a) || (c >= 0xff10 && c <= 0xff19)) return 'latin';
+  return 'sep';
+}
+
+// 単独で語境界となりやすい1字ひらがな助詞（送り仮名と区別するため1字に限定）
+const _PARTICLE_SET = new Set(['を', 'は', 'が', 'に', 'へ', 'と', 'も', 'の', 'や', 'で', 'か', 'ね', 'よ', 'さ']);
 
 /**
- * 高速化版ファジー解析
+ * セグメントが単独1字の助詞かどうかを返す。
+ * @param {string} seg
+ * @returns {boolean}
+ */
+function _isParticle(seg) {
+  return seg.length === 1 && _PARTICLE_SET.has(seg);
+}
+
+/**
+ * テキストを文字種の連続（セグメント）に分割する。
+ * 句読点・空白・記号は語境界マーカー(sep)とし、語をまたぐ連結を防ぐ。
+ * @param {string} text
+ * @returns {{ text?: string, sep: boolean }[]}
+ */
+function _segmentText(text) {
+  const segs = [];
+  let cur = '', curClass = null;
+  const flush = () => { if (cur) { segs.push({ text: cur, sep: false }); cur = ''; curClass = null; } };
+  for (const ch of text) {
+    const cls = _charClass(ch);
+    if (cls === 'sep') { flush(); segs.push({ sep: true }); continue; }
+    if (cls === curClass) cur += ch;
+    else { flush(); cur = ch; curClass = cls; }
+  }
+  flush();
+  return segs;
+}
+
+/**
+ * ファジー解析（語境界対応版）
+ *
+ * 文字種・句読点で区切ったセグメントの連結のみを候補とするため、
+ * 語の途中を切り出した断片（例「授業づくり」→「業づく」）が生成されず、
+ * 高精度に誤字・異体字だけを指摘できる。
+ *
  * @param {string} text
  * @param {string[][]} dict
- * @param {number} maxDistance
+ * @param {number} maxDistance - 許容する編集距離
  * @returns {{ dictWord: string, group: string[], candidates: string[] }[]}
  */
 function fuzzyAnalyze(text, dict, maxDistance = 1) {
   const exactSet = new Set(dict.flat().filter(w => typeof w === 'string' && w.trim().length > 0));
-  const candidateMap = new Map();
-  
+
   const dictData = [];
+  let minLen = Infinity, maxLen = 0;
   for (const group of dict) {
     if (!Array.isArray(group)) continue;
     for (const word of group) {
-      if (typeof word !== 'string' || word.length < 3) continue;
-      dictData.push({
-        word,
-        group,
-        chars: new Set(word.split('')),
-        len: word.length
-      });
+      if (typeof word !== 'string' || word.length < 2) continue;
+      dictData.push({ word, group, chars: new Set(word), len: word.length });
+      if (word.length < minLen) minLen = word.length;
+      if (word.length > maxLen) maxLen = word.length;
     }
   }
+  if (dictData.length === 0) return [];
 
-  const textLen = text.length;
-  
-  for (let i = 0; i < textLen; i++) {
-    for (let l = 3 - maxDistance; l <= 15; l++) { 
-      if (i + l > textLen) break;
-      
-      const candidate = text.slice(i, i + l);
-      
-      if (exactSet.has(candidate) || _PUNCT_RE.test(candidate)) continue;
-      if (candidateMap.has(candidate)) continue;
+  const segs = _segmentText(text);
+  const MAX_MERGE = 6; // 連結する隣接セグメント数の上限（計算量抑制）
 
-      const candidateChars = new Set(candidate.split(''));
-      
+  const candidateMap = new Map();
+  for (let i = 0; i < segs.length; i++) {
+    if (segs[i].sep) continue;
+    let combined = '';
+    for (let j = i; j < segs.length && j < i + MAX_MERGE; j++) {
+      if (segs[j].sep) break; // 句読点を越えて連結しない
+      // 末尾の単独ひらがな助詞は語境界とみなし、連結を打ち切る
+      // （例「指導を」を生成せず、助詞付着の誤検知を防ぐ。複数字の送り仮名「づく」は対象外）
+      if (j > i && _isParticle(segs[j].text)) break;
+      combined += segs[j].text;
+      if (combined.length > maxLen) break;
+      if (combined.length < minLen) continue;
+      if (exactSet.has(combined) || candidateMap.has(combined)) continue;
+
+      const candChars = new Set(combined);
       for (const item of dictData) {
-        if (Math.abs(item.len - l) > maxDistance) continue;
+        // 誤字は実務上ほぼ同字数の置換。字数違い（挿入/削除）は別語・助詞付着の
+        // ノイズが多いため同字数のみ照合し、高精度に誤字だけを指摘する
+        if (item.len !== combined.length) continue;
 
-        let commonCount = 0;
-        for (let char of candidateChars) {
-          if (item.chars.has(char)) commonCount++;
-        }
-        if (commonCount < Math.min(l, item.len) - maxDistance) continue;
+        let common = 0;
+        for (const c of candChars) if (item.chars.has(c)) common++;
+        if (common < combined.length - maxDistance) continue;
 
-        const d = levenshtein(candidate, item.word);
+        const d = levenshtein(combined, item.word);
         if (d > 0 && d <= maxDistance) {
-          candidateMap.set(candidate, { dictWord: item.word, group: item.group });
+          candidateMap.set(combined, { dictWord: item.word, group: item.group });
           break;
         }
       }
@@ -203,35 +285,39 @@ function fuzzyAnalyze(text, dict, maxDistance = 1) {
  * @param {number} chunkSize
  * @returns {Promise<{ group: string[], recommended: string, counts: {word:string, count:number}[], others: string[] }[]>}
  */
-async function analyzeAsync(text, dict, chunkSize = 50) {
+async function analyzeAsync(text, dict, chunkSize = 50, boundarySet = null) {
   const results = [];
   for (let i = 0; i < dict.length; i += chunkSize) {
     const chunk = dict.slice(i, i + chunkSize);
     for (const group of chunk) {
-      if (!Array.isArray(group)) continue;
-      
-      // 【修正】ここでも空文字や空白のみの単語を除外
-      const validGroup = group.filter(w => typeof w === 'string' && w.trim().length > 0);
-      if (validGroup.length < 2) continue;
-
-      const counts = validGroup.map(word => {
-        const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const matches = text.match(new RegExp(escaped, 'g'));
-        return { word, count: matches ? matches.length : 0 };
-      });
-
-      const found = counts.filter(c => c.count > 0);
-      if (found.length < 2) continue;
-
-      found.sort((a, b) => b.count - a.count);
-      const recommended = found[0].word;
-      const others = found.slice(1).map(c => c.word);
-
-      results.push({ group: validGroup, recommended, counts: found, others });
+      // analyze() と同一ロジックを共有し、結果のブレを防ぐ
+      const r = analyzeGroup(text, group, boundarySet);
+      if (r) results.push(r);
     }
     await new Promise(r => setTimeout(r, 0));
   }
   return results;
+}
+
+/**
+ * 形態素境界の文字オフセット集合を構築する（Kuromoji初期化済みのときのみ）。
+ * 各トークンの開始・終了位置を境界として登録し、語境界に整合しない
+ * 部分一致（例「本州」内の「本」）を analyzeGroup 側で除外できるようにする。
+ * @param {string} text
+ * @returns {Set<number>|null} - トークナイザー未準備なら null
+ */
+function buildBoundarySet(text) {
+  if (!_tokenizer) return null;
+  const tokens = _tokenizer.tokenize(text);
+  const boundarySet = new Set([0]);
+  for (const t of tokens) {
+    // word_position は1始まり。欠落時は surface 長で補う
+    const start = (typeof t.word_position === 'number' ? t.word_position - 1 : null);
+    if (start === null) continue;
+    boundarySet.add(start);
+    boundarySet.add(start + t.surface_form.length);
+  }
+  return boundarySet;
 }
 
 // ---- Kuromoji 形態素解析 (Beta) ----
