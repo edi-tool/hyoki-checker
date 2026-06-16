@@ -24,4 +24,4 @@ class AnalysisResult:
     recommended: str
     counts: list[VariantMatch]
     normalized_form: str = ""
-    source: Literal["dict", "sudachi_auto"] = "dict"
+    source: Literal["dict", "sudachi_auto", "synonym", "reading"] = "dict"

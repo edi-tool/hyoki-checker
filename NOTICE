@@ -1,0 +1,24 @@
+hyoki-checker NOTICE
+====================
+
+This product includes third-party materials listed below.
+
+----------------------------------------------------------------------
+Sudachi Synonym Dictionary (Sudachi 同義語辞書)
+----------------------------------------------------------------------
+Source  : https://github.com/WorksApplications/SudachiDict
+Copyright (c) 2017- Works Applications Co., Ltd.
+License : Apache License, Version 2.0
+          (full text: THIRD_PARTY_LICENSES/SudachiDict-Apache-2.0.txt)
+
+Modifications (派生物について):
+  backend/dicts/synonym_variants.json は、Sudachi 同義語辞書
+  (synonyms.txt) から生成した派生物です。
+  同一語彙素にまとめられた「表記ゆれ」エントリのみを抽出し、
+  backend/build_synonym_dict.py により JSON へ変換しています。
+  元の CSV (synonyms.txt) は本リポジトリには再配布していません。
+
+Note:
+  Sudachi 辞書は UniDic（国立国語研究所提供）由来の語彙データを
+  含む場合がありますが、SudachiDict の一部として Apache License 2.0
+  のもとで再配布されています。
