@@ -26,7 +26,7 @@ from pathlib import Path
 _COL_GROUP = 0  # グループ番号
 _COL_LEXEME = 3  # 語彙素番号
 _COL_VARIANT = 6  # 表記ゆれ区分（0=代表表記, 1=表記ゆれ）
-_COL_HEADWORD = 7  # 見出し
+_COL_HEADWORD = 8  # 見出し（col7は分野情報()のため8が見出し）
 
 # 通常語として採用しない見出しのパターン（表記正規化用の特殊エントリ等）
 _INVALID_HEADWORD = re.compile(r"[()（）/／\s]")
