@@ -6,3 +6,5 @@ pyahocorasick>=2.0
 pdfminer.six>=20231228
 mammoth>=1.8
 python-multipart>=0.0.9
+neologdn>=0.5.1
+pytest>=8.0
