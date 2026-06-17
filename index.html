@@ -11,10 +11,10 @@
   <script defer src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
   
   <!-- JS更新時は ?v= を一括で上げてキャッシュを破棄（js/app.js の APP_VERSION と揃える）-->
-  <script defer src="js/defaultDict.js?v=20260612"></script>
-  <script defer src="js/dictManager.js?v=20260612"></script>
-  <script defer src="js/analyzer.js?v=20260612"></script>
-  <script defer src="js/app.js?v=20260612"></script>
+  <script defer src="js/defaultDict.js?v=20260617"></script>
+  <script defer src="js/dictManager.js?v=20260617"></script>
+  <script defer src="js/analyzer.js?v=20260617"></script>
+  <script defer src="js/app.js?v=20260617"></script>
   
   <link rel="icon" href="favicon.png" type="image/png">
   <link rel="stylesheet" href="style.dist.css">
@@ -63,9 +63,9 @@
           </div>
 
           <div class="flex items-center gap-3 flex-shrink-0 bg-[#fafafa] p-2 rounded-lg border border-[#e0e0e0]">
-            <button onclick="downloadCorrectedDocx()"
+            <button id="exportDocxBtn" onclick="downloadCorrectedDocx()"
                     class="hidden flex items-center gap-1.5 text-sm btn-success rounded-md px-4 py-2 font-bold shadow-sm">
-              📄 修正済みWordを出力
+              📄 推奨表記に統一してWord出力
             </button>
             <div class="flex-1"></div>
             <span id="replacementBadge" class="hidden text-xs text-[#2e7d32] bg-[#e8f5e9] border border-[#a5d6a7] rounded-full px-3 py-1 font-bold"></span>

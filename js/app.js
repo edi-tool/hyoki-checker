@@ -7,6 +7,7 @@
 const dictManager = new DictionaryManager();
 let currentText = '';
 let replacementLog = [];
+let _lastResults = [];
 let ignoredGroups = new Set();
 let _checkVersion = 0;
 let _kuromojiInitialized = false;
@@ -29,7 +30,7 @@ async function fetchBackendAnalyze(text) {
 // ---- Worker 通信 ----
 // JSを更新したら APP_VERSION を変更し、worker/importScripts のキャッシュを破棄する
 // （index.html のローカル<script>の ?v= とも揃えること）
-const APP_VERSION = '20260612';
+const APP_VERSION = '20260617';
 const worker = new Worker(`js/worker.js?v=${APP_VERSION}`);
 const workerCallbackMap = new Map();
 let messageIdCounter = 0;
@@ -165,6 +166,9 @@ async function runCheck() {
 function renderResults(results) {
   const resultsEl = document.getElementById('results');
   const countEl = document.getElementById('resultCount');
+  // 出力時に参照する最新の検出結果を保持し、エクスポートボタンの表示を切り替える
+  _lastResults = results || [];
+  updateExportButton();
   if (!results || results.length === 0) {
     resultsEl.innerHTML = '<p class="text-sm text-gray-400 text-center py-10 font-medium">ゆらぎは検知されていません</p>';
     countEl.textContent = '0 件';
@@ -367,17 +371,61 @@ function clearAll() {
   if (kuroResults) kuroResults.innerHTML = '';
 }
 
+/** 検出グループが存在する時のみエクスポートボタンを表示する。 */
+function updateExportButton() {
+  const btn = document.getElementById('exportDocxBtn');
+  if (!btn) return;
+  btn.classList.toggle('hidden', !(currentText && _lastResults.length > 0));
+}
+
+/**
+ * 各検出グループの非推奨表記を推奨表記へ一括置換した本文を生成する。
+ * @param {string} text 元テキスト。
+ * @returns {{ text: string, log: {group: string[], recommended: string, count: number}[] }}
+ *   置換後テキストと、グループ別の置換件数ログ。
+ */
+function buildCorrectedText(text) {
+  const log = [];
+  let result = text;
+  for (const r of _lastResults) {
+    if (!r.group || !r.recommended) continue;
+    // 推奨表記以外の出現数を置換前に集計（ログ表示用）
+    const before = result;
+    result = replaceGroup(result, r.group, r.recommended);
+    if (before !== result) {
+      const replaced = (r.counts || [])
+        .filter(c => c.word !== r.recommended)
+        .reduce((sum, c) => sum + c.count, 0);
+      log.push({ group: r.group, recommended: r.recommended, count: replaced });
+    }
+  }
+  return { text: result, log };
+}
+
 function downloadCorrectedDocx() {
   if (!currentText) return alert('テキストがありません');
   if (typeof htmlDocx === 'undefined') return alert('Word生成ライブラリが読み込まれていません');
-  const safeText = typeof escapeHTML === 'function' ? escapeHTML(currentText) : currentText;
-  const htmlContent = `<!DOCTYPE html><html><body><p>${safeText.replace(/\n/g, '<br>')}</p></body></html>`;
+  if (typeof replaceGroup !== 'function') return alert('置換処理が読み込まれていません');
+
+  const { text: corrected, log } = buildCorrectedText(currentText);
+  replacementLog = log;
+
+  const esc = typeof escapeHTML === 'function' ? escapeHTML : (s => s);
+  const htmlContent = `<!DOCTYPE html><html><body><p>${esc(corrected).replace(/\n/g, '<br>')}</p></body></html>`;
   const converted = htmlDocx.asBlob(htmlContent);
   const a = document.createElement('a');
   a.href = URL.createObjectURL(converted);
   a.download = 'corrected.docx';
   a.click();
   URL.revokeObjectURL(a.href);
+
+  // 置換結果バッジを更新（推奨表記へ統一した語の総数）
+  const total = log.reduce((sum, l) => sum + l.count, 0);
+  const badge = document.getElementById('replacementBadge');
+  if (badge) {
+    badge.textContent = `✓ ${total}箇所を推奨表記に統一`;
+    badge.classList.toggle('hidden', total === 0);
+  }
 }
 
 function runDictValidation() {
