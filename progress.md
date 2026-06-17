@@ -149,3 +149,17 @@ kuromoji は `INIT_KUROMOJI`/`KUROMOJI_ANALYZE` 呼び出し時に遅延 importS
 ### 共通基盤の修正（先行）
 - analyzeAsync(本番経路) が旧二重計上のままだった点を analyzeGroup 共有で解消。
 - 同数時は辞書先頭（正規表記）を推奨する決定的タイブレークで結果を安定化。
+
+
+## 置換機能・テスト環境（2026-06-17）
+
+### 置換機能の実装（progress重大課題#2を解消）
+- 課題: 「修正済みWord出力」が置換せず原文をdocx化するだけだった（replacementLog宣言のみ）。
+- 対応: downloadCorrectedDocx を改修し、検出結果(_lastResults)の各グループの非推奨表記を推奨表記へ一括置換して出力。
+- replaceGroup(js/analyzer.js): プレースホルダ方式に修正。推奨表記を退避→非推奨語を長さ降順で置換→復元。「サーバ」が既存「サーバー」内を二重置換する不具合を解消。
+- ボタン: id=exportDocxBtn、検出>0かつ本文ありで表示。出力後 replacementBadge に統一箇所数を表示。
+- ボタン名: 「修正済みWordを出力」→「推奨表記に統一してWord出力」。
+- キャッシュ破棄: APP_VERSION/index.html ?v= を 20260617 に更新。
+
+### テスト環境
+- neologdn 未インストールで pytest collection 失敗していた → インストールで解消（requirements.txt には既出）。backend/tests 12件パス。
