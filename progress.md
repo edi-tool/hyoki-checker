@@ -163,3 +163,23 @@ kuromoji は `INIT_KUROMOJI`/`KUROMOJI_ANALYZE` 呼び出し時に遅延 importS
 
 ### テスト環境
 - neologdn 未インストールで pytest collection 失敗していた → インストールで解消（requirements.txt には既出）。backend/tests 12件パス。
+
+---
+
+## 2026-07-14 セッション
+
+- **バグ修正**: 左カラムに右パネルと同じタブバーが重複し、`tabBtn-results`/`resultCount` が
+  ID二重定義になっていた。`getElementById` が左の未使用要素を拾い、タブのアクティブ表示と
+  「○件」バッジが更新されない不具合。重複タブバーを削除し、Betaバッジを右パネルへ移設。
+  （JS未変更のため `?v=` の更新は不要）
+- **デザイン統一**: `style.css` / `style.dist.css` 末尾にプレーンCSSで共通ブロックを追記
+  （フォント実効スタック・`:focus-visible`・`prefers-reduced-motion`・ヘッダー色/フッター背景の統一）。
+  CSSキャッシュ対策で index.html の stylesheet 参照に `?v=20260714` を付与。`theme-color` 追加。
+- **SEO**: index.html がフロントマター無しの静的ファイルで description/OGP/canonical が欠落し
+  sitemap にも載らなかったため、`layout: null` フロントマターを付与し description・robots・canonical・
+  OGP一式・`twitter:card`・JSON-LD(WebApplication) を追加。`_config.yml` に `url`/`baseurl` と
+  `jekyll-sitemap` プラグインを追加。
+
+## 関連
+
+- 組織ハブ: https://edi-tool.github.io/ （`edi-tool/edi-tool.github.io` リポジトリ）
