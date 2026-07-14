@@ -4,6 +4,7 @@ from dataclasses import asdict
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import Any
 
 from .analyzer import analyze_chunks, build_automaton, morphological_detect
 from .chunker import split_text
@@ -12,7 +13,7 @@ from .normalizer import normalize_text
 from .synonym_detector import detect_synonyms, load_synonym_variants
 
 _automaton = None
-_dict_groups: list[list[str]] = []
+_dict_groups: list[dict] = []
 
 
 def _reload_dict() -> None:
@@ -46,7 +47,7 @@ class AnalyzeRequest(BaseModel):
 
 
 class CustomDictRequest(BaseModel):
-    groups: list[list[str]]
+    groups: list[Any]
 
 
 def _merge_unique(results: list, additions: list, seen: set) -> None:

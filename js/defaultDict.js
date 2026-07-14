@@ -1,279 +1,4263 @@
-/**
- * デフォルト表記ゆれ辞書
- *
- * 編集ルール:
- *   - 各グループは ['語A', '語B'] の形式（配列リテラル）
- *   - グループ末尾には必ずカンマを付ける: ['語A', '語B'],  ← カンマ必須
- *   - 最終グループもカンマ推奨（trailing comma）
- *   - 単語は2語以上、空文字不可
- *   - 起動時にバリデーションが実行され、問題があればUIに警告が表示されます
- */
-const DEFAULT_DICT = [
-
-  // ==========================================
-  // 【ひらがな vs 漢字（開き・閉じ・送り仮名）】
-  // ==========================================
-  // 補助動詞・形式名詞
-  ['～ていく', '～て行く'],
-  ['～てくる', '～て来る'],
-  ['～てみる', '～て見る'],
-  ['～ておく', '～て置く'],
-  ['～てしまう', '～て仕舞う'],
-  ['～かもしれない', '～かも知れない'],
-  ['～のために', '～の為に'],
-  ['～のとき', '～の時'],
-  ['～ところ', '～所'],
-  ['～ゆえに', '～故に'],
-  ['～とおり', '～通り'],
-  ['～ごと', '～毎'],
-
-  
-  // 副詞・接続詞・挨拶など
-  ['よろしく', '宜しく'],
-  ['いたします', '致します'],
-  ['いただく', '頂く'],
-  ['ください', '下さい'],
-  ['誠に', 'まことに'],
-  ['おかげさまで', 'お陰様で', 'お蔭様で'],
-  ['および', '及び'],
-  ['または', '又は'],
-  ['かつ', '且つ'],
-  ['したがって', '従って'],
-  ['ならびに', '並びに'],
-  ['なぜ', '何故'],
-  ['ぜひ', '是非'],
-  ['あらかじめ', '予め'],
-  ['かつて', '嘗て'],
-  ['すでに', '既に'],
-  ['まず', '先ず'],
-  ['さらに', '更に'],
-  ['すべて', '全て'],
-  ['ほとんど', '殆ど'],
-  ['いまだ', '未だ'],
-  ['きわめて', '極めて'],
-  ['できる', '出来る'],
-  ['する', '為る'],
-  ['わかる', '分かる', '分る', '判る', '解る'],
-  ['よい', '良い', '好い', '善い'],
-  ['よさ', '良さ'],
-  ['もつ', '持つ'],
-  ['ない', '無い'],
-  ['十分', '充分'],
-  ['いえる', '言える'],
-
-  
-  // 送り仮名のゆれ
-  ['表す', '表わす'],
-  ['現れる', '現われる'],
-  ['断る', '断わる'],
-  ['終わる', '終る'],
-  ['変わる', '変る'],
-  ['代わる', '代る'],
-  ['行う', '行なう', 'おこなう'],
-  ['落とす', '落す'],
-  ['暮らす', '暮す'],
-  ['もとづく', '基づく'],
-  ['もとに', '基に'],
-
-  // ==========================================
-  // 【単位・数字・記号】
-  // ==========================================
-  ['か月', 'カ月', 'ヶ月', '箇月', 'ケ月', 'ヵ月'],
-  ['か国', 'カ国', 'ヶ国', '箇国', 'ケ国'],
-  ['か所', 'カ所', 'ヶ所', '箇所', 'ケ所'],
-  ['パーセント', '%', '％'],
-  ['５か年', '５ヵ年', '５ヶ年'],
-  ['１つ、２つ', '一つ、二つ'],
-  ['１人、２人', '一人、二人'],
-
-
-  
-  // ==========================================
-  // 【教育・公用文書系（汎用）】
-  // ==========================================
-  ['子ども', 'こども', '子供', '児童'],
-  ['子どもたち', '子ども達', '子供たち', '子供達'],
-  ['一人一人', '一人ひとり', 'ひとりひとり'],
-  ['一つ一つ', '一つひとつ', 'ひとつひとつ'],
-  ['在り方', 'あり方'],
-  ['当たって', 'あたって'],
-  ['付ける', 'つける'],
-  ['気付く', '気づく'],
-  ['身に付ける', '身につける'],
-  ['し合う', 'しあう'],
-  ['通して', 'とおして'],
-  ['我が国', 'わが国'],
-  ['取り組み', '取組'],
-  ['話し合い', '話合い'],
-  ['関わる', 'かかわる'],
-  ['育む', 'はぐくむ'],
-  ['踏まえて', 'ふまえて'],
-  ['目指す', 'めざす'],
-  ['友達', '友だち'],
-  ['手立て', 'てだて'],
-  ['働き', 'はたらき'],
-  ['振り返る', 'ふり返る'],
-  ['繰り返し', 'くりかえし'],
-  ['見取る', '見とる'],
-  ['様々', 'さまざま'],
-  ['例えば', 'たとえば'],
-  ['生かす', 'いかす'],
-  ['皆', 'みんな'],
-  ['とらえる', '捉える'],
-  ['すること', 'する事'],
-  ['見いだす', '見出す'],
-  ['ねらい', '狙い'],
-  ['声かけ', '声掛け'],
-  ['諸感覚', '五感'],
-  ['保育所', '保育園'],
-  ['教師', '先生', '教員'],
-  ['児童生徒', '児童・生徒'],
-  ['ICT端末', '一人一台端末'],
-
-  // ==========================================
-  // 【教育・実務系（教員・保護者向け実用書）】
-  // ==========================================
-  ['保護者', 'お家の方', '親御さん', '父母', '父兄'],
-  ['つまずき', '躓き', 'つまづき'],
-  ['ふり返り', '振り返り', 'リフレクション'],
-  ['見取り', '評価', 'アセスメント'],
-  ['板書', '黒板書き'],
-  ['机間指導', '机間巡視'],
-  ['学習指導案', '指導案', '本案', '略案'],
-  ['働きかけ', '働き掛け', 'アプローチ'],
-  ['特別支援教育', '特支'],
-  ['学級経営', 'クラス運営', 'クラス経営'],
-
-  // ==========================================
-  // 【教科：国語】
-  // ==========================================
-  ['送り仮名', '送りがな'],
-  ['ふりがな', 'ルビ', '振り仮名'],
-  ['書き順', '筆順'],
-  ['物語文', 'お話', '文学的な文章'],
-  ['説明文', '説明的な文章'],
-  ['指示語', 'こそあど言葉'],
-  ['接続語', 'つなぎの言葉'],
-  ['修飾語', 'くわしくする言葉'],
-  ['原稿用紙', '作文用紙'],
-  ['ローマ字', 'ローマ字書き'],
-  ['漢字', 'かん字'],
-
-  // ==========================================
-  // 【教科：算数】
-  // ==========================================
-  ['足し算', 'たし算', '加法'],
-  ['引き算', 'ひき算', '減法'],
-  ['掛け算', 'かけ算', '乗法'],
-  ['割り算', 'わり算', '除法'],
-  ['筆算', 'ひっ算'],
-  ['繰り上がり', 'くり上がり', 'くりあがり'],
-  ['繰り下がり', 'くり下がり', 'くりさがり'],
-  ['文章題', '文章問題', '応用問題'],
-  ['図形', 'かたち'],
-  ['立体', 'はこのかたち'],
-  ['リットル', 'L', 'l', 'ℓ'], 
-  ['デシリットル', 'dL', 'dl'],
-  ['ミリリットル', 'mL', 'ml'],
-  ['センチメートル', 'cm', 'センチ'],
-  ['ミリメートル', 'mm', 'ミリ'],
-  ['キロメートル', 'km', 'キロ'],
-  ['グラム', 'g', 'ｇ'],
-  ['キログラム', 'kg', 'ｋｇ'],
-  ['平方メートル', 'm2', '㎡', '平米'],
-
-  // ==========================================
-  // 【ビジネス・実務系】
-  // ==========================================
-  ['マーケティング', 'マーケッティング'],
-  ['プレゼンテーション', 'プレゼンション', 'プレゼン'],
-  ['コンサルタント', 'コンサルタンド'],
-  ['売上', '売り上げ', '売上げ'],
-  ['買上', '買い上げ', '買上げ'],
-  ['支払', '支払い', '支払ひ'],
-  ['割合', '割合い'],
-  ['組合せ', '組み合わせ', '組合'],
-  ['取扱説明書', '取り扱い説明書', '取扱い説明書'],
-  ['弊社', '当社', '自社'],
-  ['貴社', '御社'],
-
-  // ==========================================
-  // 【生活・手続き系】（送り仮名の省略ゆれ）
-  // ==========================================
-  ['引越', '引越し', '引っ越し', '引っ越'],
-  ['見積', '見積り', '見積もり'],
-  ['振込', '振り込み', '振込み'],
-  ['申込', '申し込み', '申込み'],
-  ['受付', '受け付け', '受付け'],
-  ['打合', '打ち合わせ', '打合せ', '打ち合せ'],
-  ['問合', '問い合わせ', '問合せ', '問い合せ'],
-  ['取扱', '取り扱い', '取扱い'],
-  ['手続', '手続き'],
-  ['届出', '届け出'],
-
-  // ==========================================
-  // 【コンピュータ・IT系】（長音符・表記ゆれ）
-  // ==========================================
-  ['サーバー', 'サーバ'],
-  ['コンピューター', 'コンピュータ'],
-  ['ユーザー', 'ユーザ'],
-  ['プリンター', 'プリンタ'],
-  ['ルーター', 'ルータ'],
-  ['モニター', 'モニタ'],
-  ['スキャナー', 'スキャナ'],
-  ['フォルダー', 'フォルダ'],
-  ['アダプター', 'アダプタ'],
-  ['プロセッサー', 'プロセッサ'],
-  ['センサー', 'センサ'],
-  ['ブラウザー', 'ブラウザ'],
-  ['インターフェース', 'インターフェイス', 'インタフェース'],
-  ['ソフトウェア', 'ソフトウエア', 'ソフトウェアー', 'ソフト', 'Software'],
-  ['ハードウェア', 'ハードウエア', 'ハードウェアー', 'ハード', 'Hardware'],
-  ['セキュリティ', 'セキュリティー'],
-  ['ディレクトリ', 'ディレクトリー'],
-  ['デフォルト', 'ディフォルト'],
-  ['インターネット', 'インタネット', 'インタ−ネット'],
-  ['ウェブ', 'ウエブ', 'Web', 'WEB'],
-  ['メール', 'E-mail', 'Eメール', 'eメール', 'e-mail'],
-
-  // ==========================================
-  // 【Webサービス・ECサイト系】
-  // ==========================================
-  ['アカウント', '会員ID', 'ユーザーID'],
-  ['ログイン', 'サインイン', 'ログオン'],
-  ['ログアウト', 'サインアウト', 'ログオフ'],
-  ['カート', '買い物かご', '買い物カゴ', '買物かご'],
-  ['キャンセル', '取消', '取り消し', '取消し'],
-  ['パスワード', '暗証番号'],
-  ['サポート', 'ヘルプ', 'よくある質問', 'FAQ'],
-
-  // ==========================================
-  // 【外来語・カタカナ表記のゆれ】（原音重視 vs 慣用表現）
-  // ==========================================
-  ['エンターテインメント', 'エンターテイメント'],
-  ['ダイヤモンド', 'ダイアモンド'],
-  ['メイン', 'メーン'],
-  ['バイオリン', 'ヴァイオリン'],
-  ['フェスティバル', 'フェスティヴァル'],
-  ['ディレクター', 'デレクター'],
-  ['ボリューム', 'ヴォリューム', 'ボリュウム'],
-  ['ドキュメント', 'ドキュメンタリー'],
-  ['シミュレーション', 'シュミレーション'],
-  ['コミュニティ', 'コミュニティー'],
-  ['コミュニケーション', 'コミニュケーション'],
-
-  // ==========================================
-  // 【略語 vs 正式名称】
-  // ==========================================
-  ['スマートフォン', 'スマホ', 'スマートホン'],
-  ['パーソナルコンピュータ', 'パソコン', 'PC', 'ＰＣ'],
-  ['アプリケーション', 'アプリ'],
-  ['サブスクリプション', 'サブスク'],
-  ['リモートワーク', 'テレワーク', '在宅勤務'],
-  ['コストパフォーマンス', 'コスパ'],
-  ['タイムパフォーマンス', 'タイパ'],
-  ['デジタルトランスフォーメーション', 'DX', 'ＤＸ'],
-
-  
-  
-];
+/** GENERATED FILE. Edit rule pack sources and run npm run build:rules. */
+const GENERATED_RULES = {
+  "version": 1,
+  "packs": [
+    {
+      "id": "company",
+      "label": "社内標準",
+      "paths": [
+        "packs/company/rules-01.json",
+        "packs/company/rules-02.json",
+        "packs/company/rules-03.json",
+        "packs/company/rules-04.json"
+      ],
+      "priority": 300,
+      "defaultEnabled": true,
+      "source": {
+        "pack": "company",
+        "title": "hyoki-checker existing default dictionary",
+        "url": "https://github.com/edi-tool/hyoki-checker",
+        "license": "MIT",
+        "attribution": "hyoki-checker contributors",
+        "retrievedAt": "2026-07-14",
+        "modified": true,
+        "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+      },
+      "rules": [
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0001",
+          "type": "preferred",
+          "preferred": "～ていく",
+          "variants": [
+            "～ていく",
+            "～て行く"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0002",
+          "type": "preferred",
+          "preferred": "～てくる",
+          "variants": [
+            "～てくる",
+            "～て来る"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0003",
+          "type": "preferred",
+          "preferred": "～てみる",
+          "variants": [
+            "～てみる",
+            "～て見る"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0004",
+          "type": "preferred",
+          "preferred": "～ておく",
+          "variants": [
+            "～ておく",
+            "～て置く"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0005",
+          "type": "preferred",
+          "preferred": "～てしまう",
+          "variants": [
+            "～てしまう",
+            "～て仕舞う"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0006",
+          "type": "preferred",
+          "preferred": "～かもしれない",
+          "variants": [
+            "～かもしれない",
+            "～かも知れない"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0007",
+          "type": "preferred",
+          "preferred": "～のために",
+          "variants": [
+            "～のために",
+            "～の為に"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0008",
+          "type": "preferred",
+          "preferred": "～のとき",
+          "variants": [
+            "～のとき",
+            "～の時"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0009",
+          "type": "preferred",
+          "preferred": "～ところ",
+          "variants": [
+            "～ところ",
+            "～所"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0010",
+          "type": "preferred",
+          "preferred": "～ゆえに",
+          "variants": [
+            "～ゆえに",
+            "～故に"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0011",
+          "type": "preferred",
+          "preferred": "～とおり",
+          "variants": [
+            "～とおり",
+            "～通り"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0012",
+          "type": "preferred",
+          "preferred": "～ごと",
+          "variants": [
+            "～ごと",
+            "～毎"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0013",
+          "type": "preferred",
+          "preferred": "よろしく",
+          "variants": [
+            "よろしく",
+            "宜しく"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0014",
+          "type": "preferred",
+          "preferred": "いたします",
+          "variants": [
+            "いたします",
+            "致します"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0015",
+          "type": "preferred",
+          "preferred": "いただく",
+          "variants": [
+            "いただく",
+            "頂く"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0016",
+          "type": "preferred",
+          "preferred": "ください",
+          "variants": [
+            "ください",
+            "下さい"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0017",
+          "type": "preferred",
+          "preferred": "誠に",
+          "variants": [
+            "誠に",
+            "まことに"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0018",
+          "type": "preferred",
+          "preferred": "おかげさまで",
+          "variants": [
+            "おかげさまで",
+            "お陰様で",
+            "お蔭様で"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0019",
+          "type": "preferred",
+          "preferred": "および",
+          "variants": [
+            "および",
+            "及び"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0020",
+          "type": "preferred",
+          "preferred": "または",
+          "variants": [
+            "または",
+            "又は"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0021",
+          "type": "preferred",
+          "preferred": "かつ",
+          "variants": [
+            "かつ",
+            "且つ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0022",
+          "type": "preferred",
+          "preferred": "したがって",
+          "variants": [
+            "したがって",
+            "従って"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0023",
+          "type": "preferred",
+          "preferred": "ならびに",
+          "variants": [
+            "ならびに",
+            "並びに"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0024",
+          "type": "preferred",
+          "preferred": "なぜ",
+          "variants": [
+            "なぜ",
+            "何故"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0025",
+          "type": "preferred",
+          "preferred": "ぜひ",
+          "variants": [
+            "ぜひ",
+            "是非"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0026",
+          "type": "preferred",
+          "preferred": "あらかじめ",
+          "variants": [
+            "あらかじめ",
+            "予め"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0027",
+          "type": "preferred",
+          "preferred": "かつて",
+          "variants": [
+            "かつて",
+            "嘗て"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0028",
+          "type": "preferred",
+          "preferred": "すでに",
+          "variants": [
+            "すでに",
+            "既に"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0029",
+          "type": "preferred",
+          "preferred": "まず",
+          "variants": [
+            "まず",
+            "先ず"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0030",
+          "type": "preferred",
+          "preferred": "さらに",
+          "variants": [
+            "さらに",
+            "更に"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0031",
+          "type": "preferred",
+          "preferred": "すべて",
+          "variants": [
+            "すべて",
+            "全て"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0032",
+          "type": "preferred",
+          "preferred": "ほとんど",
+          "variants": [
+            "ほとんど",
+            "殆ど"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0033",
+          "type": "preferred",
+          "preferred": "いまだ",
+          "variants": [
+            "いまだ",
+            "未だ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0034",
+          "type": "preferred",
+          "preferred": "きわめて",
+          "variants": [
+            "きわめて",
+            "極めて"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0035",
+          "type": "preferred",
+          "preferred": "できる",
+          "variants": [
+            "できる",
+            "出来る"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0036",
+          "type": "preferred",
+          "preferred": "する",
+          "variants": [
+            "する",
+            "為る"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0037",
+          "type": "preferred",
+          "preferred": "わかる",
+          "variants": [
+            "わかる",
+            "分かる",
+            "分る",
+            "判る",
+            "解る"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0038",
+          "type": "preferred",
+          "preferred": "よい",
+          "variants": [
+            "よい",
+            "良い",
+            "好い",
+            "善い"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0039",
+          "type": "preferred",
+          "preferred": "よさ",
+          "variants": [
+            "よさ",
+            "良さ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0040",
+          "type": "preferred",
+          "preferred": "もつ",
+          "variants": [
+            "もつ",
+            "持つ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0041",
+          "type": "preferred",
+          "preferred": "ない",
+          "variants": [
+            "ない",
+            "無い"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0042",
+          "type": "preferred",
+          "preferred": "十分",
+          "variants": [
+            "十分",
+            "充分"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0043",
+          "type": "preferred",
+          "preferred": "いえる",
+          "variants": [
+            "いえる",
+            "言える"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0044",
+          "type": "preferred",
+          "preferred": "表す",
+          "variants": [
+            "表す",
+            "表わす"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0045",
+          "type": "preferred",
+          "preferred": "現れる",
+          "variants": [
+            "現れる",
+            "現われる"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0046",
+          "type": "preferred",
+          "preferred": "断る",
+          "variants": [
+            "断る",
+            "断わる"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0047",
+          "type": "preferred",
+          "preferred": "終わる",
+          "variants": [
+            "終わる",
+            "終る"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0048",
+          "type": "preferred",
+          "preferred": "変わる",
+          "variants": [
+            "変わる",
+            "変る"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0049",
+          "type": "preferred",
+          "preferred": "代わる",
+          "variants": [
+            "代わる",
+            "代る"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0050",
+          "type": "preferred",
+          "preferred": "行う",
+          "variants": [
+            "行う",
+            "行なう",
+            "おこなう"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0051",
+          "type": "preferred",
+          "preferred": "落とす",
+          "variants": [
+            "落とす",
+            "落す"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0052",
+          "type": "preferred",
+          "preferred": "暮らす",
+          "variants": [
+            "暮らす",
+            "暮す"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0053",
+          "type": "preferred",
+          "preferred": "もとづく",
+          "variants": [
+            "もとづく",
+            "基づく"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0054",
+          "type": "preferred",
+          "preferred": "もとに",
+          "variants": [
+            "もとに",
+            "基に"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0055",
+          "type": "preferred",
+          "preferred": "か月",
+          "variants": [
+            "か月",
+            "カ月",
+            "ヶ月",
+            "箇月",
+            "ケ月",
+            "ヵ月"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0056",
+          "type": "preferred",
+          "preferred": "か国",
+          "variants": [
+            "か国",
+            "カ国",
+            "ヶ国",
+            "箇国",
+            "ケ国"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0057",
+          "type": "preferred",
+          "preferred": "か所",
+          "variants": [
+            "か所",
+            "カ所",
+            "ヶ所",
+            "箇所",
+            "ケ所"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0058",
+          "type": "preferred",
+          "preferred": "パーセント",
+          "variants": [
+            "パーセント",
+            "%",
+            "％"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0059",
+          "type": "preferred",
+          "preferred": "５か年",
+          "variants": [
+            "５か年",
+            "５ヵ年",
+            "５ヶ年"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0060",
+          "type": "preferred",
+          "preferred": "１つ、２つ",
+          "variants": [
+            "１つ、２つ",
+            "一つ、二つ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0061",
+          "type": "preferred",
+          "preferred": "１人、２人",
+          "variants": [
+            "１人、２人",
+            "一人、二人"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "語の意味・対象範囲が異なる可能性があり、機械的に統一できない。",
+          "id": "company.0062",
+          "type": "contextual",
+          "preferred": null,
+          "variants": [
+            "子ども",
+            "こども",
+            "子供",
+            "児童"
+          ],
+          "category": "context-dependent",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0063",
+          "type": "preferred",
+          "preferred": "子どもたち",
+          "variants": [
+            "子どもたち",
+            "子ども達",
+            "子供たち",
+            "子供達"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0064",
+          "type": "preferred",
+          "preferred": "一人一人",
+          "variants": [
+            "一人一人",
+            "一人ひとり",
+            "ひとりひとり"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0065",
+          "type": "preferred",
+          "preferred": "一つ一つ",
+          "variants": [
+            "一つ一つ",
+            "一つひとつ",
+            "ひとつひとつ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0066",
+          "type": "preferred",
+          "preferred": "在り方",
+          "variants": [
+            "在り方",
+            "あり方"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0067",
+          "type": "preferred",
+          "preferred": "当たって",
+          "variants": [
+            "当たって",
+            "あたって"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0068",
+          "type": "preferred",
+          "preferred": "付ける",
+          "variants": [
+            "付ける",
+            "つける"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0069",
+          "type": "preferred",
+          "preferred": "気付く",
+          "variants": [
+            "気付く",
+            "気づく"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0070",
+          "type": "preferred",
+          "preferred": "身に付ける",
+          "variants": [
+            "身に付ける",
+            "身につける"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0071",
+          "type": "preferred",
+          "preferred": "し合う",
+          "variants": [
+            "し合う",
+            "しあう"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0072",
+          "type": "preferred",
+          "preferred": "通して",
+          "variants": [
+            "通して",
+            "とおして"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0073",
+          "type": "preferred",
+          "preferred": "我が国",
+          "variants": [
+            "我が国",
+            "わが国"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0074",
+          "type": "preferred",
+          "preferred": "取り組み",
+          "variants": [
+            "取り組み",
+            "取組"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0075",
+          "type": "preferred",
+          "preferred": "話し合い",
+          "variants": [
+            "話し合い",
+            "話合い"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0076",
+          "type": "preferred",
+          "preferred": "関わる",
+          "variants": [
+            "関わる",
+            "かかわる"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0077",
+          "type": "preferred",
+          "preferred": "育む",
+          "variants": [
+            "育む",
+            "はぐくむ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0078",
+          "type": "preferred",
+          "preferred": "踏まえて",
+          "variants": [
+            "踏まえて",
+            "ふまえて"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0079",
+          "type": "preferred",
+          "preferred": "目指す",
+          "variants": [
+            "目指す",
+            "めざす"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0080",
+          "type": "preferred",
+          "preferred": "友達",
+          "variants": [
+            "友達",
+            "友だち"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0081",
+          "type": "preferred",
+          "preferred": "手立て",
+          "variants": [
+            "手立て",
+            "てだて"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0082",
+          "type": "preferred",
+          "preferred": "働き",
+          "variants": [
+            "働き",
+            "はたらき"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0083",
+          "type": "preferred",
+          "preferred": "振り返る",
+          "variants": [
+            "振り返る",
+            "ふり返る"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0084",
+          "type": "preferred",
+          "preferred": "繰り返し",
+          "variants": [
+            "繰り返し",
+            "くりかえし"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0085",
+          "type": "preferred",
+          "preferred": "見取る",
+          "variants": [
+            "見取る",
+            "見とる"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0086",
+          "type": "preferred",
+          "preferred": "様々",
+          "variants": [
+            "様々",
+            "さまざま"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0087",
+          "type": "preferred",
+          "preferred": "例えば",
+          "variants": [
+            "例えば",
+            "たとえば"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0088",
+          "type": "preferred",
+          "preferred": "生かす",
+          "variants": [
+            "生かす",
+            "いかす"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0089",
+          "type": "preferred",
+          "preferred": "皆",
+          "variants": [
+            "皆",
+            "みんな"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0090",
+          "type": "preferred",
+          "preferred": "とらえる",
+          "variants": [
+            "とらえる",
+            "捉える"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0091",
+          "type": "preferred",
+          "preferred": "すること",
+          "variants": [
+            "すること",
+            "する事"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0092",
+          "type": "preferred",
+          "preferred": "見いだす",
+          "variants": [
+            "見いだす",
+            "見出す"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0093",
+          "type": "preferred",
+          "preferred": "ねらい",
+          "variants": [
+            "ねらい",
+            "狙い"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0094",
+          "type": "preferred",
+          "preferred": "声かけ",
+          "variants": [
+            "声かけ",
+            "声掛け"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "語の意味・対象範囲が異なる可能性があり、機械的に統一できない。",
+          "id": "company.0095",
+          "type": "contextual",
+          "preferred": null,
+          "variants": [
+            "諸感覚",
+            "五感"
+          ],
+          "category": "context-dependent",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "語の意味・対象範囲が異なる可能性があり、機械的に統一できない。",
+          "id": "company.0096",
+          "type": "contextual",
+          "preferred": null,
+          "variants": [
+            "保育所",
+            "保育園"
+          ],
+          "category": "context-dependent",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "語の意味・対象範囲が異なる可能性があり、機械的に統一できない。",
+          "id": "company.0097",
+          "type": "contextual",
+          "preferred": null,
+          "variants": [
+            "教師",
+            "先生",
+            "教員"
+          ],
+          "category": "context-dependent",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0098",
+          "type": "preferred",
+          "preferred": "児童生徒",
+          "variants": [
+            "児童生徒",
+            "児童・生徒"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "語の意味・対象範囲が異なる可能性があり、機械的に統一できない。",
+          "id": "company.0099",
+          "type": "contextual",
+          "preferred": null,
+          "variants": [
+            "ICT端末",
+            "一人一台端末"
+          ],
+          "category": "context-dependent",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "語の意味・対象範囲が異なる可能性があり、機械的に統一できない。",
+          "id": "company.0100",
+          "type": "contextual",
+          "preferred": null,
+          "variants": [
+            "保護者",
+            "お家の方",
+            "親御さん",
+            "父母",
+            "父兄"
+          ],
+          "category": "context-dependent",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0101",
+          "type": "preferred",
+          "preferred": "つまずき",
+          "variants": [
+            "つまずき",
+            "躓き",
+            "つまづき"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "語の意味・対象範囲が異なる可能性があり、機械的に統一できない。",
+          "id": "company.0102",
+          "type": "contextual",
+          "preferred": null,
+          "variants": [
+            "ふり返り",
+            "振り返り",
+            "リフレクション"
+          ],
+          "category": "context-dependent",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "語の意味・対象範囲が異なる可能性があり、機械的に統一できない。",
+          "id": "company.0103",
+          "type": "contextual",
+          "preferred": null,
+          "variants": [
+            "見取り",
+            "評価",
+            "アセスメント"
+          ],
+          "category": "context-dependent",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "語の意味・対象範囲が異なる可能性があり、機械的に統一できない。",
+          "id": "company.0104",
+          "type": "contextual",
+          "preferred": null,
+          "variants": [
+            "板書",
+            "黒板書き"
+          ],
+          "category": "context-dependent",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "語の意味・対象範囲が異なる可能性があり、機械的に統一できない。",
+          "id": "company.0105",
+          "type": "contextual",
+          "preferred": null,
+          "variants": [
+            "机間指導",
+            "机間巡視"
+          ],
+          "category": "context-dependent",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "語の意味・対象範囲が異なる可能性があり、機械的に統一できない。",
+          "id": "company.0106",
+          "type": "contextual",
+          "preferred": null,
+          "variants": [
+            "学習指導案",
+            "指導案",
+            "本案",
+            "略案"
+          ],
+          "category": "context-dependent",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "語の意味・対象範囲が異なる可能性があり、機械的に統一できない。",
+          "id": "company.0107",
+          "type": "contextual",
+          "preferred": null,
+          "variants": [
+            "働きかけ",
+            "働き掛け",
+            "アプローチ"
+          ],
+          "category": "context-dependent",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "語の意味・対象範囲が異なる可能性があり、機械的に統一できない。",
+          "id": "company.0108",
+          "type": "contextual",
+          "preferred": null,
+          "variants": [
+            "特別支援教育",
+            "特支"
+          ],
+          "category": "context-dependent",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "語の意味・対象範囲が異なる可能性があり、機械的に統一できない。",
+          "id": "company.0109",
+          "type": "contextual",
+          "preferred": null,
+          "variants": [
+            "学級経営",
+            "クラス運営",
+            "クラス経営"
+          ],
+          "category": "context-dependent",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0110",
+          "type": "preferred",
+          "preferred": "送り仮名",
+          "variants": [
+            "送り仮名",
+            "送りがな"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0111",
+          "type": "preferred",
+          "preferred": "ふりがな",
+          "variants": [
+            "ふりがな",
+            "ルビ",
+            "振り仮名"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0112",
+          "type": "preferred",
+          "preferred": "書き順",
+          "variants": [
+            "書き順",
+            "筆順"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "語の意味・対象範囲が異なる可能性があり、機械的に統一できない。",
+          "id": "company.0113",
+          "type": "contextual",
+          "preferred": null,
+          "variants": [
+            "物語文",
+            "お話",
+            "文学的な文章"
+          ],
+          "category": "context-dependent",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0114",
+          "type": "preferred",
+          "preferred": "説明文",
+          "variants": [
+            "説明文",
+            "説明的な文章"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "語の意味・対象範囲が異なる可能性があり、機械的に統一できない。",
+          "id": "company.0115",
+          "type": "contextual",
+          "preferred": null,
+          "variants": [
+            "指示語",
+            "こそあど言葉"
+          ],
+          "category": "context-dependent",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "語の意味・対象範囲が異なる可能性があり、機械的に統一できない。",
+          "id": "company.0116",
+          "type": "contextual",
+          "preferred": null,
+          "variants": [
+            "接続語",
+            "つなぎの言葉"
+          ],
+          "category": "context-dependent",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0117",
+          "type": "preferred",
+          "preferred": "修飾語",
+          "variants": [
+            "修飾語",
+            "くわしくする言葉"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0118",
+          "type": "preferred",
+          "preferred": "原稿用紙",
+          "variants": [
+            "原稿用紙",
+            "作文用紙"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0119",
+          "type": "preferred",
+          "preferred": "ローマ字",
+          "variants": [
+            "ローマ字",
+            "ローマ字書き"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0120",
+          "type": "preferred",
+          "preferred": "漢字",
+          "variants": [
+            "漢字",
+            "かん字"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0121",
+          "type": "preferred",
+          "preferred": "足し算",
+          "variants": [
+            "足し算",
+            "たし算",
+            "加法"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0122",
+          "type": "preferred",
+          "preferred": "引き算",
+          "variants": [
+            "引き算",
+            "ひき算",
+            "減法"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0123",
+          "type": "preferred",
+          "preferred": "掛け算",
+          "variants": [
+            "掛け算",
+            "かけ算",
+            "乗法"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0124",
+          "type": "preferred",
+          "preferred": "割り算",
+          "variants": [
+            "割り算",
+            "わり算",
+            "除法"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0125",
+          "type": "preferred",
+          "preferred": "筆算",
+          "variants": [
+            "筆算",
+            "ひっ算"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0126",
+          "type": "preferred",
+          "preferred": "繰り上がり",
+          "variants": [
+            "繰り上がり",
+            "くり上がり",
+            "くりあがり"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0127",
+          "type": "preferred",
+          "preferred": "繰り下がり",
+          "variants": [
+            "繰り下がり",
+            "くり下がり",
+            "くりさがり"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0128",
+          "type": "preferred",
+          "preferred": "文章題",
+          "variants": [
+            "文章題",
+            "文章問題",
+            "応用問題"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0129",
+          "type": "preferred",
+          "preferred": "図形",
+          "variants": [
+            "図形",
+            "かたち"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0130",
+          "type": "preferred",
+          "preferred": "立体",
+          "variants": [
+            "立体",
+            "はこのかたち"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0131",
+          "type": "preferred",
+          "preferred": "リットル",
+          "variants": [
+            "リットル",
+            "L",
+            "l",
+            "ℓ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0132",
+          "type": "preferred",
+          "preferred": "デシリットル",
+          "variants": [
+            "デシリットル",
+            "dL",
+            "dl"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0133",
+          "type": "preferred",
+          "preferred": "ミリリットル",
+          "variants": [
+            "ミリリットル",
+            "mL",
+            "ml"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0134",
+          "type": "preferred",
+          "preferred": "センチメートル",
+          "variants": [
+            "センチメートル",
+            "cm",
+            "センチ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0135",
+          "type": "preferred",
+          "preferred": "ミリメートル",
+          "variants": [
+            "ミリメートル",
+            "mm",
+            "ミリ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0136",
+          "type": "preferred",
+          "preferred": "キロメートル",
+          "variants": [
+            "キロメートル",
+            "km",
+            "キロ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0137",
+          "type": "preferred",
+          "preferred": "グラム",
+          "variants": [
+            "グラム",
+            "g",
+            "ｇ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0138",
+          "type": "preferred",
+          "preferred": "キログラム",
+          "variants": [
+            "キログラム",
+            "kg",
+            "ｋｇ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0139",
+          "type": "preferred",
+          "preferred": "平方メートル",
+          "variants": [
+            "平方メートル",
+            "m2",
+            "㎡",
+            "平米"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0140",
+          "type": "preferred",
+          "preferred": "マーケティング",
+          "variants": [
+            "マーケティング",
+            "マーケッティング"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0141",
+          "type": "preferred",
+          "preferred": "プレゼンテーション",
+          "variants": [
+            "プレゼンテーション",
+            "プレゼンション",
+            "プレゼン"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0142",
+          "type": "preferred",
+          "preferred": "コンサルタント",
+          "variants": [
+            "コンサルタント",
+            "コンサルタンド"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0143",
+          "type": "preferred",
+          "preferred": "売上",
+          "variants": [
+            "売上",
+            "売り上げ",
+            "売上げ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0144",
+          "type": "preferred",
+          "preferred": "買上",
+          "variants": [
+            "買上",
+            "買い上げ",
+            "買上げ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0145",
+          "type": "preferred",
+          "preferred": "支払",
+          "variants": [
+            "支払",
+            "支払い",
+            "支払ひ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0146",
+          "type": "preferred",
+          "preferred": "割合",
+          "variants": [
+            "割合",
+            "割合い"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0147",
+          "type": "preferred",
+          "preferred": "組合せ",
+          "variants": [
+            "組合せ",
+            "組み合わせ",
+            "組合"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0148",
+          "type": "preferred",
+          "preferred": "取扱説明書",
+          "variants": [
+            "取扱説明書",
+            "取り扱い説明書",
+            "取扱い説明書"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0149",
+          "type": "preferred",
+          "preferred": "弊社",
+          "variants": [
+            "弊社",
+            "当社",
+            "自社"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0150",
+          "type": "preferred",
+          "preferred": "貴社",
+          "variants": [
+            "貴社",
+            "御社"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0151",
+          "type": "preferred",
+          "preferred": "引越",
+          "variants": [
+            "引越",
+            "引越し",
+            "引っ越し",
+            "引っ越"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0152",
+          "type": "preferred",
+          "preferred": "見積",
+          "variants": [
+            "見積",
+            "見積り",
+            "見積もり"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0153",
+          "type": "preferred",
+          "preferred": "振込",
+          "variants": [
+            "振込",
+            "振り込み",
+            "振込み"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0154",
+          "type": "preferred",
+          "preferred": "申込",
+          "variants": [
+            "申込",
+            "申し込み",
+            "申込み"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0155",
+          "type": "preferred",
+          "preferred": "受付",
+          "variants": [
+            "受付",
+            "受け付け",
+            "受付け"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0156",
+          "type": "preferred",
+          "preferred": "打合",
+          "variants": [
+            "打合",
+            "打ち合わせ",
+            "打合せ",
+            "打ち合せ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0157",
+          "type": "preferred",
+          "preferred": "問合",
+          "variants": [
+            "問合",
+            "問い合わせ",
+            "問合せ",
+            "問い合せ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0158",
+          "type": "preferred",
+          "preferred": "取扱",
+          "variants": [
+            "取扱",
+            "取り扱い",
+            "取扱い"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0159",
+          "type": "preferred",
+          "preferred": "手続",
+          "variants": [
+            "手続",
+            "手続き"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0160",
+          "type": "preferred",
+          "preferred": "届出",
+          "variants": [
+            "届出",
+            "届け出"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0161",
+          "type": "preferred",
+          "preferred": "サーバー",
+          "variants": [
+            "サーバー",
+            "サーバ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0162",
+          "type": "preferred",
+          "preferred": "コンピューター",
+          "variants": [
+            "コンピューター",
+            "コンピュータ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0163",
+          "type": "preferred",
+          "preferred": "ユーザー",
+          "variants": [
+            "ユーザー",
+            "ユーザ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0164",
+          "type": "preferred",
+          "preferred": "プリンター",
+          "variants": [
+            "プリンター",
+            "プリンタ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0165",
+          "type": "preferred",
+          "preferred": "ルーター",
+          "variants": [
+            "ルーター",
+            "ルータ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0166",
+          "type": "preferred",
+          "preferred": "モニター",
+          "variants": [
+            "モニター",
+            "モニタ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0167",
+          "type": "preferred",
+          "preferred": "スキャナー",
+          "variants": [
+            "スキャナー",
+            "スキャナ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0168",
+          "type": "preferred",
+          "preferred": "フォルダー",
+          "variants": [
+            "フォルダー",
+            "フォルダ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0169",
+          "type": "preferred",
+          "preferred": "アダプター",
+          "variants": [
+            "アダプター",
+            "アダプタ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0170",
+          "type": "preferred",
+          "preferred": "プロセッサー",
+          "variants": [
+            "プロセッサー",
+            "プロセッサ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0171",
+          "type": "preferred",
+          "preferred": "センサー",
+          "variants": [
+            "センサー",
+            "センサ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        },
+        {
+          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "id": "company.0172",
+          "type": "preferred",
+          "preferred": "ブラウザー",
+          "variants": [
+            "ブラウザー",
+            "ブラウザ"
+          ],
+          "category": "legacy",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "hyoki-checker existing default dictionary",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+          }
+        }
+      ]
+    },
+    {
+      "id": "jtf-3.0",
+      "label": "JTF 3.0",
+      "path": "packs/jtf-3.0/rules.json",
+      "priority": 200,
+      "defaultEnabled": false,
+      "rules": [
+        {
+          "reason": "JTF 3.0はカタカナ語末の長音を省略しない方針を示す。",
+          "id": "jtf-3.0.katakana-long-vowel.server",
+          "type": "preferred",
+          "preferred": "サーバー",
+          "variants": [
+            "サーバー",
+            "サーバ"
+          ],
+          "category": "katakana",
+          "severity": "warning",
+          "fixMode": "auto",
+          "source": {
+            "pack": "jtf-3.0",
+            "title": "JTF日本語標準スタイルガイド 第3.0版",
+            "url": "https://www.jtf.jp/pdf/jtf_style_guide.pdf",
+            "license": "CC BY 4.0",
+            "attribution": "日本翻訳連盟（JTF）",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "原文の方針から機械判定可能な語例へ加工。"
+          }
+        },
+        {
+          "reason": "形式名詞としての「ため」は平仮名で書く。語の一部を誤置換しないよう「の」を含む形に限定。",
+          "id": "jtf-3.0.hiragana.tame",
+          "type": "preferred",
+          "preferred": "のため",
+          "variants": [
+            "のため",
+            "の為"
+          ],
+          "category": "hiragana-kanji",
+          "severity": "warning",
+          "fixMode": "auto",
+          "source": {
+            "pack": "jtf-3.0",
+            "title": "JTF日本語標準スタイルガイド 第3.0版",
+            "url": "https://www.jtf.jp/pdf/jtf_style_guide.pdf",
+            "license": "CC BY 4.0",
+            "attribution": "日本翻訳連盟（JTF）",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "2.2.1の方針を安全な文字列ルールへ加工。"
+          }
+        },
+        {
+          "reason": "「とき」と「時」は品詞・意味で使い分けるため、文脈なしでは統一できない。",
+          "id": "jtf-3.0.context.toki",
+          "type": "contextual",
+          "preferred": null,
+          "variants": [
+            "とき",
+            "時"
+          ],
+          "category": "context-dependent",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "jtf-3.0",
+            "title": "JTF日本語標準スタイルガイド 第3.0版",
+            "url": "https://www.jtf.jp/pdf/jtf_style_guide.pdf",
+            "license": "CC BY 4.0",
+            "attribution": "日本翻訳連盟（JTF）",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "2.2.1の文脈依存ルールを要約。"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bunka-official",
+      "label": "文化庁・公用文",
+      "path": "packs/bunka/rules.json",
+      "priority": 200,
+      "defaultEnabled": false,
+      "rules": [
+        {
+          "reason": "読点は「、」が原則だが横書きでは「，」も許容され、文書内で統一する。",
+          "id": "bunka-official.punctuation.comma",
+          "type": "consistency",
+          "preferred": null,
+          "variants": [
+            "、",
+            "，"
+          ],
+          "category": "punctuation",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "bunka-official",
+            "title": "公用文作成の考え方（文化審議会建議）",
+            "url": "https://www.bunka.go.jp/seisaku/bunkashingikai/kokugo/hokoku/pdf/93651301_01.pdf",
+            "license": "文化庁ウェブサイトの利用条件を要個別確認",
+            "attribution": "文化審議会（文化庁）",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "Ⅰ 表記の原則 5(1)アを要約。ライセンス確定まで原文転載はせず、出典付きの事実記述のみ。"
+          }
+        },
+        {
+          "reason": "算用数字を使う横書きでは「○か所」とする。数字を含む文脈依存パターンのため自動置換しない。",
+          "id": "bunka-official.numeral.kasho",
+          "type": "pattern",
+          "preferred": "○か所",
+          "variants": [
+            "○カ所",
+            "○ケ所",
+            "○ヶ所",
+            "○箇所",
+            "○ヵ所"
+          ],
+          "category": "numerals",
+          "severity": "warning",
+          "fixMode": "none",
+          "pattern": "[0-9０-９](?:カ|ケ|ヶ|箇|ヵ)所",
+          "source": {
+            "pack": "bunka-official",
+            "title": "公用文作成の考え方（文化審議会建議）",
+            "url": "https://www.bunka.go.jp/seisaku/bunkashingikai/kokugo/hokoku/pdf/93651301_01.pdf",
+            "license": "文化庁ウェブサイトの利用条件を要個別確認",
+            "attribution": "文化審議会（文化庁）",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "Ⅰ 表記の原則 4ケを機械検出用正規表現へ加工。"
+          }
+        }
+      ]
+    },
+    {
+      "id": "consistency-only",
+      "label": "文書内統一のみ",
+      "path": "packs/consistency-only/rules.json",
+      "priority": 100,
+      "defaultEnabled": false,
+      "rules": [
+        {
+          "reason": "正誤は決めず、同一文書内での混在だけを通知する。",
+          "id": "consistency-only.web",
+          "type": "consistency",
+          "preferred": null,
+          "variants": [
+            "Web",
+            "ウェブ",
+            "ウエブ"
+          ],
+          "category": "general",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "consistency-only",
+            "title": "hyoki-checker consistency rules",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true
+          }
+        },
+        {
+          "reason": "意味が同じ範囲の表記混在だけを通知し、統一先は決めない。",
+          "id": "consistency-only.child",
+          "type": "consistency",
+          "preferred": null,
+          "variants": [
+            "子ども",
+            "こども",
+            "子供"
+          ],
+          "category": "general",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "consistency-only",
+            "title": "hyoki-checker consistency rules",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "sudachi",
+      "label": "Sudachi候補",
+      "path": "packs/sudachi/rules.json",
+      "priority": 50,
+      "defaultEnabled": false,
+      "hidden": true,
+      "rules": []
+    }
+  ]
+};
+const DEFAULT_RULE_PACKS = GENERATED_RULES.packs;
+const DEFAULT_DICT = DEFAULT_RULE_PACKS.flatMap(pack => pack.rules);

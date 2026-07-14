@@ -1,9 +1,11 @@
 from collections import defaultdict
 from functools import lru_cache
+import re
 
 import ahocorasick
 
 from .models import AnalysisResult, TextChunk, VariantMatch
+from .dict_manager import adapt_rule
 
 # 表記ゆれ判定の対象とする自立語の品詞大分類
 _CONTENT_POS = {"名詞", "動詞", "形容詞", "副詞"}
@@ -46,11 +48,18 @@ def _has_kanji(text: str) -> bool:
     return any("一" <= c <= "鿿" for c in text)
 
 
-def build_automaton(dict_groups: list[list[str]]) -> ahocorasick.Automaton:
-    """辞書グループからAho-Corasickオートマトンを構築する。"""
+def _normalize_rules(values: list) -> list[dict]:
+    return [rule for index, value in enumerate(values) if (rule := adapt_rule(value, index, "legacy"))]
+
+
+def build_automaton(dict_groups: list[dict]) -> ahocorasick.Automaton:
+    """構造化ルールからAho-Corasickオートマトンを構築する。"""
+    dict_groups = _normalize_rules(dict_groups)
     A = ahocorasick.Automaton()
-    for gid, group in enumerate(dict_groups):
-        for word in group:
+    for gid, rule in enumerate(dict_groups):
+        if rule.get("type") == "pattern":
+            continue
+        for word in rule.get("variants", []):
             if word:
                 A.add_word(word, (gid, word))
     A.make_automaton()
@@ -82,7 +91,7 @@ def _token_boundaries(text: str) -> tuple[set[int], set[int]]:
 def analyze_chunks(
     chunks: list[TextChunk],
     automaton: ahocorasick.Automaton,
-    dict_groups: list[list[str]],
+    dict_groups: list[dict],
 ) -> list[AnalysisResult]:
     """チャンクリストを解析し、辞書ベースの表記揺れを検知する。
 
@@ -90,8 +99,10 @@ def analyze_chunks(
     ものだけを採用し、部分文字列による誤検出を排除する。位置は絶対位置の集合で
     集計するため、チャンクのオーバーラップによる二重計上も解消される。
     """
+    dict_groups = _normalize_rules(dict_groups)
     # gid → {word → {絶対position, ...}}（setでoverlap重複を排除）
     all_matches: dict[int, dict[str, set[int]]] = defaultdict(lambda: defaultdict(set))
+    pattern_matches: dict[int, dict[str, set[int]]] = defaultdict(lambda: defaultdict(set))
 
     for chunk in chunks:
         starts, ends = _token_boundaries(chunk.text)
@@ -102,23 +113,63 @@ def analyze_chunks(
             if use_boundary and (start not in starts or end_excl not in ends):
                 continue  # 形態素境界に揃わない部分一致は誤検出として除外
             all_matches[gid][word].add(chunk.offset + start)
+        for gid, rule in enumerate(dict_groups):
+            if rule.get("type") != "pattern" or not rule.get("pattern"):
+                continue
+            try:
+                for match in re.finditer(rule["pattern"], chunk.text):
+                    pattern_matches[gid][match.group(0)].add(chunk.offset + match.start())
+            except re.error:
+                continue
 
     results: list[AnalysisResult] = []
-    for gid, word_positions in all_matches.items():
-        if len(word_positions) < 2:
-            continue  # 1種類のみの出現はスキップ
-
-        group = dict_groups[gid]
+    for gid, word_positions in {**all_matches, **pattern_matches}.items():
+        rule = dict_groups[gid]
+        group = rule.get("variants", [])
         counts = [
             VariantMatch(word=w, count=len(ps), positions=sorted(ps))
             for w, ps in word_positions.items()
         ]
         counts.sort(key=lambda x: x.count, reverse=True)
 
+        rule_type = rule.get("type", "preferred")
+        preferred = rule.get("preferred")
+        if rule_type in {"consistency", "contextual"} and len(word_positions) < 2:
+            continue
+        if rule_type not in {"consistency", "contextual", "forbidden", "pattern"}:
+            if not any(word != preferred for word in word_positions):
+                continue
+        fix_mode = rule.get("fixMode", "none")
+        if rule_type in {"consistency", "contextual"}:
+            fix_mode = "none"
+        if rule_type in {"consistency", "contextual", "forbidden", "pattern"}:
+            others = list(word_positions)
+        else:
+            others = [word for word in word_positions if word != preferred]
+        occurrences = sorted(
+            (
+                {"word": word, "start": start, "end": start + len(word)}
+                for word, positions in word_positions.items()
+                for start in positions
+            ),
+            key=lambda item: item["start"],
+        )
+
         results.append(AnalysisResult(
             group=group,
-            recommended=counts[0].word,
+            recommended=preferred,
             counts=counts,
+            others=others,
+            occurrences=occurrences,
+            isInconsistent=len(word_positions) >= 2,
+            observedMajority=counts[0].word,
+            ruleId=rule.get("id", ""),
+            type=rule_type,
+            category=rule.get("category", ""),
+            severity=rule.get("severity", "info"),
+            fixMode=fix_mode,
+            reason=rule.get("reason", ""),
+            source=rule.get("source", {}),
         ))
 
     return results
@@ -180,10 +231,31 @@ def morphological_detect(text: str, *, use_reading: bool = False) -> list[Analys
         counts.sort(key=lambda x: x.count, reverse=True)
         results.append(AnalysisResult(
             group=group,
-            recommended=counts[0].word,
+            recommended=None,
             counts=counts,
+            others=group,
+            occurrences=sorted(
+                (
+                    {"word": word, "start": start, "end": start + len(word)}
+                    for word, positions in surf_positions.items()
+                    for start in positions
+                ),
+                key=lambda item: item["start"],
+            ),
+            isInconsistent=True,
+            observedMajority=counts[0].word,
+            ruleId=f"sudachi.{kind}.{key}",
+            type="consistency",
+            category="sudachi",
+            severity="info",
+            fixMode="none",
+            reason="Sudachiによる自動候補。意味と文脈を確認してください。",
             normalized_form=key if kind == "norm" else "",
-            source="reading" if kind == "read" else "sudachi_auto",
+            source={
+                "pack": "sudachi",
+                "title": "Sudachi automatic detection",
+                "license": "Apache-2.0",
+            },
         ))
 
     return results

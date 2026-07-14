@@ -1,0 +1,43 @@
+[
+  {
+    "id": "bunka-official.punctuation.comma",
+    "type": "consistency",
+    "preferred": null,
+    "variants": ["、", "，"],
+    "category": "punctuation",
+    "severity": "info",
+    "fixMode": "none",
+    "reason": "読点は「、」が原則だが横書きでは「，」も許容され、文書内で統一する。",
+    "source": {
+      "pack": "bunka-official",
+      "title": "公用文作成の考え方（文化審議会建議）",
+      "url": "https://www.bunka.go.jp/seisaku/bunkashingikai/kokugo/hokoku/pdf/93651301_01.pdf",
+      "license": "文化庁ウェブサイトの利用条件を要個別確認",
+      "attribution": "文化審議会（文化庁）",
+      "retrievedAt": "2026-07-14",
+      "modified": true,
+      "notes": "Ⅰ 表記の原則 5(1)アを要約。ライセンス確定まで原文転載はせず、出典付きの事実記述のみ。"
+    }
+  },
+  {
+    "id": "bunka-official.numeral.kasho",
+    "type": "pattern",
+    "preferred": "○か所",
+    "variants": ["○カ所", "○ケ所", "○ヶ所", "○箇所", "○ヵ所"],
+    "category": "numerals",
+    "severity": "warning",
+    "fixMode": "none",
+    "pattern": "[0-9０-９](?:カ|ケ|ヶ|箇|ヵ)所",
+    "reason": "算用数字を使う横書きでは「○か所」とする。数字を含む文脈依存パターンのため自動置換しない。",
+    "source": {
+      "pack": "bunka-official",
+      "title": "公用文作成の考え方（文化審議会建議）",
+      "url": "https://www.bunka.go.jp/seisaku/bunkashingikai/kokugo/hokoku/pdf/93651301_01.pdf",
+      "license": "文化庁ウェブサイトの利用条件を要個別確認",
+      "attribution": "文化審議会（文化庁）",
+      "retrievedAt": "2026-07-14",
+      "modified": true,
+      "notes": "Ⅰ 表記の原則 4ケを機械検出用正規表現へ加工。"
+    }
+  }
+]

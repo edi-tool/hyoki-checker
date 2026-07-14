@@ -1,0 +1,17 @@
+文化審議会「公用文作成の考え方」参照ルール
+============================================
+
+Title: 公用文作成の考え方（文化審議会建議）
+Publisher / responsible body: 文化審議会（文化庁）
+Document date: 2022-01-07
+Source: https://www.bunka.go.jp/seisaku/bunkashingikai/kokugo/hokoku/pdf/93651301_01.pdf
+Retrieved: 2026-07-14
+
+rules/packs/bunka/rules.json records source-backed facts and transformed
+machine-detection patterns. It does not include a copy of the source text.
+The repository maintainers did not confirm a document-specific open license
+from the source page during this change. Consequently, this pack is disabled
+by default, contains no automatic fixes, and avoids verbatim reproduction.
+
+Before expanding this pack, verify the then-current reuse terms for each
+specific Culture Agency document and record them in the rule source metadata.

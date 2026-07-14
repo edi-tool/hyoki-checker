@@ -10,23 +10,58 @@
 - **多様な入力**: `.docx` / `.pdf` / `.txt` 読込・直接貼り付けに対応
 - **3種の検出**: 辞書ベース／ファジー（近似一致）／Kuromoji 活用形解析（Beta）
 - **カスタム辞書**: 自社の表記基準を追加（localStorage 保存、JSON/TSV/CSV インポート）
-- **推奨表記へ統一**: 検出結果を推奨表記へ一括置換し `.docx` 出力
+- **基準表記を明示**: 辞書グループの先頭を基準とし、多数派に流されず判定
+- **原文位置へ移動**: 結果の表記をクリックすると該当箇所を順番に選択
+- **基準表記へ統一**: 実際に検出した位置だけを一括置換し、新しい `.docx` を出力
 
 ## 使い方
 
 1. テキストを貼り付け、またはファイルをドラッグ＆ドロップ
 2. 検知結果タブで表記ゆれグループと出現数を確認
 3. プレビュータブで非推奨表記のハイライトを確認
-4. 「推奨表記に統一してWord出力」で統一済み `.docx` をダウンロード
+4. 必要なら「基準表記に統一したWordを作成」で統一済み `.docx` をダウンロード
+
+辞書では各グループの先頭が基準表記です（例: `Web,ウェブ,ウエブ`）。基準外の表記しか
+文書にない場合も指摘します。生成する Word はプレーンテキストの新規文書であり、元文書の
+書式・画像・脚注・変更履歴は引き継ぎません。実務で書式を保つ場合は、結果カードから原文位置へ
+移動して Word 側で修正してください。
 
 ## 技術構成
 
-| 区分 | 内容 |
-|---|---|
-| フロント | バニラ JS（Web Worker）、Tailwind（ビルド済み CSS） |
-| 形態素解析 | Kuromoji.js（Beta、遅延ロード） |
-| 文書入出力 | mammoth（docx 読込）、pdf.js（PDF 読込）、html-docx-js（docx 出力） |
+| 区分                 | 内容                                                                                |
+| -------------------- | ----------------------------------------------------------------------------------- |
+| フロント             | バニラ JS（Web Worker）、Tailwind（ビルド済み CSS）                                 |
+| 形態素解析           | Kuromoji.js（Beta、遅延ロード）                                                     |
+| 文書入出力           | mammoth（docx 読込）、pdf.js（PDF 読込）、html-docx-js（docx 出力）                 |
 | バックエンド（任意） | FastAPI + SudachiPy + Aho-Corasick（大容量テキスト向け、`API_BASE` 設定時のみ使用） |
+
+## ルールパックと安全な修正
+
+ルールの原本は `rules/packs/` にあり、`npm run build:rules` でフロント用
+`js/defaultDict.js` とバックエンド用 `backend/dicts/default_dict.json` を同時生成します。
+生成ファイルは直接編集しません。
+
+- `company`: 既存辞書を構造化して移行。初期ON、旧ルールは安全のため原則 `confirm`
+- `jtf-3.0`: JTF 3.0から加工した少数ルール。初期OFF
+- `bunka-official`: 文化審議会資料を参照した少数ルール。初期OFF、自動修正なし
+- `consistency-only`: 正誤を決めず、文書内の混在だけを通知。初期OFF
+
+`fixMode: auto` のルールだけが一括Word出力の置換対象です。`confirm`、`none`、
+文脈依存、Sudachi・ファジー由来の候補は自動置換しません。旧カスタム辞書の
+`string[][]` は読み込み時に構造化し、`confirm` として移行します。
+
+コードはMITライセンスです。外部資料由来のルールデータには各ルールの `source`、
+`NOTICE`、`THIRD_PARTY_LICENSES` に記載した個別条件が適用されます。
+
+## 採用・参考にした技術
+
+- [PDF.js](https://github.com/mozilla/pdf.js) の `TextItem.hasEOL` と座標を利用し、PDFの改行と欧文の語間を復元
+- [Mammoth.js](https://github.com/mwilliamson/mammoth.js) のブラウザ版で `.docx` をプレーンテキスト化
+- [kuromoji.js](https://github.com/takuyaa/kuromoji.js) を Web Worker で遅延読込し、形態素境界と活用形を補助判定
+- [textlint](https://github.com/textlint/textlint) は日本語校正の参考実装として調査。汎用ルールエンジンのため、現状は軽量な辞書ベース処理を維持
+
+いずれも文書本文を外部APIへ送らず、ブラウザ内で処理します。CDNからライブラリ本体を取得する
+場合はありますが、読み込んだ文書データは送信しません。
 
 詳細な開発経緯は [progress.md](progress.md) を参照。
 

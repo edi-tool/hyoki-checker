@@ -1,0 +1,62 @@
+[
+  {
+    "id": "jtf-3.0.katakana-long-vowel.server",
+    "type": "preferred",
+    "preferred": "サーバー",
+    "variants": ["サーバー", "サーバ"],
+    "category": "katakana",
+    "severity": "warning",
+    "fixMode": "auto",
+    "reason": "JTF 3.0はカタカナ語末の長音を省略しない方針を示す。",
+    "source": {
+      "pack": "jtf-3.0",
+      "title": "JTF日本語標準スタイルガイド 第3.0版",
+      "url": "https://www.jtf.jp/pdf/jtf_style_guide.pdf",
+      "license": "CC BY 4.0",
+      "attribution": "日本翻訳連盟（JTF）",
+      "retrievedAt": "2026-07-14",
+      "modified": true,
+      "notes": "原文の方針から機械判定可能な語例へ加工。"
+    }
+  },
+  {
+    "id": "jtf-3.0.hiragana.tame",
+    "type": "preferred",
+    "preferred": "のため",
+    "variants": ["のため", "の為"],
+    "category": "hiragana-kanji",
+    "severity": "warning",
+    "fixMode": "auto",
+    "reason": "形式名詞としての「ため」は平仮名で書く。語の一部を誤置換しないよう「の」を含む形に限定。",
+    "source": {
+      "pack": "jtf-3.0",
+      "title": "JTF日本語標準スタイルガイド 第3.0版",
+      "url": "https://www.jtf.jp/pdf/jtf_style_guide.pdf",
+      "license": "CC BY 4.0",
+      "attribution": "日本翻訳連盟（JTF）",
+      "retrievedAt": "2026-07-14",
+      "modified": true,
+      "notes": "2.2.1の方針を安全な文字列ルールへ加工。"
+    }
+  },
+  {
+    "id": "jtf-3.0.context.toki",
+    "type": "contextual",
+    "preferred": null,
+    "variants": ["とき", "時"],
+    "category": "context-dependent",
+    "severity": "info",
+    "fixMode": "none",
+    "reason": "「とき」と「時」は品詞・意味で使い分けるため、文脈なしでは統一できない。",
+    "source": {
+      "pack": "jtf-3.0",
+      "title": "JTF日本語標準スタイルガイド 第3.0版",
+      "url": "https://www.jtf.jp/pdf/jtf_style_guide.pdf",
+      "license": "CC BY 4.0",
+      "attribution": "日本翻訳連盟（JTF）",
+      "retrievedAt": "2026-07-14",
+      "modified": true,
+      "notes": "2.2.1の文脈依存ルールを要約。"
+    }
+  }
+]

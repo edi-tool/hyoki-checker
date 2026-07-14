@@ -94,13 +94,32 @@ def detect_synonyms(text: str) -> list[AnalysisResult]:
         counts.sort(key=lambda x: x.count, reverse=True)
 
         cluster = _cluster_words[cid]
-        # 推奨表記はクラスタ代表（先頭）。出現語に無くても辞書の代表を提示
-        recommended = cluster[0]
         results.append(AnalysisResult(
             group=cluster,
-            recommended=recommended,
+            recommended=None,
             counts=counts,
-            source="synonym",
+            others=list(word_positions),
+            occurrences=sorted(
+                (
+                    {"word": word, "start": start, "end": start + len(word)}
+                    for word, positions in word_positions.items()
+                    for start in positions
+                ),
+                key=lambda item: item["start"],
+            ),
+            isInconsistent=True,
+            observedMajority=counts[0].word,
+            ruleId=f"sudachi.synonym.{cid}",
+            type="contextual",
+            category="sudachi-synonym",
+            severity="info",
+            fixMode="none",
+            reason="Sudachi同義語辞書由来の候補。意味が同一とは限らないため自動置換しません。",
+            source={
+                "pack": "sudachi",
+                "title": "Sudachi Synonym Dictionary",
+                "license": "Apache-2.0",
+            },
         ))
 
     return results

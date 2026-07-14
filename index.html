@@ -4,243 +4,459 @@ title: 表記ゆれ検出ツール
 description: 文章中の表記ゆれ（ゆらぎ）をブラウザ内で検出・統一する無料ツール。辞書ベース／ファジー／形態素解析に対応。テキストは外部送信しません。
 lang: ja
 ---
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#f8f6f2">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f8f6f2" />
 
-  <title>表記統一さん | {{ page.title }}</title>
-  <meta name="description" content="{{ page.description }}">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="{{ site.url }}{{ site.baseurl }}/">
+    <title>表記統一さん | {{ page.title }}</title>
+    <meta name="description" content="{{ page.description }}" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="{{ site.url }}{{ site.baseurl }}/" />
 
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="表記統一さん | {{ page.title }}">
-  <meta property="og:description" content="{{ page.description }}">
-  <meta property="og:url" content="{{ site.url }}{{ site.baseurl }}/">
-  <meta property="og:image" content="{{ site.url }}{{ site.baseurl }}/favicon.png">
-  <meta property="og:locale" content="ja_JP">
-  <meta name="twitter:card" content="summary">
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="表記統一さん | {{ page.title }}" />
+    <meta property="og:description" content="{{ page.description }}" />
+    <meta property="og:url" content="{{ site.url }}{{ site.baseurl }}/" />
+    <meta
+      property="og:image"
+      content="{{ site.url }}{{ site.baseurl }}/favicon.png"
+    />
+    <meta property="og:locale" content="ja_JP" />
+    <meta name="twitter:card" content="summary" />
 
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "表記統一さん",
-    "description": "文章中の表記ゆれをブラウザ内で検出・統一するツール。テキストは外部送信しません。",
-    "applicationCategory": "UtilitiesApplication",
-    "inLanguage": "ja",
-    "isAccessibleForFree": true
-  }
-  </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "表記統一さん",
+        "description": "文章中の表記ゆれをブラウザ内で検出・統一するツール。テキストは外部送信しません。",
+        "applicationCategory": "UtilitiesApplication",
+        "inLanguage": "ja",
+        "isAccessibleForFree": true
+      }
+    </script>
 
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
-  
-  <!-- JS更新時は ?v= を一括で上げてキャッシュを破棄（js/app.js の APP_VERSION と揃える）-->
-  <script defer src="js/defaultDict.js?v=20260617"></script>
-  <script defer src="js/dictManager.js?v=20260617"></script>
-  <script defer src="js/analyzer.js?v=20260617"></script>
-  <script defer src="js/app.js?v=20260617"></script>
-  
-  <link rel="icon" href="favicon.png" type="image/png">
-  <link rel="stylesheet" href="style.dist.css?v=20260714">
-</head>
-<body>
+    <script
+      defer
+      src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"
+    ></script>
+    <script
+      defer
+      src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"
+    ></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"
+    ></script>
 
-  <header class="site-header">
-    <h1 class="header-title">表記統一さん</h1>
-    <p class="header-subtitle">文章中の表記ゆれを検出・統一します</p>
-  </header>
+    <!-- JS更新時は ?v= を一括で上げてキャッシュを破棄（js/app.js の APP_VERSION と揃える）-->
+    <script defer src="js/defaultDict.js?v=20260714d"></script>
+    <script defer src="js/dictManager.js?v=20260714d"></script>
+    <script defer src="js/documentText.js?v=20260714d"></script>
+    <script defer src="js/analyzer.js?v=20260714d"></script>
+    <script defer src="js/app.js?v=20260714d"></script>
 
-  <main>
-    <div id="dictErrorBanner" class="hidden w-full max-w-[1300px] bg-[#fef2f2] border border-[#f87171] rounded-xl px-5 py-3 mb-4 shadow-sm mx-auto">
-      <div class="flex items-start justify-between gap-4">
-        <div class="flex-1">
-          <div class="flex items-center gap-2 mb-1">
-            <span class="text-red-700 font-bold text-sm">⚠ 辞書に問題が見つかりました</span>
-            <span id="dictErrorSummary" class="text-xs text-red-500 font-medium"></span>
-          </div>
-          <ul id="dictErrorList" class="text-xs text-red-600 space-y-1 list-disc list-inside hidden mt-2 bg-white/50 p-2 rounded"></ul>
-          <button onclick="toggleDictErrorDetail()"
-                  id="dictErrorDetailBtn"
-                  class="text-xs text-red-500 font-semibold underline mt-1 hover:text-red-700">詳細を表示 ▼</button>
-        </div>
-        <button onclick="document.getElementById('dictErrorBanner').classList.add('hidden')"
-                class="text-red-400 hover:text-red-600 text-xl font-bold leading-none flex-shrink-0">×</button>
-      </div>
-    </div>
+    <link rel="icon" href="favicon.png" type="image/png" />
+    <link rel="stylesheet" href="style.dist.css?v=20260714" />
+  </head>
+  <body>
+    <header class="site-header">
+      <h1 class="header-title">表記統一さん</h1>
+      <p class="header-subtitle">文章中の表記ゆれを検出・統一します</p>
+    </header>
 
-    <div class="app-container mx-auto">
-      <div class="flex gap-6 min-h-0 flex-1">
-
-        <div class="flex-[1.8] flex flex-col gap-4 min-w-0 h-full">
-
-          <div id="dropZone"
-               class="drop-zone rounded-xl p-5 text-center cursor-pointer flex-shrink-0 shadow-sm"
-               onclick="document.getElementById('fileInput').click()">
-            <div class="text-3xl mb-2">📂</div>
-            <div class="text-sm font-bold text-gray-700">Word / PDF をドロップ、またはクリックして選択</div>
-            <div class="text-xs text-gray-400 mt-1.5 font-medium">.docx / .pdf 形式に対応</div>
-            <input id="fileInput" type="file" accept=".docx,.pdf" class="hidden">
-          </div>
-
-          <div id="loading" class="hidden text-center text-sm text-[#f28c06] font-bold py-1 bg-[#fff8f0] rounded-lg">
-            <span class="animate-pulse">⏳ 読み込み中...</span>
-          </div>
-
-          <div class="flex items-center gap-3 flex-shrink-0 bg-[#fafafa] p-2 rounded-lg border border-[#e0e0e0]">
-            <button id="exportDocxBtn" onclick="downloadCorrectedDocx()"
-                    class="hidden flex items-center gap-1.5 text-sm btn-success rounded-md px-4 py-2 font-bold shadow-sm">
-              📄 推奨表記に統一してWord出力
-            </button>
-            <div class="flex-1"></div>
-            <span id="replacementBadge" class="hidden text-xs text-[#2e7d32] bg-[#e8f5e9] border border-[#a5d6a7] rounded-full px-3 py-1 font-bold"></span>
-            <button onclick="clearAll()" class="text-sm font-bold text-gray-400 hover:text-red-500 transition-colors px-2">クリア</button>
-          </div>
-
-          <div class="flex-1 flex flex-col gap-5 min-h-0">
-            <div class="flex-1 flex flex-col gap-2 min-h-0">
-              <label class="text-[15px] font-bold text-[#0f0f0f] border-l-4 border-[#f28c06] pl-2 leading-none">入力テキスト</label>
-              <textarea id="inputText"
-                        class="flex-1 w-full border border-[#e0e0e0] rounded-xl p-4 text-[15px] resize-none focus:outline-none focus:border-[#f28c06] focus:ring-2 focus:ring-[#f28c06]/20 transition-shadow bg-white shadow-inner leading-relaxed"
-                        placeholder="ここにテキストを入力、またはファイルをドロップしてください..."></textarea>
+    <main>
+      <div
+        id="dictErrorBanner"
+        class="hidden w-full max-w-[1300px] bg-[#fef2f2] border border-[#f87171] rounded-xl px-5 py-3 mb-4 shadow-sm mx-auto"
+      >
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-red-700 font-bold text-sm"
+                >⚠ 辞書に問題が見つかりました</span
+              >
+              <span
+                id="dictErrorSummary"
+                class="text-xs text-red-500 font-medium"
+              ></span>
             </div>
-
-            <div class="flex-1 flex flex-col gap-2 min-h-0">
-              <div class="flex items-center justify-between">
-                <label class="text-[15px] font-bold text-[#0f0f0f] border-l-4 border-[#e53935] pl-2 leading-none">プレビュー（ハイライト）</label>
-                <span id="previewCount" class="text-xs font-bold text-gray-500 bg-gray-100 border border-gray-200 px-2 py-0.5 rounded-full"></span>
-              </div>
-              <div id="preview"
-                   class="flex-1 overflow-y-auto border border-[#e0e0e0] rounded-xl p-4 text-[15px] bg-[#fafafa] leading-relaxed whitespace-pre-wrap break-words text-gray-800 shadow-inner">
-                <span class="text-gray-400">ここにハイライト表示されます</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="w-[400px] flex flex-col flex-shrink-0 bg-white border border-[#e0e0e0] rounded-xl shadow-sm h-full overflow-hidden">
-          <div class="tabs px-2 pt-2 bg-[#fafafa] border-b border-[#e0e0e0]">
-            <button id="tabBtn-results" class="tab-btn active flex items-center gap-1.5" onclick="switchTab('results')">
-              検知結果 <span id="resultCount" class="text-[11px] bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full font-bold">0 件</span>
-            </button>
-            <button id="tabBtn-kuromoji" class="tab-btn flex items-center" onclick="switchTab('kuromoji')">
-              活用形 <span class="text-[10px] bg-orange-100 text-orange-600 border border-orange-300 px-1.5 py-0.5 rounded ml-1.5 font-bold">Beta</span>
-            </button>
-            <button id="tabBtn-fuzzy" class="tab-btn flex items-center" onclick="switchTab('fuzzy')">
-              ファジー <span class="text-[10px] bg-orange-100 text-orange-600 border border-orange-300 px-1.5 py-0.5 rounded ml-1.5 font-bold">Beta</span>
-            </button>
-            <button id="tabBtn-dict" class="tab-btn flex items-center" onclick="switchTab('dict')">
-              辞書設定 <span class="text-[10px] bg-orange-100 text-orange-600 border border-orange-300 px-1.5 py-0.5 rounded ml-1.5 font-bold">Beta</span>
+            <ul
+              id="dictErrorList"
+              class="text-xs text-red-600 space-y-1 list-disc list-inside hidden mt-2 bg-white/50 p-2 rounded"
+            ></ul>
+            <button
+              onclick="toggleDictErrorDetail()"
+              id="dictErrorDetailBtn"
+              class="text-xs text-red-500 font-semibold underline mt-1 hover:text-red-700"
+            >
+              詳細を表示 ▼
             </button>
           </div>
-
-          <div class="flex-1 overflow-y-auto bg-white p-4">
-            <div id="tab-results" class="tab-pane flex flex-col">
-              <div id="results" class="flex flex-col gap-3">
-                <p class="text-sm text-gray-400 text-center py-10 font-medium">ゆらぎは検知されていません</p>
-              </div>
-            </div>
-
-            <div id="tab-kuromoji" class="tab-pane hidden flex-col gap-4">
-              <div class="bg-[#fff8f0] border border-[#ffe0b2] p-3 rounded-lg text-sm text-[#d97706] leading-relaxed">
-                「みて / 見て」のような活用形ゆれを、形態素解析を用いて検出します。<br>
-                <span class="text-xs opacity-80">※初回のみ辞書ファイル（約7MB）の取得が必要です。</span>
-              </div>
-              
-              <div id="kuromojiStatus" class="text-sm font-bold text-gray-500 flex items-center gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
-                <span class="inline-block w-3 h-3 rounded-full bg-gray-300"></span>未初期化
-              </div>
-              
-              <button id="kuromojiInitBtn" onclick="initAndRunKuromoji()"
-                      class="btn-primary text-sm rounded-lg px-4 py-3 font-bold w-full shadow-sm">
-                Kuromoji を初期化して解析
-              </button>
-              
-              <button id="kuromojiRunBtn" onclick="runKuromojiAnalysis()" class="hidden border-2 border-[#f28c06] text-[#f28c06] hover:bg-[#fff8f0] text-sm rounded-lg px-4 py-2.5 font-bold transition-colors w-full">
-                再解析を実行
-              </button>
-              
-              <div id="kuromojiResults" class="flex flex-col gap-3 mt-2"></div>
-            </div>
-
-            <div id="tab-fuzzy" class="tab-pane hidden flex-col gap-4">
-              <div class="bg-[#f3e5f5] border border-[#ce93d8] p-3 rounded-lg text-sm text-[#6a1b9a] leading-relaxed">
-                辞書に近い（ただし完全一致しない）表記をスキャンします。誤字や異体字の発見に有効です。
-              </div>
-              
-              <div class="flex flex-col gap-3 bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <div class="flex items-center justify-between text-sm text-gray-800 font-bold">
-                  <label>許容する編集距離</label>
-                  <span id="fuzzyDistLabel" class="text-[#f28c06] bg-[#fff8f0] px-2 py-0.5 rounded border border-[#ffe0b2]">1（厳格）</span>
-                </div>
-                <input type="range" id="fuzzyThreshold" min="1" max="2" value="1"
-                       class="w-full accent-[#f28c06] mt-1 cursor-pointer"
-                       oninput="document.getElementById('fuzzyDistLabel').textContent = this.value == 1 ? '1（厳格）' : '2（緩やか）'">
-              </div>
-              
-              <button onclick="runFuzzyCheck(event)"
-                      class="btn-primary text-sm rounded-lg px-4 py-3 font-bold w-full shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all">
-                ファジーチェックを実行
-              </button>
-              
-              <div id="fuzzyLoading" class="hidden text-sm text-[#f28c06] font-bold text-center animate-pulse py-2">⏳ 解析中...</div>
-              <div id="fuzzyResults" class="flex flex-col gap-3 mt-2"></div>
-            </div>
-
-            <div id="tab-dict" class="tab-pane hidden flex-col gap-6">
-              <div class="flex flex-col gap-2 bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <label class="text-sm font-bold text-gray-800">新しいゆらぎグループを追加</label>
-                <p class="text-xs text-gray-500 mb-1">対象とする単語をカンマ区切りで入力してください。</p>
-                <input id="newRuleInput" type="text"
-                       class="border border-[#e0e0e0] rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[#f28c06] focus:ring-2 focus:ring-[#f28c06]/20 bg-white"
-                       placeholder="例: ウェブ,ウエブ,Web"
-                       onkeydown="if(event.key==='Enter') addCustomRule()">
-                <button onclick="addCustomRule()"
-                        class="btn-primary text-sm rounded-md px-4 py-2 font-bold mt-1">
-                  追加する
-                </button>
-              </div>
-
-              <div class="flex flex-col gap-3">
-                <p class="text-sm font-bold text-gray-800 border-b border-gray-200 pb-2">一括データ操作</p>
-                <div class="grid grid-cols-2 gap-2">
-                  <label class="block text-center text-sm font-bold text-[#f28c06] border-2 border-[#f28c06] rounded-lg px-2 py-2 hover:bg-[#fff8f0] cursor-pointer transition-colors bg-white">
-                    📥 CSV/TSV 読込
-                    <input type="file" accept=".tsv,.csv,.txt" class="hidden" onchange="importTSVCSV(event)">
-                  </label>
-                  <label class="block text-center text-sm font-bold text-gray-600 border-2 border-gray-300 rounded-lg px-2 py-2 hover:bg-gray-50 cursor-pointer transition-colors bg-white">
-                    📁 JSON 読込
-                    <input type="file" accept=".json" class="hidden" onchange="importCustomDict(event)">
-                  </label>
-                </div>
-                <button onclick="dictManager.exportJSON()"
-                        class="w-full text-sm font-bold text-gray-600 border-2 border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors bg-white mt-1">
-                  📤 現在の辞書を JSON で書き出し
-                </button>
-              </div>
-
-              <div class="flex flex-col min-h-0">
-                <p class="text-sm font-bold text-gray-800 mb-2">登録済みカスタム辞書</p>
-                <div id="customDictList" class="flex flex-col gap-2 max-h-[25vh] overflow-y-auto border border-gray-200 rounded-lg p-2 bg-[#fafafa]"></div>
-              </div>
-            </div>
-
-          </div>
+          <button
+            onclick="
+              document.getElementById('dictErrorBanner').classList.add('hidden')
+            "
+            class="text-red-400 hover:text-red-600 text-xl font-bold leading-none flex-shrink-0"
+          >
+            ×
+          </button>
         </div>
       </div>
-    </div>
-  </main>
 
-  <footer class="site-footer">
-    <div class="footer-content">
-      <p>&copy; 2026 ISHIKAWA, Natsuki | MIT License</p>
-    </div>
-  </footer>
+      <div class="app-container mx-auto">
+        <div class="flex gap-6 min-h-0 flex-1">
+          <div class="flex-[1.8] flex flex-col gap-4 min-w-0 h-full">
+            <div
+              id="dropZone"
+              class="drop-zone rounded-xl p-5 text-center cursor-pointer flex-shrink-0 shadow-sm"
+              onclick="document.getElementById('fileInput').click()"
+            >
+              <div class="text-3xl mb-2">📂</div>
+              <div class="text-sm font-bold text-gray-700">
+                Word / PDF をドロップ、またはクリックして選択
+              </div>
+              <div class="text-xs text-gray-400 mt-1.5 font-medium">
+                .docx / .pdf / .txt 形式に対応（文書は外部送信しません）
+              </div>
+              <input
+                id="fileInput"
+                type="file"
+                accept=".docx,.pdf,.txt"
+                class="hidden"
+              />
+            </div>
 
-</body>
+            <div
+              id="documentMeta"
+              class="hidden text-xs text-gray-600 bg-white border border-gray-200 rounded-lg px-3 py-2 flex-shrink-0"
+              aria-live="polite"
+            ></div>
+
+            <div
+              id="loading"
+              class="hidden text-center text-sm text-[#f28c06] font-bold py-1 bg-[#fff8f0] rounded-lg"
+            >
+              <span class="animate-pulse">⏳ 読み込み中...</span>
+            </div>
+
+            <div
+              class="flex items-center gap-3 flex-shrink-0 bg-[#fafafa] p-2 rounded-lg border border-[#e0e0e0]"
+            >
+              <button
+                id="exportDocxBtn"
+                onclick="downloadCorrectedDocx()"
+                title="新しいWordファイルを作成します。元文書の書式・画像・変更履歴は引き継ぎません"
+                class="hidden flex items-center gap-1.5 text-sm btn-success rounded-md px-4 py-2 font-bold shadow-sm"
+              >
+                📄 基準表記に統一したWordを作成
+              </button>
+              <div class="flex-1"></div>
+              <span
+                id="replacementBadge"
+                class="hidden text-xs text-[#2e7d32] bg-[#e8f5e9] border border-[#a5d6a7] rounded-full px-3 py-1 font-bold"
+              ></span>
+              <button
+                onclick="clearAll()"
+                class="text-sm font-bold text-gray-400 hover:text-red-500 transition-colors px-2"
+              >
+                クリア
+              </button>
+            </div>
+
+            <div class="flex-1 flex flex-col gap-5 min-h-0">
+              <div class="flex-1 flex flex-col gap-2 min-h-0">
+                <label
+                  class="text-[15px] font-bold text-[#0f0f0f] border-l-4 border-[#f28c06] pl-2 leading-none"
+                  >入力テキスト</label
+                >
+                <textarea
+                  id="inputText"
+                  class="flex-1 w-full border border-[#e0e0e0] rounded-xl p-4 text-[15px] resize-none focus:outline-none focus:border-[#f28c06] focus:ring-2 focus:ring-[#f28c06]/20 transition-shadow bg-white shadow-inner leading-relaxed"
+                  placeholder="ここにテキストを入力、またはファイルをドロップしてください..."
+                ></textarea>
+              </div>
+
+              <div class="flex-1 flex flex-col gap-2 min-h-0">
+                <div class="flex items-center justify-between">
+                  <label
+                    class="text-[15px] font-bold text-[#0f0f0f] border-l-4 border-[#e53935] pl-2 leading-none"
+                    >プレビュー（ハイライト）</label
+                  >
+                  <span
+                    id="previewCount"
+                    class="text-xs font-bold text-gray-500 bg-gray-100 border border-gray-200 px-2 py-0.5 rounded-full"
+                  ></span>
+                </div>
+                <div
+                  id="preview"
+                  class="flex-1 overflow-y-auto border border-[#e0e0e0] rounded-xl p-4 text-[15px] bg-[#fafafa] leading-relaxed whitespace-pre-wrap break-words text-gray-800 shadow-inner"
+                >
+                  <span class="text-gray-400"
+                    >ここにハイライト表示されます</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="w-[400px] flex flex-col flex-shrink-0 bg-white border border-[#e0e0e0] rounded-xl shadow-sm h-full overflow-hidden"
+          >
+            <div class="tabs px-2 pt-2 bg-[#fafafa] border-b border-[#e0e0e0]">
+              <button
+                id="tabBtn-results"
+                class="tab-btn active flex items-center gap-1.5"
+                onclick="switchTab('results')"
+              >
+                検知結果
+                <span
+                  id="resultCount"
+                  class="text-[11px] bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full font-bold"
+                  >0 件</span
+                >
+              </button>
+              <button
+                id="tabBtn-kuromoji"
+                class="tab-btn flex items-center"
+                onclick="switchTab('kuromoji')"
+              >
+                活用形
+                <span
+                  class="text-[10px] bg-orange-100 text-orange-600 border border-orange-300 px-1.5 py-0.5 rounded ml-1.5 font-bold"
+                  >Beta</span
+                >
+              </button>
+              <button
+                id="tabBtn-fuzzy"
+                class="tab-btn flex items-center"
+                onclick="switchTab('fuzzy')"
+              >
+                ファジー
+                <span
+                  class="text-[10px] bg-orange-100 text-orange-600 border border-orange-300 px-1.5 py-0.5 rounded ml-1.5 font-bold"
+                  >Beta</span
+                >
+              </button>
+              <button
+                id="tabBtn-dict"
+                class="tab-btn flex items-center"
+                onclick="switchTab('dict')"
+              >
+                辞書設定
+                <span
+                  class="text-[10px] bg-orange-100 text-orange-600 border border-orange-300 px-1.5 py-0.5 rounded ml-1.5 font-bold"
+                  >Beta</span
+                >
+              </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto bg-white p-4">
+              <div id="tab-results" class="tab-pane flex flex-col">
+                <div id="results" class="flex flex-col gap-3">
+                  <p
+                    class="text-sm text-gray-400 text-center py-10 font-medium"
+                  >
+                    ゆらぎは検知されていません
+                  </p>
+                </div>
+              </div>
+
+              <div id="tab-kuromoji" class="tab-pane hidden flex-col gap-4">
+                <div
+                  class="bg-[#fff8f0] border border-[#ffe0b2] p-3 rounded-lg text-sm text-[#d97706] leading-relaxed"
+                >
+                  「みて /
+                  見て」のような活用形ゆれを、形態素解析を用いて検出します。<br />
+                  <span class="text-xs opacity-80"
+                    >※初回のみ辞書ファイル（約7MB）の取得が必要です。</span
+                  >
+                </div>
+
+                <div
+                  id="kuromojiStatus"
+                  class="text-sm font-bold text-gray-500 flex items-center gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200"
+                >
+                  <span
+                    class="inline-block w-3 h-3 rounded-full bg-gray-300"
+                  ></span
+                  >未初期化
+                </div>
+
+                <button
+                  id="kuromojiInitBtn"
+                  onclick="initAndRunKuromoji()"
+                  class="btn-primary text-sm rounded-lg px-4 py-3 font-bold w-full shadow-sm"
+                >
+                  Kuromoji を初期化して解析
+                </button>
+
+                <button
+                  id="kuromojiRunBtn"
+                  onclick="runKuromojiAnalysis()"
+                  class="hidden border-2 border-[#f28c06] text-[#f28c06] hover:bg-[#fff8f0] text-sm rounded-lg px-4 py-2.5 font-bold transition-colors w-full"
+                >
+                  再解析を実行
+                </button>
+
+                <div
+                  id="kuromojiResults"
+                  class="flex flex-col gap-3 mt-2"
+                ></div>
+              </div>
+
+              <div id="tab-fuzzy" class="tab-pane hidden flex-col gap-4">
+                <div
+                  class="bg-[#f3e5f5] border border-[#ce93d8] p-3 rounded-lg text-sm text-[#6a1b9a] leading-relaxed"
+                >
+                  辞書に近い（ただし完全一致しない）表記をスキャンします。誤字や異体字の発見に有効です。
+                </div>
+
+                <div
+                  class="flex flex-col gap-3 bg-gray-50 p-4 rounded-lg border border-gray-200"
+                >
+                  <div
+                    class="flex items-center justify-between text-sm text-gray-800 font-bold"
+                  >
+                    <label>許容する編集距離</label>
+                    <span
+                      id="fuzzyDistLabel"
+                      class="text-[#f28c06] bg-[#fff8f0] px-2 py-0.5 rounded border border-[#ffe0b2]"
+                      >1（厳格）</span
+                    >
+                  </div>
+                  <input
+                    type="range"
+                    id="fuzzyThreshold"
+                    min="1"
+                    max="2"
+                    value="1"
+                    class="w-full accent-[#f28c06] mt-1 cursor-pointer"
+                    oninput="
+                      document.getElementById('fuzzyDistLabel').textContent =
+                        this.value == 1 ? '1（厳格）' : '2（緩やか）'
+                    "
+                  />
+                </div>
+
+                <button
+                  onclick="runFuzzyCheck(event)"
+                  class="btn-primary text-sm rounded-lg px-4 py-3 font-bold w-full shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  ファジーチェックを実行
+                </button>
+
+                <div
+                  id="fuzzyLoading"
+                  class="hidden text-sm text-[#f28c06] font-bold text-center animate-pulse py-2"
+                >
+                  ⏳ 解析中...
+                </div>
+                <div id="fuzzyResults" class="flex flex-col gap-3 mt-2"></div>
+              </div>
+
+              <div id="tab-dict" class="tab-pane hidden flex-col gap-6">
+                <div
+                  class="flex flex-col gap-2 bg-[#fff8f0] p-4 rounded-lg border border-[#ffe0b2]"
+                >
+                  <div>
+                    <p class="text-sm font-bold text-gray-800">ルールパック</p>
+                    <p class="text-xs text-gray-500 mt-1">
+                      独立してON/OFFできます。カスタム辞書が常に最優先です。
+                    </p>
+                  </div>
+                  <div
+                    id="rulePackControls"
+                    class="grid grid-cols-1 gap-2"
+                  ></div>
+                </div>
+
+                <div
+                  class="flex flex-col gap-2 bg-gray-50 p-4 rounded-lg border border-gray-200"
+                >
+                  <label class="text-sm font-bold text-gray-800"
+                    >新しいゆらぎグループを追加</label
+                  >
+                  <p class="text-xs text-gray-500 mb-1">
+                    先頭を基準表記にします。安全のため追加ルールは「要確認」となり、自動置換しません。
+                  </p>
+                  <input
+                    id="newRuleInput"
+                    type="text"
+                    class="border border-[#e0e0e0] rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[#f28c06] focus:ring-2 focus:ring-[#f28c06]/20 bg-white"
+                    placeholder="例: ウェブ,ウエブ,Web"
+                    onkeydown="if (event.key === 'Enter') addCustomRule();"
+                  />
+                  <button
+                    onclick="addCustomRule()"
+                    class="btn-primary text-sm rounded-md px-4 py-2 font-bold mt-1"
+                  >
+                    追加する
+                  </button>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                  <p
+                    class="text-sm font-bold text-gray-800 border-b border-gray-200 pb-2"
+                  >
+                    一括データ操作
+                  </p>
+                  <div class="grid grid-cols-2 gap-2">
+                    <label
+                      class="block text-center text-sm font-bold text-[#f28c06] border-2 border-[#f28c06] rounded-lg px-2 py-2 hover:bg-[#fff8f0] cursor-pointer transition-colors bg-white"
+                    >
+                      📥 CSV/TSV 読込
+                      <input
+                        type="file"
+                        accept=".tsv,.csv,.txt"
+                        class="hidden"
+                        onchange="importTSVCSV(event)"
+                      />
+                    </label>
+                    <label
+                      class="block text-center text-sm font-bold text-gray-600 border-2 border-gray-300 rounded-lg px-2 py-2 hover:bg-gray-50 cursor-pointer transition-colors bg-white"
+                    >
+                      📁 JSON 読込
+                      <input
+                        type="file"
+                        accept=".json"
+                        class="hidden"
+                        onchange="importCustomDict(event)"
+                      />
+                    </label>
+                  </div>
+                  <button
+                    onclick="dictManager.exportJSON()"
+                    class="w-full text-sm font-bold text-gray-600 border-2 border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors bg-white mt-1"
+                  >
+                    📤 現在の辞書を JSON で書き出し
+                  </button>
+                </div>
+
+                <div class="flex flex-col min-h-0">
+                  <p class="text-sm font-bold text-gray-800 mb-2">
+                    登録済みカスタム辞書
+                  </p>
+                  <div
+                    id="customDictList"
+                    class="flex flex-col gap-2 max-h-[25vh] overflow-y-auto border border-gray-200 rounded-lg p-2 bg-[#fafafa]"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-content">
+        <p>&copy; 2026 ISHIKAWA, Natsuki | MIT License</p>
+      </div>
+    </footer>
+  </body>
 </html>

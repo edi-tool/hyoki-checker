@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://edi-tool.github.io/hyoki-checker/rules/schema/rule.schema.json",
+  "title": "hyoki-checker structured rule",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "type",
+    "preferred",
+    "variants",
+    "category",
+    "severity",
+    "fixMode",
+    "source"
+  ],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]+$" },
+    "type": {
+      "enum": [
+        "preferred",
+        "consistency",
+        "contextual",
+        "forbidden",
+        "pattern",
+        "spelling"
+      ]
+    },
+    "preferred": { "type": ["string", "null"] },
+    "variants": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "category": { "type": "string", "minLength": 1 },
+    "severity": { "enum": ["info", "warning", "error"] },
+    "fixMode": { "enum": ["auto", "confirm", "none"] },
+    "reason": { "type": "string" },
+    "pattern": { "type": "string" },
+    "replacement": { "type": "string" },
+    "source": {
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "pack",
+            "title",
+            "url",
+            "license",
+            "attribution",
+            "retrievedAt",
+            "modified"
+          ],
+          "properties": {
+            "pack": { "type": "string", "minLength": 1 },
+            "title": { "type": "string", "minLength": 1 },
+            "url": { "type": "string" },
+            "license": { "type": "string", "minLength": 1 },
+            "attribution": { "type": "string", "minLength": 1 },
+            "retrievedAt": { "type": "string", "format": "date" },
+            "modified": { "type": "boolean" },
+            "notes": { "type": "string" }
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "fixMode": { "const": "auto" } } },
+      "then": {
+        "properties": { "preferred": { "type": "string", "minLength": 1 } }
+      }
+    },
+    {
+      "if": { "properties": { "type": { "const": "pattern" } } },
+      "then": { "required": ["pattern"] }
+    }
+  ]
+}

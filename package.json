@@ -4,7 +4,10 @@
   "description": "ブラウザ完結型の表記ゆれ検出ツール\r https://edi-tool.github.io/hyoki-checker/",
   "main": "index.js",
   "scripts": {
-    "build:css": "tailwindcss -i ./style.css -o ./style.dist.css --minify"
+    "build:css": "tailwindcss -i ./style.css -o ./style.dist.css --minify",
+    "build:rules": "node scripts/build-rules.mjs",
+    "validate:rules": "node scripts/validate-rules.mjs",
+    "test": "node --test tests/*.test.js"
   },
   "repository": {
     "type": "git",
@@ -12,7 +15,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "type": "commonjs",
   "bugs": {
     "url": "https://github.com/edi-tool/hyoki-checker/issues"

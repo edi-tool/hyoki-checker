@@ -1,0 +1,432 @@
+[
+  {
+    "id": "company.0130",
+    "type": "preferred",
+    "preferred": "立体",
+    "variants": ["立体", "はこのかたち"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0131",
+    "type": "preferred",
+    "preferred": "リットル",
+    "variants": ["リットル", "L", "l", "ℓ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0132",
+    "type": "preferred",
+    "preferred": "デシリットル",
+    "variants": ["デシリットル", "dL", "dl"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0133",
+    "type": "preferred",
+    "preferred": "ミリリットル",
+    "variants": ["ミリリットル", "mL", "ml"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0134",
+    "type": "preferred",
+    "preferred": "センチメートル",
+    "variants": ["センチメートル", "cm", "センチ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0135",
+    "type": "preferred",
+    "preferred": "ミリメートル",
+    "variants": ["ミリメートル", "mm", "ミリ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0136",
+    "type": "preferred",
+    "preferred": "キロメートル",
+    "variants": ["キロメートル", "km", "キロ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0137",
+    "type": "preferred",
+    "preferred": "グラム",
+    "variants": ["グラム", "g", "ｇ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0138",
+    "type": "preferred",
+    "preferred": "キログラム",
+    "variants": ["キログラム", "kg", "ｋｇ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0139",
+    "type": "preferred",
+    "preferred": "平方メートル",
+    "variants": ["平方メートル", "m2", "㎡", "平米"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0140",
+    "type": "preferred",
+    "preferred": "マーケティング",
+    "variants": ["マーケティング", "マーケッティング"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0141",
+    "type": "preferred",
+    "preferred": "プレゼンテーション",
+    "variants": ["プレゼンテーション", "プレゼンション", "プレゼン"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0142",
+    "type": "preferred",
+    "preferred": "コンサルタント",
+    "variants": ["コンサルタント", "コンサルタンド"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0143",
+    "type": "preferred",
+    "preferred": "売上",
+    "variants": ["売上", "売り上げ", "売上げ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0144",
+    "type": "preferred",
+    "preferred": "買上",
+    "variants": ["買上", "買い上げ", "買上げ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0145",
+    "type": "preferred",
+    "preferred": "支払",
+    "variants": ["支払", "支払い", "支払ひ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0146",
+    "type": "preferred",
+    "preferred": "割合",
+    "variants": ["割合", "割合い"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0147",
+    "type": "preferred",
+    "preferred": "組合せ",
+    "variants": ["組合せ", "組み合わせ", "組合"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0148",
+    "type": "preferred",
+    "preferred": "取扱説明書",
+    "variants": ["取扱説明書", "取り扱い説明書", "取扱い説明書"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0149",
+    "type": "preferred",
+    "preferred": "弊社",
+    "variants": ["弊社", "当社", "自社"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0150",
+    "type": "preferred",
+    "preferred": "貴社",
+    "variants": ["貴社", "御社"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0151",
+    "type": "preferred",
+    "preferred": "引越",
+    "variants": ["引越", "引越し", "引っ越し", "引っ越"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0152",
+    "type": "preferred",
+    "preferred": "見積",
+    "variants": ["見積", "見積り", "見積もり"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0153",
+    "type": "preferred",
+    "preferred": "振込",
+    "variants": ["振込", "振り込み", "振込み"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0154",
+    "type": "preferred",
+    "preferred": "申込",
+    "variants": ["申込", "申し込み", "申込み"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0155",
+    "type": "preferred",
+    "preferred": "受付",
+    "variants": ["受付", "受け付け", "受付け"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0156",
+    "type": "preferred",
+    "preferred": "打合",
+    "variants": ["打合", "打ち合わせ", "打合せ", "打ち合せ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0157",
+    "type": "preferred",
+    "preferred": "問合",
+    "variants": ["問合", "問い合わせ", "問合せ", "問い合せ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0158",
+    "type": "preferred",
+    "preferred": "取扱",
+    "variants": ["取扱", "取り扱い", "取扱い"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0159",
+    "type": "preferred",
+    "preferred": "手続",
+    "variants": ["手続", "手続き"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0160",
+    "type": "preferred",
+    "preferred": "届出",
+    "variants": ["届出", "届け出"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0161",
+    "type": "preferred",
+    "preferred": "サーバー",
+    "variants": ["サーバー", "サーバ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0162",
+    "type": "preferred",
+    "preferred": "コンピューター",
+    "variants": ["コンピューター", "コンピュータ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0163",
+    "type": "preferred",
+    "preferred": "ユーザー",
+    "variants": ["ユーザー", "ユーザ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0164",
+    "type": "preferred",
+    "preferred": "プリンター",
+    "variants": ["プリンター", "プリンタ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0165",
+    "type": "preferred",
+    "preferred": "ルーター",
+    "variants": ["ルーター", "ルータ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0166",
+    "type": "preferred",
+    "preferred": "モニター",
+    "variants": ["モニター", "モニタ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0167",
+    "type": "preferred",
+    "preferred": "スキャナー",
+    "variants": ["スキャナー", "スキャナ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0168",
+    "type": "preferred",
+    "preferred": "フォルダー",
+    "variants": ["フォルダー", "フォルダ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0169",
+    "type": "preferred",
+    "preferred": "アダプター",
+    "variants": ["アダプター", "アダプタ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0170",
+    "type": "preferred",
+    "preferred": "プロセッサー",
+    "variants": ["プロセッサー", "プロセッサ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0171",
+    "type": "preferred",
+    "preferred": "センサー",
+    "variants": ["センサー", "センサ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0172",
+    "type": "preferred",
+    "preferred": "ブラウザー",
+    "variants": ["ブラウザー", "ブラウザ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  }
+]

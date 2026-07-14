@@ -1,0 +1,432 @@
+[
+  {
+    "id": "company.0044",
+    "type": "preferred",
+    "preferred": "表す",
+    "variants": ["表す", "表わす"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0045",
+    "type": "preferred",
+    "preferred": "現れる",
+    "variants": ["現れる", "現われる"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0046",
+    "type": "preferred",
+    "preferred": "断る",
+    "variants": ["断る", "断わる"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0047",
+    "type": "preferred",
+    "preferred": "終わる",
+    "variants": ["終わる", "終る"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0048",
+    "type": "preferred",
+    "preferred": "変わる",
+    "variants": ["変わる", "変る"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0049",
+    "type": "preferred",
+    "preferred": "代わる",
+    "variants": ["代わる", "代る"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0050",
+    "type": "preferred",
+    "preferred": "行う",
+    "variants": ["行う", "行なう", "おこなう"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0051",
+    "type": "preferred",
+    "preferred": "落とす",
+    "variants": ["落とす", "落す"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0052",
+    "type": "preferred",
+    "preferred": "暮らす",
+    "variants": ["暮らす", "暮す"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0053",
+    "type": "preferred",
+    "preferred": "もとづく",
+    "variants": ["もとづく", "基づく"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0054",
+    "type": "preferred",
+    "preferred": "もとに",
+    "variants": ["もとに", "基に"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0055",
+    "type": "preferred",
+    "preferred": "か月",
+    "variants": ["か月", "カ月", "ヶ月", "箇月", "ケ月", "ヵ月"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0056",
+    "type": "preferred",
+    "preferred": "か国",
+    "variants": ["か国", "カ国", "ヶ国", "箇国", "ケ国"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0057",
+    "type": "preferred",
+    "preferred": "か所",
+    "variants": ["か所", "カ所", "ヶ所", "箇所", "ケ所"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0058",
+    "type": "preferred",
+    "preferred": "パーセント",
+    "variants": ["パーセント", "%", "％"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0059",
+    "type": "preferred",
+    "preferred": "５か年",
+    "variants": ["５か年", "５ヵ年", "５ヶ年"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0060",
+    "type": "preferred",
+    "preferred": "１つ、２つ",
+    "variants": ["１つ、２つ", "一つ、二つ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0061",
+    "type": "preferred",
+    "preferred": "１人、２人",
+    "variants": ["１人、２人", "一人、二人"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0062",
+    "type": "contextual",
+    "preferred": null,
+    "variants": ["子ども", "こども", "子供", "児童"],
+    "category": "context-dependent",
+    "severity": "info",
+    "fixMode": "none",
+    "source": "company"
+  },
+  {
+    "id": "company.0063",
+    "type": "preferred",
+    "preferred": "子どもたち",
+    "variants": ["子どもたち", "子ども達", "子供たち", "子供達"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0064",
+    "type": "preferred",
+    "preferred": "一人一人",
+    "variants": ["一人一人", "一人ひとり", "ひとりひとり"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0065",
+    "type": "preferred",
+    "preferred": "一つ一つ",
+    "variants": ["一つ一つ", "一つひとつ", "ひとつひとつ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0066",
+    "type": "preferred",
+    "preferred": "在り方",
+    "variants": ["在り方", "あり方"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0067",
+    "type": "preferred",
+    "preferred": "当たって",
+    "variants": ["当たって", "あたって"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0068",
+    "type": "preferred",
+    "preferred": "付ける",
+    "variants": ["付ける", "つける"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0069",
+    "type": "preferred",
+    "preferred": "気付く",
+    "variants": ["気付く", "気づく"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0070",
+    "type": "preferred",
+    "preferred": "身に付ける",
+    "variants": ["身に付ける", "身につける"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0071",
+    "type": "preferred",
+    "preferred": "し合う",
+    "variants": ["し合う", "しあう"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0072",
+    "type": "preferred",
+    "preferred": "通して",
+    "variants": ["通して", "とおして"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0073",
+    "type": "preferred",
+    "preferred": "我が国",
+    "variants": ["我が国", "わが国"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0074",
+    "type": "preferred",
+    "preferred": "取り組み",
+    "variants": ["取り組み", "取組"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0075",
+    "type": "preferred",
+    "preferred": "話し合い",
+    "variants": ["話し合い", "話合い"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0076",
+    "type": "preferred",
+    "preferred": "関わる",
+    "variants": ["関わる", "かかわる"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0077",
+    "type": "preferred",
+    "preferred": "育む",
+    "variants": ["育む", "はぐくむ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0078",
+    "type": "preferred",
+    "preferred": "踏まえて",
+    "variants": ["踏まえて", "ふまえて"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0079",
+    "type": "preferred",
+    "preferred": "目指す",
+    "variants": ["目指す", "めざす"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0080",
+    "type": "preferred",
+    "preferred": "友達",
+    "variants": ["友達", "友だち"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0081",
+    "type": "preferred",
+    "preferred": "手立て",
+    "variants": ["手立て", "てだて"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0082",
+    "type": "preferred",
+    "preferred": "働き",
+    "variants": ["働き", "はたらき"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0083",
+    "type": "preferred",
+    "preferred": "振り返る",
+    "variants": ["振り返る", "ふり返る"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0084",
+    "type": "preferred",
+    "preferred": "繰り返し",
+    "variants": ["繰り返し", "くりかえし"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0085",
+    "type": "preferred",
+    "preferred": "見取る",
+    "variants": ["見取る", "見とる"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0086",
+    "type": "preferred",
+    "preferred": "様々",
+    "variants": ["様々", "さまざま"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  }
+]

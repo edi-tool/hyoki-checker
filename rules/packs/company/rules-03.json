@@ -1,0 +1,432 @@
+[
+  {
+    "id": "company.0087",
+    "type": "preferred",
+    "preferred": "例えば",
+    "variants": ["例えば", "たとえば"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0088",
+    "type": "preferred",
+    "preferred": "生かす",
+    "variants": ["生かす", "いかす"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0089",
+    "type": "preferred",
+    "preferred": "皆",
+    "variants": ["皆", "みんな"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0090",
+    "type": "preferred",
+    "preferred": "とらえる",
+    "variants": ["とらえる", "捉える"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0091",
+    "type": "preferred",
+    "preferred": "すること",
+    "variants": ["すること", "する事"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0092",
+    "type": "preferred",
+    "preferred": "見いだす",
+    "variants": ["見いだす", "見出す"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0093",
+    "type": "preferred",
+    "preferred": "ねらい",
+    "variants": ["ねらい", "狙い"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0094",
+    "type": "preferred",
+    "preferred": "声かけ",
+    "variants": ["声かけ", "声掛け"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0095",
+    "type": "contextual",
+    "preferred": null,
+    "variants": ["諸感覚", "五感"],
+    "category": "context-dependent",
+    "severity": "info",
+    "fixMode": "none",
+    "source": "company"
+  },
+  {
+    "id": "company.0096",
+    "type": "contextual",
+    "preferred": null,
+    "variants": ["保育所", "保育園"],
+    "category": "context-dependent",
+    "severity": "info",
+    "fixMode": "none",
+    "source": "company"
+  },
+  {
+    "id": "company.0097",
+    "type": "contextual",
+    "preferred": null,
+    "variants": ["教師", "先生", "教員"],
+    "category": "context-dependent",
+    "severity": "info",
+    "fixMode": "none",
+    "source": "company"
+  },
+  {
+    "id": "company.0098",
+    "type": "preferred",
+    "preferred": "児童生徒",
+    "variants": ["児童生徒", "児童・生徒"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0099",
+    "type": "contextual",
+    "preferred": null,
+    "variants": ["ICT端末", "一人一台端末"],
+    "category": "context-dependent",
+    "severity": "info",
+    "fixMode": "none",
+    "source": "company"
+  },
+  {
+    "id": "company.0100",
+    "type": "contextual",
+    "preferred": null,
+    "variants": ["保護者", "お家の方", "親御さん", "父母", "父兄"],
+    "category": "context-dependent",
+    "severity": "info",
+    "fixMode": "none",
+    "source": "company"
+  },
+  {
+    "id": "company.0101",
+    "type": "preferred",
+    "preferred": "つまずき",
+    "variants": ["つまずき", "躓き", "つまづき"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0102",
+    "type": "contextual",
+    "preferred": null,
+    "variants": ["ふり返り", "振り返り", "リフレクション"],
+    "category": "context-dependent",
+    "severity": "info",
+    "fixMode": "none",
+    "source": "company"
+  },
+  {
+    "id": "company.0103",
+    "type": "contextual",
+    "preferred": null,
+    "variants": ["見取り", "評価", "アセスメント"],
+    "category": "context-dependent",
+    "severity": "info",
+    "fixMode": "none",
+    "source": "company"
+  },
+  {
+    "id": "company.0104",
+    "type": "contextual",
+    "preferred": null,
+    "variants": ["板書", "黒板書き"],
+    "category": "context-dependent",
+    "severity": "info",
+    "fixMode": "none",
+    "source": "company"
+  },
+  {
+    "id": "company.0105",
+    "type": "contextual",
+    "preferred": null,
+    "variants": ["机間指導", "机間巡視"],
+    "category": "context-dependent",
+    "severity": "info",
+    "fixMode": "none",
+    "source": "company"
+  },
+  {
+    "id": "company.0106",
+    "type": "contextual",
+    "preferred": null,
+    "variants": ["学習指導案", "指導案", "本案", "略案"],
+    "category": "context-dependent",
+    "severity": "info",
+    "fixMode": "none",
+    "source": "company"
+  },
+  {
+    "id": "company.0107",
+    "type": "contextual",
+    "preferred": null,
+    "variants": ["働きかけ", "働き掛け", "アプローチ"],
+    "category": "context-dependent",
+    "severity": "info",
+    "fixMode": "none",
+    "source": "company"
+  },
+  {
+    "id": "company.0108",
+    "type": "contextual",
+    "preferred": null,
+    "variants": ["特別支援教育", "特支"],
+    "category": "context-dependent",
+    "severity": "info",
+    "fixMode": "none",
+    "source": "company"
+  },
+  {
+    "id": "company.0109",
+    "type": "contextual",
+    "preferred": null,
+    "variants": ["学級経営", "クラス運営", "クラス経営"],
+    "category": "context-dependent",
+    "severity": "info",
+    "fixMode": "none",
+    "source": "company"
+  },
+  {
+    "id": "company.0110",
+    "type": "preferred",
+    "preferred": "送り仮名",
+    "variants": ["送り仮名", "送りがな"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0111",
+    "type": "preferred",
+    "preferred": "ふりがな",
+    "variants": ["ふりがな", "ルビ", "振り仮名"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0112",
+    "type": "preferred",
+    "preferred": "書き順",
+    "variants": ["書き順", "筆順"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0113",
+    "type": "contextual",
+    "preferred": null,
+    "variants": ["物語文", "お話", "文学的な文章"],
+    "category": "context-dependent",
+    "severity": "info",
+    "fixMode": "none",
+    "source": "company"
+  },
+  {
+    "id": "company.0114",
+    "type": "preferred",
+    "preferred": "説明文",
+    "variants": ["説明文", "説明的な文章"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0115",
+    "type": "contextual",
+    "preferred": null,
+    "variants": ["指示語", "こそあど言葉"],
+    "category": "context-dependent",
+    "severity": "info",
+    "fixMode": "none",
+    "source": "company"
+  },
+  {
+    "id": "company.0116",
+    "type": "contextual",
+    "preferred": null,
+    "variants": ["接続語", "つなぎの言葉"],
+    "category": "context-dependent",
+    "severity": "info",
+    "fixMode": "none",
+    "source": "company"
+  },
+  {
+    "id": "company.0117",
+    "type": "preferred",
+    "preferred": "修飾語",
+    "variants": ["修飾語", "くわしくする言葉"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0118",
+    "type": "preferred",
+    "preferred": "原稿用紙",
+    "variants": ["原稿用紙", "作文用紙"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0119",
+    "type": "preferred",
+    "preferred": "ローマ字",
+    "variants": ["ローマ字", "ローマ字書き"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0120",
+    "type": "preferred",
+    "preferred": "漢字",
+    "variants": ["漢字", "かん字"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0121",
+    "type": "preferred",
+    "preferred": "足し算",
+    "variants": ["足し算", "たし算", "加法"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0122",
+    "type": "preferred",
+    "preferred": "引き算",
+    "variants": ["引き算", "ひき算", "減法"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0123",
+    "type": "preferred",
+    "preferred": "掛け算",
+    "variants": ["掛け算", "かけ算", "乗法"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0124",
+    "type": "preferred",
+    "preferred": "割り算",
+    "variants": ["割り算", "わり算", "除法"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0125",
+    "type": "preferred",
+    "preferred": "筆算",
+    "variants": ["筆算", "ひっ算"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0126",
+    "type": "preferred",
+    "preferred": "繰り上がり",
+    "variants": ["繰り上がり", "くり上がり", "くりあがり"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0127",
+    "type": "preferred",
+    "preferred": "繰り下がり",
+    "variants": ["繰り下がり", "くり下がり", "くりさがり"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0128",
+    "type": "preferred",
+    "preferred": "文章題",
+    "variants": ["文章題", "文章問題", "応用問題"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0129",
+    "type": "preferred",
+    "preferred": "図形",
+    "variants": ["図形", "かたち"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  }
+]

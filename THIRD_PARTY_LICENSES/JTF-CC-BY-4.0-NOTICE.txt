@@ -1,0 +1,20 @@
+JTF日本語標準スタイルガイド 第3.0版 由来ルール
+=================================================
+
+Original title: JTF日本語標準スタイルガイド 第3.0版
+Creator: 日本翻訳連盟（Japan Translation Federation / JTF）
+Source: https://www.jtf.jp/pdf/jtf_style_guide.pdf
+Edition date: 2019-08-20
+Retrieved: 2026-07-14
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+License URL: https://creativecommons.org/licenses/by/4.0/
+Legal code: https://creativecommons.org/licenses/by/4.0/legalcode
+
+This repository contains modified material in rules/packs/jtf-3.0/rules.json.
+The material was selected, summarized, and converted into machine-readable
+rules. It is not an unmodified copy of the guide and does not reproduce every
+exception or contextual condition in the original.
+
+Attribution:
+「JTF日本語標準スタイルガイド 第3.0版」（日本翻訳連盟、CC BY 4.0）
+を基に、hyoki-checker用の機械判定ルールへ加工しました。

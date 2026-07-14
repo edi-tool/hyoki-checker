@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Literal
+from typing import Any, Literal
 
 
 @dataclass
@@ -21,7 +21,17 @@ class VariantMatch:
 @dataclass
 class AnalysisResult:
     group: list[str]
-    recommended: str
+    recommended: str | None
     counts: list[VariantMatch]
+    others: list[str] = field(default_factory=list)
+    occurrences: list[dict[str, Any]] = field(default_factory=list)
+    isInconsistent: bool = False
+    observedMajority: str | None = None
+    ruleId: str = ""
+    type: str = "consistency"
+    category: str = ""
+    severity: str = "info"
+    fixMode: Literal["auto", "confirm", "none"] = "none"
+    reason: str = ""
     normalized_form: str = ""
-    source: Literal["dict", "sudachi_auto", "synonym", "reading"] = "dict"
+    source: dict[str, Any] | str = field(default_factory=dict)

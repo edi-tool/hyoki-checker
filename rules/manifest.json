@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "schema": "schema/rule.schema.json",
+  "generatedOutputs": [
+    "../js/defaultDict.js",
+    "../backend/dicts/default_dict.json"
+  ],
+  "packs": [
+    {
+      "id": "company",
+      "label": "社内標準",
+      "paths": [
+        "packs/company/rules-01.json",
+        "packs/company/rules-02.json",
+        "packs/company/rules-03.json",
+        "packs/company/rules-04.json"
+      ],
+      "priority": 300,
+      "defaultEnabled": true,
+      "source": {
+        "pack": "company",
+        "title": "hyoki-checker existing default dictionary",
+        "url": "https://github.com/edi-tool/hyoki-checker",
+        "license": "MIT",
+        "attribution": "hyoki-checker contributors",
+        "retrievedAt": "2026-07-14",
+        "modified": true,
+        "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+      }
+    },
+    {
+      "id": "jtf-3.0",
+      "label": "JTF 3.0",
+      "path": "packs/jtf-3.0/rules.json",
+      "priority": 200,
+      "defaultEnabled": false
+    },
+    {
+      "id": "bunka-official",
+      "label": "文化庁・公用文",
+      "path": "packs/bunka/rules.json",
+      "priority": 200,
+      "defaultEnabled": false
+    },
+    {
+      "id": "consistency-only",
+      "label": "文書内統一のみ",
+      "path": "packs/consistency-only/rules.json",
+      "priority": 100,
+      "defaultEnabled": false
+    },
+    {
+      "id": "sudachi",
+      "label": "Sudachi候補",
+      "path": "packs/sudachi/rules.json",
+      "priority": 50,
+      "defaultEnabled": false,
+      "hidden": true
+    }
+  ]
+}

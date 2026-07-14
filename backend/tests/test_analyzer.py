@@ -4,7 +4,21 @@ from backend.analyzer import analyze_chunks, build_automaton, morphological_dete
 from backend.chunker import split_text
 
 
-def _run_dict(text: str, groups: list[list[str]]) -> list:
+def _rule(preferred: str | None, variants: list[str], *, rule_type: str = "preferred", fix_mode: str = "auto") -> dict:
+    return {
+        "id": "test.rule",
+        "type": rule_type,
+        "preferred": preferred,
+        "variants": variants,
+        "category": "test",
+        "severity": "warning",
+        "fixMode": fix_mode,
+        "reason": "test",
+        "source": {"pack": "test", "title": "test"},
+    }
+
+
+def _run_dict(text: str, groups: list) -> list:
     """辞書グループでテキストを解析するヘルパー。"""
     automaton = build_automaton(groups)
     return analyze_chunks(split_text(text), automaton, groups)
@@ -12,17 +26,32 @@ def _run_dict(text: str, groups: list[list[str]]) -> list:
 
 def test_boundary_filter_no_false_positive() -> None:
     """「サーバー」のみの文で部分文字列「サーバ」を誤検出しない。"""
-    groups = [["サーバ", "サーバー"]]
+    groups = [_rule("サーバー", ["サーバー", "サーバ"])]
     results = _run_dict("サーバーを設定する。サーバーを再起動する。", groups)
     assert results == []
 
 
 def test_dict_detects_real_mixture() -> None:
     """「サーバ」と「サーバー」が実際に混在する場合は検出する。"""
-    groups = [["サーバ", "サーバー"]]
+    groups = [_rule("サーバー", ["サーバー", "サーバ"])]
     results = _run_dict("サーバを設定する。サーバーを再起動する。", groups)
     assert len(results) == 1
     assert set(results[0].group) == {"サーバ", "サーバー"}
+
+
+def test_preferred_wins_when_minority() -> None:
+    """出現数ではなくルールのpreferredを推奨する。"""
+    rules = [_rule("Web", ["Web", "ウェブ"])]
+    result = _run_dict("Webとウェブとウェブ", rules)[0]
+    assert result.recommended == "Web"
+    assert result.observedMajority == "ウェブ"
+
+
+def test_contextual_never_auto_fixed() -> None:
+    rules = [_rule(None, ["子ども", "児童"], rule_type="contextual", fix_mode="none")]
+    result = _run_dict("子どもと児童", rules)[0]
+    assert result.recommended is None
+    assert result.fixMode == "none"
 
 
 def test_morphological_okurigana() -> None:

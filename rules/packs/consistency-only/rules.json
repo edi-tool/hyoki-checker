@@ -1,0 +1,40 @@
+[
+  {
+    "id": "consistency-only.web",
+    "type": "consistency",
+    "preferred": null,
+    "variants": ["Web", "ウェブ", "ウエブ"],
+    "category": "general",
+    "severity": "info",
+    "fixMode": "none",
+    "reason": "正誤は決めず、同一文書内での混在だけを通知する。",
+    "source": {
+      "pack": "consistency-only",
+      "title": "hyoki-checker consistency rules",
+      "url": "https://github.com/edi-tool/hyoki-checker",
+      "license": "MIT",
+      "attribution": "hyoki-checker contributors",
+      "retrievedAt": "2026-07-14",
+      "modified": true
+    }
+  },
+  {
+    "id": "consistency-only.child",
+    "type": "consistency",
+    "preferred": null,
+    "variants": ["子ども", "こども", "子供"],
+    "category": "general",
+    "severity": "info",
+    "fixMode": "none",
+    "reason": "意味が同じ範囲の表記混在だけを通知し、統一先は決めない。",
+    "source": {
+      "pack": "consistency-only",
+      "title": "hyoki-checker consistency rules",
+      "url": "https://github.com/edi-tool/hyoki-checker",
+      "license": "MIT",
+      "attribution": "hyoki-checker contributors",
+      "retrievedAt": "2026-07-14",
+      "modified": true
+    }
+  }
+]

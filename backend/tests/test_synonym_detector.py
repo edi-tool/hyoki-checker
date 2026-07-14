@@ -25,8 +25,10 @@ def test_single_notation_no_detect() -> None:
     assert all(not ({"アイデア", "アイディア"} <= set(r.group)) for r in results)
 
 
-def test_recommended_is_representative() -> None:
-    """推奨表記がクラスタ代表（アイデア）になる。"""
+def test_sudachi_synonym_is_never_auto_fixed() -> None:
+    """Sudachi同義語候補は推奨を決めず、自動置換しない。"""
     results = detect_synonyms("アイデアとアイディア。")
     target = [r for r in results if {"アイデア", "アイディア"} <= set(r.group)]
-    assert target and target[0].recommended == "アイデア"
+    assert target and target[0].recommended is None
+    assert target[0].fixMode == "none"
+    assert target[0].source["pack"] == "sudachi"

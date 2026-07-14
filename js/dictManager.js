@@ -1,122 +1,251 @@
-/** 辞書管理クラス（デフォルト辞書 + localStorage カスタム辞書を統合） */
+/** 構造化ルールパック + localStorage カスタム辞書を管理する。 */
 class DictionaryManager {
-  /** @param {string} storageKey - localStorageキー */
-  constructor(storageKey = 'hyoki_custom_dict') {
+  constructor(storageKey = "hyoki_custom_dict", packKey = "hyoki_rule_packs") {
     this._key = storageKey;
+    this._packKey = packKey;
   }
 
-  /** デフォルト + カスタム辞書を結合して返す */
+  /** 旧 string[] グループを安全側（confirm）で構造化する互換アダプター。 */
+  normalizeRule(input, index = 0, pack = "custom") {
+    if (Array.isArray(input)) {
+      const variants = [
+        ...new Set(
+          input.filter((word) => typeof word === "string" && word.trim()),
+        ),
+      ];
+      if (variants.length < 2) return null;
+      return {
+        id: `${pack}.legacy.${index + 1}`,
+        type: "preferred",
+        preferred: variants[0],
+        variants,
+        category: "legacy-custom",
+        severity: "warning",
+        fixMode: "confirm",
+        reason: "旧配列形式から移行したルール。自動置換前に確認が必要です。",
+        source: this._customSource(pack),
+      };
+    }
+    if (!input || typeof input !== "object") return null;
+    const variants = [
+      ...new Set(
+        (input.variants || []).filter(
+          (word) => typeof word === "string" && word.trim(),
+        ),
+      ),
+    ];
+    if (variants.length === 0) return null;
+    const type = input.type || "preferred";
+    const preferred =
+      input.preferred ?? (type === "preferred" ? variants[0] : null);
+    return {
+      id: input.id || `${pack}.imported.${index + 1}`,
+      type,
+      preferred,
+      variants,
+      category: input.category || "custom",
+      severity: input.severity || "warning",
+      fixMode: ["auto", "confirm", "none"].includes(input.fixMode)
+        ? input.fixMode
+        : "confirm",
+      reason: input.reason || "ユーザーカスタムルール",
+      source: input.source || this._customSource(pack),
+      ...(input.pattern ? { pattern: input.pattern } : {}),
+      ...(input.replacement ? { replacement: input.replacement } : {}),
+    };
+  }
+
+  /** 選択中パックを優先順位順に重ね、語が重なる低優先ルールを除外する。 */
   getAll() {
-    return [...DEFAULT_DICT, ...this._loadCustom()];
+    const customPack = {
+      id: "custom",
+      priority: 400,
+      rules: this._loadCustom(),
+    };
+    const enabled = this._loadPackSettings();
+    const packs = [
+      customPack,
+      ...this._packs().filter((pack) => enabled[pack.id]),
+    ].sort((a, b) => b.priority - a.priority);
+    const claimed = new Set();
+    const merged = [];
+    for (const pack of packs) {
+      for (const rule of pack.rules || []) {
+        const words = rule.variants || [];
+        if (words.some((word) => claimed.has(word))) continue;
+        merged.push(rule);
+        words.forEach((word) => claimed.add(word));
+      }
+    }
+    return merged;
   }
 
-  /** カスタム辞書のみ返す */
   getCustom() {
     return this._loadCustom();
   }
 
-  /**
-   * カスタムグループを追加する
-   * @param {string[]} words - 単語グループ（2語以上）
-   */
+  getPackStates() {
+    const enabled = this._loadPackSettings();
+    return this._packs()
+      .filter((pack) => !pack.hidden)
+      .map((pack) => ({
+        id: pack.id,
+        label: pack.label,
+        enabled: Boolean(enabled[pack.id]),
+        ruleCount: pack.rules?.length || 0,
+      }));
+  }
+
+  setPackEnabled(id, value) {
+    const settings = this._loadPackSettings();
+    settings[id] = Boolean(value);
+    localStorage.setItem(this._packKey, JSON.stringify(settings));
+  }
+
   addCustomGroup(words) {
-    if (!Array.isArray(words) || words.length < 2) return;
     const custom = this._loadCustom();
-    custom.push(words);
+    const rule = this.normalizeRule(words, custom.length, "custom");
+    if (!rule) return;
+    rule.id = `custom.${Date.now().toString(36)}`;
+    rule.category = "custom";
+    rule.reason = "ユーザーが登録した表記基準";
+    custom.push(rule);
     this._saveCustom(custom);
   }
 
-  /**
-   * カスタム辞書のエントリを削除する
-   * @param {number} index - カスタム辞書内のインデックス
-   */
   removeCustomGroup(index) {
     const custom = this._loadCustom();
     custom.splice(index, 1);
     this._saveCustom(custom);
   }
 
-  /** カスタム辞書をJSONファイルとしてダウンロード（フェーズ2） */
   exportJSON() {
-    const blob = new Blob([JSON.stringify(this._loadCustom(), null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
+    const blob = new Blob([JSON.stringify(this._loadCustom(), null, 2)], {
+      type: "application/json",
+    });
+    const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = 'hyoki_custom_dict.json';
+    a.download = "hyoki_custom_rules.json";
     a.click();
     URL.revokeObjectURL(a.href);
   }
 
-  /**
-   * JSONファイルからカスタム辞書をインポート（フェーズ2）
-   * @param {File} file
-   */
   async importJSON(file) {
-    const text = await file.text();
-    const data = JSON.parse(text);
-    if (!Array.isArray(data)) throw new Error('不正な形式です');
-    this._saveCustom(data);
+    const data = JSON.parse(await file.text());
+    if (!Array.isArray(data)) throw new Error("ルール配列ではありません");
+    const rules = data
+      .map((item, index) => this.normalizeRule(item, index, "custom"))
+      .filter(Boolean);
+    if (rules.length !== data.length)
+      throw new Error("変換できないルールが含まれています");
+    this._saveCustom(rules);
   }
 
-  /**
-   * TSV / CSV テキストをカスタム辞書にインポートする（追記）
-   * 形式: A列=語A, B列=語B（片方が空の行はスキップ）
-   * @param {string} text - ファイルテキスト
-   * @param {string} sep - 区切り文字（デフォルト: タブ）
-   * @returns {number} 追加されたグループ数
-   */
-  importDelimited(text, sep = '\t') {
-    text = text.replace(/^\uFEFF/, ''); // BOM除去
-    const lines = text.split(/\r?\n/);
-    const groups = [];
+  importDelimited(text, separator = "\t") {
+    const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/);
+    const existing = this._loadCustom();
+    const additions = [];
     for (const line of lines) {
       if (!line.trim()) continue;
-      const cols = line.split(sep);
-      const a = cols[0]?.trim();
-      const b = cols[1]?.trim();
-      if (a && b) groups.push([a, b]);
+      const variants = line
+        .split(separator)
+        .map((value) => value.trim())
+        .filter(Boolean);
+      const rule = this.normalizeRule(
+        variants,
+        existing.length + additions.length,
+        "custom",
+      );
+      if (rule) additions.push(rule);
     }
-    const existing = this._loadCustom();
-    this._saveCustom([...existing, ...groups]);
-    return groups.length;
+    this._saveCustom([...existing, ...additions]);
+    return additions.length;
   }
 
-  /**
-   * 辞書配列を検証して問題グループを報告する
-   * @param {any[]} dict - 検証対象の辞書配列
-   * @returns {{ valid: boolean, total: number, validCount: number, errors: {index: number, value: any, reason: string}[] }}
-   */
-  validateDict(dict) {
+  validateDict(rules) {
     const errors = [];
-    dict.forEach((group, i) => {
-      if (!Array.isArray(group)) {
-        errors.push({ index: i, value: group, reason: 'グループが配列ではありません（カンマ漏れの可能性）' });
-      } else if (group.length < 2) {
-        errors.push({ index: i, value: group, reason: '単語が1語のみです（2語以上必要）' });
-      } else {
-        group.forEach((word, j) => {
-          if (typeof word !== 'string' || word.trim() === '') {
-            errors.push({ index: i, value: group, reason: `${j + 1}番目の単語が空か文字列ではありません` });
-          }
-        });
+    (rules || []).forEach((rule, index) => {
+      if (!rule || typeof rule !== "object" || Array.isArray(rule)) {
+        errors.push({ index, reason: "構造化ルールではありません" });
+      } else if (
+        !rule.id ||
+        !rule.type ||
+        !Array.isArray(rule.variants) ||
+        !rule.variants.length
+      ) {
+        errors.push({ index, reason: "必須項目が不足しています" });
+      } else if (rule.fixMode === "auto" && !rule.preferred) {
+        errors.push({ index, reason: "autoルールにはpreferredが必要です" });
+      } else if (
+        ["contextual", "consistency"].includes(rule.type) &&
+        rule.fixMode === "auto"
+      ) {
+        errors.push({ index, reason: `${rule.type}は自動置換できません` });
       }
     });
     return {
       valid: errors.length === 0,
-      total: dict.length,
-      validCount: dict.length - errors.length,
+      total: rules.length,
+      validCount: rules.length - errors.length,
       errors,
     };
   }
 
-  _loadCustom() {
+  _packs() {
+    return typeof DEFAULT_RULE_PACKS !== "undefined" ? DEFAULT_RULE_PACKS : [];
+  }
+
+  _loadPackSettings() {
+    let stored = {};
     try {
-      return JSON.parse(localStorage.getItem(this._key)) || [];
+      stored = JSON.parse(localStorage.getItem(this._packKey)) || {};
+    } catch {
+      stored = {};
+    }
+    const settings = {};
+    for (const pack of this._packs()) {
+      settings[pack.id] =
+        pack.id in stored
+          ? Boolean(stored[pack.id])
+          : Boolean(pack.defaultEnabled);
+    }
+    return settings;
+  }
+
+  _loadCustom() {
+    let data = [];
+    try {
+      data = JSON.parse(localStorage.getItem(this._key)) || [];
     } catch {
       return [];
     }
+    if (!Array.isArray(data)) return [];
+    const normalized = data
+      .map((item, index) => this.normalizeRule(item, index, "custom"))
+      .filter(Boolean);
+    const migrated =
+      data.some(Array.isArray) || normalized.length !== data.length;
+    if (migrated) this._saveCustom(normalized);
+    return normalized;
   }
 
   _saveCustom(data) {
     localStorage.setItem(this._key, JSON.stringify(data));
   }
+
+  _customSource(pack) {
+    return {
+      pack,
+      title: "ユーザーカスタム辞書",
+      url: "",
+      license: "user-provided",
+      attribution: "user",
+      retrievedAt: new Date().toISOString().slice(0, 10),
+      modified: true,
+    };
+  }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { DictionaryManager };
 }

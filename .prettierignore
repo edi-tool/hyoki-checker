@@ -1,0 +1,12 @@
+node_modules/
+.git/
+.pytest_cache/
+.claude/worktrees/
+cmaps/
+dict/
+js/kuromoji.js
+style.dist.css
+backend/dicts/synonym_variants.json
+backend/dicts/default_dict.json
+rules/generated/
+js/defaultDict.js

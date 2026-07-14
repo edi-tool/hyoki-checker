@@ -1,0 +1,432 @@
+[
+  {
+    "id": "company.0001",
+    "type": "preferred",
+    "preferred": "～ていく",
+    "variants": ["～ていく", "～て行く"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0002",
+    "type": "preferred",
+    "preferred": "～てくる",
+    "variants": ["～てくる", "～て来る"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0003",
+    "type": "preferred",
+    "preferred": "～てみる",
+    "variants": ["～てみる", "～て見る"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0004",
+    "type": "preferred",
+    "preferred": "～ておく",
+    "variants": ["～ておく", "～て置く"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0005",
+    "type": "preferred",
+    "preferred": "～てしまう",
+    "variants": ["～てしまう", "～て仕舞う"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0006",
+    "type": "preferred",
+    "preferred": "～かもしれない",
+    "variants": ["～かもしれない", "～かも知れない"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0007",
+    "type": "preferred",
+    "preferred": "～のために",
+    "variants": ["～のために", "～の為に"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0008",
+    "type": "preferred",
+    "preferred": "～のとき",
+    "variants": ["～のとき", "～の時"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0009",
+    "type": "preferred",
+    "preferred": "～ところ",
+    "variants": ["～ところ", "～所"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0010",
+    "type": "preferred",
+    "preferred": "～ゆえに",
+    "variants": ["～ゆえに", "～故に"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0011",
+    "type": "preferred",
+    "preferred": "～とおり",
+    "variants": ["～とおり", "～通り"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0012",
+    "type": "preferred",
+    "preferred": "～ごと",
+    "variants": ["～ごと", "～毎"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0013",
+    "type": "preferred",
+    "preferred": "よろしく",
+    "variants": ["よろしく", "宜しく"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0014",
+    "type": "preferred",
+    "preferred": "いたします",
+    "variants": ["いたします", "致します"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0015",
+    "type": "preferred",
+    "preferred": "いただく",
+    "variants": ["いただく", "頂く"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0016",
+    "type": "preferred",
+    "preferred": "ください",
+    "variants": ["ください", "下さい"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0017",
+    "type": "preferred",
+    "preferred": "誠に",
+    "variants": ["誠に", "まことに"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0018",
+    "type": "preferred",
+    "preferred": "おかげさまで",
+    "variants": ["おかげさまで", "お陰様で", "お蔭様で"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0019",
+    "type": "preferred",
+    "preferred": "および",
+    "variants": ["および", "及び"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0020",
+    "type": "preferred",
+    "preferred": "または",
+    "variants": ["または", "又は"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0021",
+    "type": "preferred",
+    "preferred": "かつ",
+    "variants": ["かつ", "且つ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0022",
+    "type": "preferred",
+    "preferred": "したがって",
+    "variants": ["したがって", "従って"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0023",
+    "type": "preferred",
+    "preferred": "ならびに",
+    "variants": ["ならびに", "並びに"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0024",
+    "type": "preferred",
+    "preferred": "なぜ",
+    "variants": ["なぜ", "何故"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0025",
+    "type": "preferred",
+    "preferred": "ぜひ",
+    "variants": ["ぜひ", "是非"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0026",
+    "type": "preferred",
+    "preferred": "あらかじめ",
+    "variants": ["あらかじめ", "予め"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0027",
+    "type": "preferred",
+    "preferred": "かつて",
+    "variants": ["かつて", "嘗て"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0028",
+    "type": "preferred",
+    "preferred": "すでに",
+    "variants": ["すでに", "既に"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0029",
+    "type": "preferred",
+    "preferred": "まず",
+    "variants": ["まず", "先ず"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0030",
+    "type": "preferred",
+    "preferred": "さらに",
+    "variants": ["さらに", "更に"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0031",
+    "type": "preferred",
+    "preferred": "すべて",
+    "variants": ["すべて", "全て"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0032",
+    "type": "preferred",
+    "preferred": "ほとんど",
+    "variants": ["ほとんど", "殆ど"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0033",
+    "type": "preferred",
+    "preferred": "いまだ",
+    "variants": ["いまだ", "未だ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0034",
+    "type": "preferred",
+    "preferred": "きわめて",
+    "variants": ["きわめて", "極めて"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0035",
+    "type": "preferred",
+    "preferred": "できる",
+    "variants": ["できる", "出来る"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0036",
+    "type": "preferred",
+    "preferred": "する",
+    "variants": ["する", "為る"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0037",
+    "type": "preferred",
+    "preferred": "わかる",
+    "variants": ["わかる", "分かる", "分る", "判る", "解る"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0038",
+    "type": "preferred",
+    "preferred": "よい",
+    "variants": ["よい", "良い", "好い", "善い"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0039",
+    "type": "preferred",
+    "preferred": "よさ",
+    "variants": ["よさ", "良さ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0040",
+    "type": "preferred",
+    "preferred": "もつ",
+    "variants": ["もつ", "持つ"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0041",
+    "type": "preferred",
+    "preferred": "ない",
+    "variants": ["ない", "無い"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0042",
+    "type": "preferred",
+    "preferred": "十分",
+    "variants": ["十分", "充分"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  },
+  {
+    "id": "company.0043",
+    "type": "preferred",
+    "preferred": "いえる",
+    "variants": ["いえる", "言える"],
+    "category": "legacy",
+    "severity": "warning",
+    "fixMode": "confirm",
+    "source": "company"
+  }
+]
