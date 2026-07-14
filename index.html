@@ -1,3 +1,9 @@
+---
+layout: null
+title: 表記ゆれ検出ツール
+description: 文章中の表記ゆれ（ゆらぎ）をブラウザ内で検出・統一する無料ツール。辞書ベース／ファジー／形態素解析に対応。テキストは外部送信しません。
+lang: ja
+---
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -5,8 +11,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#f8f6f2">
 
-  <title>表記統一さん | 表記ゆれ検出ツール</title>
-  
+  <title>表記統一さん | {{ page.title }}</title>
+  <meta name="description" content="{{ page.description }}">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="{{ site.url }}{{ site.baseurl }}/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="表記統一さん | {{ page.title }}">
+  <meta property="og:description" content="{{ page.description }}">
+  <meta property="og:url" content="{{ site.url }}{{ site.baseurl }}/">
+  <meta property="og:image" content="{{ site.url }}{{ site.baseurl }}/favicon.png">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "表記統一さん",
+    "description": "文章中の表記ゆれをブラウザ内で検出・統一するツール。テキストは外部送信しません。",
+    "applicationCategory": "UtilitiesApplication",
+    "inLanguage": "ja",
+    "isAccessibleForFree": true
+  }
+  </script>
+
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>

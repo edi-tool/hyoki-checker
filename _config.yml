@@ -1,1 +1,7 @@
 theme: jekyll-theme-minimal
+
+url: "https://edi-tool.github.io"
+baseurl: "/hyoki-checker"
+
+plugins:
+  - jekyll-sitemap
