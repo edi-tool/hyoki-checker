@@ -170,3 +170,17 @@ main {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* =========================================
+   共通デザイン統一（事務ツール5種で統一）
+   ※ プレーンCSS。style.dist.css 末尾にも同内容を追記済み
+========================================= */
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", Meiryo, Roboto, sans-serif;
+}
+.header-title { color: #0f0f0f; }
+.site-footer { background-color: transparent; border-top: 1px solid #e0e0e0; }
+:focus-visible { outline: 2px solid #f28c06; outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
