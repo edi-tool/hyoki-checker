@@ -243,4 +243,11 @@ kuromoji は `INIT_KUROMOJI`/`KUROMOJI_ANALYZE` 呼び出し時に遅延 importS
 
 ## 関連
 
+### 2026-07-15 セキュリティ更新
+
+- PDF.jsを脆弱性修正版の`pdfjs-dist 6.1.200`へ更新し、CDN・worker・npm依存を同一バージョンに固定。
+- PDF解析時に`isEvalSupported: false`を指定し、多層防御を追加。
+- `.claude/`をGit追跡対象から除外し、Dependabotの週次npm更新を追加。
+- `npm audit`で既知の脆弱性0件を確認。
+
 - 組織ハブ: https://edi-tool.github.io/ （`edi-tool/edi-tool.github.io` リポジトリ）

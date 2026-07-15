@@ -31,7 +31,7 @@ async function fetchBackendAnalyze(text) {
 // ---- Worker 通信 ----
 // JSを更新したら APP_VERSION を変更し、worker/importScripts のキャッシュを破棄する
 // （index.html のローカル<script>の ?v= とも揃えること）
-const APP_VERSION = "20260714d";
+const APP_VERSION = "20260715a";
 const worker = new Worker(`js/worker.js?v=${APP_VERSION}`);
 const workerCallbackMap = new Map();
 let messageIdCounter = 0;
@@ -136,10 +136,12 @@ async function handleFile(file) {
 }
 
 async function extractPDF(arrayBuffer) {
+  const pdfjsLib = await window.pdfjsReady;
   const pdf = await pdfjsLib.getDocument({
     data: arrayBuffer,
     cMapUrl: new URL("./cmaps/", document.baseURI).href,
     cMapPacked: true,
+    isEvalSupported: false,
   }).promise;
   const pages = [];
   let textPages = 0;
@@ -692,10 +694,6 @@ async function importTSVCSV(e) {
 
 // ---- 初期化 ----
 document.addEventListener("DOMContentLoaded", () => {
-  if (typeof pdfjsLib !== "undefined") {
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
-  }
 
   const dropZone = document.getElementById("dropZone");
   const fileInput = document.getElementById("fileInput");
