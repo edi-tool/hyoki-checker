@@ -40,13 +40,19 @@ lang: ja
       }
     </script>
 
+    <script>
+      window.pdfjsReady = import(
+        "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.1.200/build/pdf.min.mjs"
+      ).then((pdfjsLib) => {
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+          "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.1.200/build/pdf.worker.min.mjs";
+        window.pdfjsLib = pdfjsLib;
+        return pdfjsLib;
+      });
+    </script>
     <script
       defer
-      src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"
-    ></script>
-    <script
-      defer
-      src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"
+      src="https://cdn.jsdelivr.net/npm/mammoth@1.12.0/mammoth.browser.min.js"
     ></script>
     <script
       defer
@@ -54,11 +60,11 @@ lang: ja
     ></script>
 
     <!-- JS更新時は ?v= を一括で上げてキャッシュを破棄（js/app.js の APP_VERSION と揃える）-->
-    <script defer src="js/defaultDict.js?v=20260714d"></script>
-    <script defer src="js/dictManager.js?v=20260714d"></script>
-    <script defer src="js/documentText.js?v=20260714d"></script>
-    <script defer src="js/analyzer.js?v=20260714d"></script>
-    <script defer src="js/app.js?v=20260714d"></script>
+    <script defer src="js/defaultDict.js?v=20260715a"></script>
+    <script defer src="js/dictManager.js?v=20260715a"></script>
+    <script defer src="js/documentText.js?v=20260715a"></script>
+    <script defer src="js/analyzer.js?v=20260715a"></script>
+    <script defer src="js/app.js?v=20260715a"></script>
 
     <link rel="icon" href="favicon.png" type="image/png" />
     <link rel="stylesheet" href="style.dist.css?v=20260714" />
