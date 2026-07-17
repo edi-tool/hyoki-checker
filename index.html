@@ -1,7 +1,7 @@
 ---
 layout: null
 title: 表記ゆれ検出ツール
-description: 文章中の表記ゆれ（ゆらぎ）をブラウザ内で検出・統一する無料ツール。辞書ベース／ファジー／形態素解析に対応。テキストは外部送信しません。
+description: 文章中の表記ゆれ（ゆらぎ）をブラウザ内で検出・統一する無料ツール。辞書ベース／形態素解析に対応。テキストは外部送信しません。
 lang: ja
 ---
 
@@ -41,14 +41,15 @@ lang: ja
     </script>
 
     <script>
-      window.pdfjsReady = import(
-        "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.1.200/build/pdf.min.mjs"
-      ).then((pdfjsLib) => {
-        pdfjsLib.GlobalWorkerOptions.workerSrc =
-          "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.1.200/build/pdf.worker.min.mjs";
-        window.pdfjsLib = pdfjsLib;
-        return pdfjsLib;
-      });
+      window.pdfjsReady =
+        import("https://cdn.jsdelivr.net/npm/pdfjs-dist@6.1.200/build/pdf.min.mjs").then(
+          (pdfjsLib) => {
+            pdfjsLib.GlobalWorkerOptions.workerSrc =
+              "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.1.200/build/pdf.worker.min.mjs";
+            window.pdfjsLib = pdfjsLib;
+            return pdfjsLib;
+          },
+        );
     </script>
     <script
       defer
@@ -237,9 +238,12 @@ lang: ja
                   >Beta</span
                 >
               </button>
+              <!-- 課題#12: 精度が実用水準に達するまでファジー検出を非表示にする。
+                   実行は本ボタン経由のみのため、hidden で機能ごと止まる。
+                   再開時はこの hidden を外す（実装は js/analyzer.js に維持）。 -->
               <button
                 id="tabBtn-fuzzy"
-                class="tab-btn flex items-center"
+                class="tab-btn flex hidden items-center"
                 onclick="switchTab('fuzzy')"
               >
                 ファジー
