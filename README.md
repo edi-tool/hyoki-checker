@@ -9,7 +9,7 @@
 - **ブラウザ完結**: テキストは外部送信されず、解析はすべてブラウザ内（Web Worker）で実行
 - **多様な入力**: `.docx` / `.pdf` / `.txt` 読込・直接貼り付けに対応
 - **2種の検出**: 辞書ベース／Kuromoji 活用形解析（Beta）
-  （ファジー（近似一致）は精度が実用水準に達するまで非表示。実装は維持。課題#12）
+  （ファジー（近似一致）は精度不足のため非表示。実装は維持。[#12](https://github.com/edi-tool/hyoki-checker/issues/12) / [#27](https://github.com/edi-tool/hyoki-checker/issues/27)）
 - **カスタム辞書**: 自社の表記基準を追加（localStorage 保存、JSON/TSV/CSV インポート）
 - **基準表記を明示**: 辞書グループの先頭を基準とし、多数派に流されず判定
 - **原文位置へ移動**: 結果の表記をクリックすると該当箇所を順番に選択
@@ -77,4 +77,32 @@ python3 -m http.server 8000
 ```sh
 pip install -r backend/requirements.txt
 python -m pytest backend/tests
+```
+
+## 開発時の注意
+
+### CSS を変更したら再生成と `?v=` 更新が必要
+
+`style.dist.css` は Tailwind の生成物ですが**リポジトリにコミットしています**。CI が無いため、
+再生成を忘れてもエラーになりません（実際に、使用中のクラスが生成物から欠落したまま
+本番に出ていたことがあります）。マークアップのクラスを変更したら必ず以下を同じコミットに含めてください。
+
+```sh
+npm run build:css                       # style.dist.css を再生成
+# さらに index.html の <link rel="stylesheet" href="style.dist.css?v=...">
+# の ?v= を更新する（更新しないと既存訪問者に旧CSSがキャッシュ配信される）
+```
+
+JS を変更した場合は `js/app.js` の `APP_VERSION` と `index.html` の各 `?v=` を揃えて更新します。
+
+### ルールは生成ファイルを直接編集しない
+
+`js/defaultDict.js` と `backend/dicts/default_dict.json` は生成物です。原本の `rules/packs/` を
+編集し、`npm run build:rules` で再生成、`npm run validate:rules` で検証してください。
+
+### 検証コマンド
+
+```sh
+npm test                # フロントのテスト
+npm run validate:rules  # ルールパックの検証
 ```

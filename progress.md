@@ -1,23 +1,30 @@
 # 進捗: Web Worker 経由の表記ゆれチェック
 
-## コミット履歴（最新）
+## 現在の状態（2026-07-17 時点）
 
-| コミット  | 内容                                                                                                      |
-| --------- | --------------------------------------------------------------------------------------------------------- |
-| `ff48812` | Refactor: extract inline scripts from index.html into js/app.js, fix DOMContentLoaded execution order bug |
-| `25674a4` | Lazy-load kuromoji in worker + update progress.md to match current architecture                           |
-| `72b5a28` | Fix: restore working analyzer/worker for ANALYZE protocol and renderResults counts display                |
+| 項目       | 状態                                                                       |
+| ---------- | -------------------------------------------------------------------------- |
+| main       | `0a444b6`                                                                  |
+| ブランチ   | リモートは `main` のみ（マージ済みブランチは全て削除）                     |
+| PR         | open なし                                                                  |
+| open Issue | #15（JTF全ルール）、#16（prh辞書）、#27（ファジー精度）                    |
+| 動作形態   | フロント単体（`js/app.js` の `API_BASE` は空。backend は任意構成で未接続） |
+| テスト     | `npm test` 9件、`npm run validate:rules` 5パック179ルール、backend pytest  |
+| Tailwind   | 4.3.2（`style.dist.css` はコミット管理。CI無しのため手動再生成が必要）     |
+
+古いコミット履歴表（`ff48812` 等）は情報が古くなったため削除した。履歴は `git log` を参照。
 
 ## 現在のアーキテクチャ
 
-| ファイル            | 役割                                                                                                    |
-| ------------------- | ------------------------------------------------------------------------------------------------------- |
-| `index.html`        | UIシェル（マークアップのみ、defer スクリプト読込）                                                      |
-| `js/app.js`         | **新規** UIロジック全体：Worker通信・イベント登録・描画関数・初期化（DOMContentLoaded）                 |
-| `js/worker.js`      | Worker: `ANALYZE` / `FUZZY` / `INIT_KUROMOJI` / `KUROMOJI_ANALYZE` を処理                               |
-| `js/analyzer.js`    | `analyze` / `analyzeAsync` / `fuzzyAnalyze` / `kuromojiAnalyze` / `buildHighlightedHTML` / `escapeHTML` |
-| `js/defaultDict.js` | 同義語グループ辞書（492エントリ）                                                                       |
-| `js/dictManager.js` | カスタム辞書管理（localStorage + JSON/TSV/CSV import）                                                  |
+| ファイル             | 役割                                                                                                                         |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `index.html`         | UIシェル（マークアップのみ、defer スクリプト読込）                                                                           |
+| `js/app.js`          | **新規** UIロジック全体：Worker通信・イベント登録・描画関数・初期化（DOMContentLoaded）                                      |
+| `js/worker.js`       | Worker: `ANALYZE` / `FUZZY` / `INIT_KUROMOJI` / `KUROMOJI_ANALYZE` を処理                                                    |
+| `js/analyzer.js`     | `analyze` / `analyzeAsync` / `fuzzyAnalyze` / `kuromojiAnalyze` / `buildHighlightedHTML` / `escapeHTML`                      |
+| `js/defaultDict.js`  | **生成ファイル**（`GENERATED_RULES`／5パック179ルール）。原本は `rules/packs/`、`npm run build:rules` で生成。直接編集しない |
+| `js/dictManager.js`  | カスタム辞書管理（localStorage + JSON/TSV/CSV import、パックON/OFF）                                                         |
+| `js/documentText.js` | PDF.js の断片から改行・語間を復元してテキスト化                                                                              |
 
 **削除済:**
 
@@ -53,6 +60,14 @@ kuromoji は `INIT_KUROMOJI`/`KUROMOJI_ANALYZE` 呼び出し時に遅延 importS
 ```
 
 ---
+
+---
+
+# セッション別の経緯（履歴）
+
+ここから下は時系列の作業記録。**冒頭の「現在の状態」が最新**であり、以下に含まれる
+「未解決」「予定」の記述は後のセッションで解消されている場合がある（解消済みのものには
+取り消し線と注記を付けている）。
 
 ## リファクタリング内容（コミット `ff48812`）
 
@@ -111,10 +126,12 @@ kuromoji は `INIT_KUROMOJI`/`KUROMOJI_ANALYZE` 呼び出し時に遅延 importS
 | PDF.js cMapUrl | `pdfjsLib.getDocument()` に `cMapUrl` / `cMapPacked` 追加（日本語PDF文字化け防止） |
 | Tailwind       | CDN スクリプト除去 → CLI ビルド済み `style.dist.css` に移行                        |
 
-## 現在の状態
+### 当時の状態（2026-04-21 時点・履歴）
 
-✅ main ブランチ最新・PR #9・#10 マージ済み
-⏳ Render デプロイ確認待ち（コミット `f36ee65`）
+✅ PR #9・#10 マージ済み / ⏳ Render デプロイ確認待ち（コミット `f36ee65`）
+
+> その後 PR #22（`fix: render.yaml を Docker 構成に戻しデプロイ失敗を解消`）で解消。
+> ただし `js/app.js` の `API_BASE` は空のままで、backend は接続していない（フロント単体で動作）。
 
 ## 実用性検証（2026-06-12）
 
@@ -129,12 +146,14 @@ kuromoji は `INIT_KUROMOJI`/`KUROMOJI_ANALYZE` 呼び出し時に遅延 importS
 
 ### バグ・重大課題
 
-1. **Kuromoji活用形が動作不能**: `worker.js` L10 の絶対URLがkuromoji内部で壊れ `GET /localhost:8000/dict/...` 404。`KUROMOJI_DIC_PATH` を `'/dict/'` 等に修正要
-2. ~~**「修正済みWord出力」が未修正のまま出力**: 置換機能が未実装（`replacementLog` は宣言のみ）。原文を書式なしdocx化するだけでボタン名と乖離~~ → **解消済み（2026-06-17、本ファイル末尾参照）**
-3. **部分文字列の重複カウント**: `analyzer.js` analyze() が単純match()のため「サーバー」が「サーバ」にも加算→出現数逆転し推奨形が誤る
-4. **推奨形=最多出現**: 出版社の表記基準と無関係。基準側を「正」と指定する仕組みなし
+1. ~~**Kuromoji活用形が動作不能**: `worker.js` L10 の絶対URLがkuromoji内部で壊れ `GET /localhost:8000/dict/...` 404~~ → **解消済み**（PR #5。現在 `js/worker.js:16` は `self.KUROMOJI_DIC_PATH = '../dict/'`）
+2. ~~**「修正済みWord出力」が未修正のまま出力**: 置換機能が未実装（`replacementLog` は宣言のみ）~~ → **解消済み（2026-06-17、本ファイル参照）**
+3. ~~**部分文字列の重複カウント**: `analyzer.js` analyze() が単純match()のため「サーバー」が「サーバ」にも加算~~ → **解消済み**（2026-06-12「共通基盤の修正」で `analyzeGroup` を共有化、形態素境界フィルタを追加）
+4. ~~**推奨形=最多出現**: 出版社の表記基準と無関係~~ → **解消済み**（2026-07-14「基準表記の固定」。`recommended` は常にルールの `preferred`、最多表記は `observedMajority` として分離）
 5. **ファジー検出はノイズ過多**: 「子ど」「業づく」等の断片が大量、実用困難
-6. **API_BASE未設定**: バックエンドは未接続（>5,000字でもフロント処理）
+   → 2026-06-12 のタスクAで一度は改善したが、**2026-07-17 の再実測で依然として実用水準になし**。
+   非表示化（課題#12 / `a48b647`）のうえ課題#27として再設計待ち。本ファイル後半を参照。
+6. **API_BASE未設定**: バックエンドは未接続（>5,000字でもフロント処理）。2026-07-17 時点も `API_BASE = ""` のまま
 
 ### 実務判定
 
@@ -148,6 +167,10 @@ kuromoji は `INIT_KUROMOJI`/`KUROMOJI_ANALYZE` 呼び出し時に遅延 importS
 - 包含関係（接頭/接尾/助詞付着）を除外、同字数の置換のみ照合、末尾1字ひらがな助詞を境界扱い。
 - 結果：ノイズ7件→0、真の誤字（子とも/サーパ/基づつ）のみ検出。31k字47ms。
 - 追加関数: _charClass / _segmentText / _isParticle、fuzzyAnalyze 全面改訂。
+
+> **注記（2026-07-17）**: 上記「ノイズ0」は限られたテスト文での結果であり、**一般の文章では再現しない**。
+> 誤字を含まない教育書ふうの文章で13件の誤検知が出るうえ、`common` の数え方の不整合により
+> 長音を含むカタカナ語の誤字を構造的に見逃す。詳細は本ファイル後半および課題#27。
 
 ### タスクB: 語境界の誤検知抑制（Kuromoji連携）
 
