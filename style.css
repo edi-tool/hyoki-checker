@@ -173,7 +173,7 @@ main {
 
 /* =========================================
    共通デザイン統一（事務ツール5種で統一）
-   ※ プレーンCSS。style.dist.css 末尾にも同内容を追記済み
+   ※ プレーンCSS。Tailwindがそのまま通すので build:css の出力に含まれる
 ========================================= */
 body {
   font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", Meiryo, Roboto, sans-serif;

@@ -1,0 +1,54 @@
+name: CI
+
+# Actions の実行回数を抑えるため、生成物やテストに影響しうる変更を含む PR のみで実行する。
+on:
+  pull_request:
+    paths:
+      - "index.html"
+      - "js/**"
+      - "style.css"
+      - "style.dist.css"
+      - "rules/**"
+      - "scripts/**"
+      - "tests/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/ci.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: ルール定義の検証
+        run: npm run validate:rules
+
+      - name: テスト
+        run: npm test
+
+      - name: 生成物が最新か確認（ルール）
+        run: |
+          npm run build:rules
+          git diff --exit-code -- js/defaultDict.js rules/generated/rules.json backend/dicts/default_dict.json \
+            || { echo "::error::ルール生成物が古くなっています。'npm run build:rules' を実行して結果をコミットしてください。"; exit 1; }
+
+      - name: 生成物が最新か確認（CSS）
+        run: |
+          npm run build:css
+          git diff --exit-code -- style.dist.css \
+            || { echo "::error::style.dist.css が古くなっています。'npm run build:css' を実行して結果をコミットしてください。"; exit 1; }
