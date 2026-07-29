@@ -1,0 +1,33 @@
+name: tmp-fix-css
+
+on:
+  push:
+    branches:
+      - chore/bump-tailwind-4.3.3
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chore/bump-tailwind-4.3.3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build:css
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add style.dist.css
+          git diff --cached --quiet || git commit -m "chore: rebuild style.dist.css on Linux (CI parity)"
+          git push
