@@ -51,6 +51,18 @@
 文脈依存、Sudachi・ファジー由来の候補は自動置換しません。旧カスタム辞書の
 `string[][]` は読み込み時に構造化し、`confirm` として移行します。
 
+## prh 形式辞書の読み書き
+
+[textlint-rule-prh](https://github.com/textlint-ja/textlint-rule-prh) が使う prh 形式
+YAML を読み込めます（辞書設定パネルの「📥 prh YAML 読込」）。
+[prh/rules](https://github.com/prh/rules) の公開辞書や JTF日本語標準スタイルガイド系の
+prh 辞書をそのまま利用できます。逆に「📤 prh YAML 書き出し」でカスタム辞書を prh 形式へ
+書き出し、VS Code や CI の textlint へ持ち出せます。
+
+対応キー（`expected` / `pattern` / `patterns` / `options.wordBoundary` /
+`regexpMustEmpty` / `specs`）と未対応項目は [docs/prh-compat.md](docs/prh-compat.md)
+を参照してください。
+
 コードはMITライセンスです。外部資料由来のルールデータには各ルールの `source`、
 `NOTICE`、`THIRD_PARTY_LICENSES` に記載した個別条件が適用されます。
 

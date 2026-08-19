@@ -84,6 +84,8 @@ function analyzeGroup(text, group, boundarySet = null) {
         regex.lastIndex++;
         continue;
       }
+      // prh の regexpMustEmpty 相当：指定グループが空のときだけ指摘する
+      if (rule.mustEmpty && match[rule.mustEmpty]) continue;
       const replacement = rule.replacement
         ? match[0].replace(new RegExp(rule.pattern, "u"), rule.replacement)
         : rule.preferred;
