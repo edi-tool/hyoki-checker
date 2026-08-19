@@ -31,7 +31,7 @@ async function fetchBackendAnalyze(text) {
 // ---- Worker 通信 ----
 // JSを更新したら APP_VERSION を変更し、worker/importScripts のキャッシュを破棄する
 // （index.html のローカル<script>の ?v= とも揃えること）
-const APP_VERSION = "20260715a";
+const APP_VERSION = "20260819a";
 const worker = new Worker(`js/worker.js?v=${APP_VERSION}`);
 const workerCallbackMap = new Map();
 let messageIdCounter = 0;
@@ -692,9 +692,40 @@ async function importTSVCSV(e) {
   }
 }
 
+async function importPrhDict(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const pack = file.name.replace(/\.(ya?ml)$/i, "");
+    const result = dictManager.importPRH(await file.text(), { pack });
+    renderCustomDictList();
+    runDictValidation();
+    runCheck();
+    const notes = [`${result.added}件のprhルールを取り込みました`];
+    if (result.skipped.length)
+      notes.push(`未対応のため${result.skipped.length}件をスキップしました`);
+    if (result.imports.length)
+      notes.push(
+        `imports（${result.imports.join(", ")}）は参照先ファイルを個別に読み込んでください`,
+      );
+    alert(notes.join("\n"));
+  } catch (err) {
+    alert("読み込み失敗: " + err.message);
+  } finally {
+    e.target.value = "";
+  }
+}
+
+function exportPrhDict() {
+  try {
+    dictManager.exportPRH();
+  } catch (err) {
+    alert("書き出し失敗: " + err.message);
+  }
+}
+
 // ---- 初期化 ----
 document.addEventListener("DOMContentLoaded", () => {
-
   const dropZone = document.getElementById("dropZone");
   const fileInput = document.getElementById("fileInput");
   if (dropZone) {

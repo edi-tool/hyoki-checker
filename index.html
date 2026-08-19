@@ -61,11 +61,12 @@ lang: ja
     ></script>
 
     <!-- JS更新時は ?v= を一括で上げてキャッシュを破棄（js/app.js の APP_VERSION と揃える）-->
-    <script defer src="js/defaultDict.js?v=20260715a"></script>
-    <script defer src="js/dictManager.js?v=20260715a"></script>
-    <script defer src="js/documentText.js?v=20260715a"></script>
-    <script defer src="js/analyzer.js?v=20260715a"></script>
-    <script defer src="js/app.js?v=20260715a"></script>
+    <script defer src="js/defaultDict.js?v=20260819a"></script>
+    <script defer src="js/prh.js?v=20260819a"></script>
+    <script defer src="js/dictManager.js?v=20260819a"></script>
+    <script defer src="js/documentText.js?v=20260819a"></script>
+    <script defer src="js/analyzer.js?v=20260819a"></script>
+    <script defer src="js/app.js?v=20260819a"></script>
 
     <link rel="icon" href="favicon.png" type="image/png" />
     <link rel="stylesheet" href="style.dist.css?v=20260717a" />
@@ -439,6 +440,31 @@ lang: ja
                       />
                     </label>
                   </div>
+                  <div class="grid grid-cols-2 gap-2">
+                    <label
+                      class="block text-center text-sm font-bold text-[#f28c06] border-2 border-[#f28c06] rounded-lg px-2 py-2 hover:bg-[#fff8f0] cursor-pointer transition-colors bg-white"
+                    >
+                      📥 prh YAML 読込
+                      <input
+                        type="file"
+                        accept=".yml,.yaml"
+                        class="hidden"
+                        onchange="importPrhDict(event)"
+                      />
+                    </label>
+                    <button
+                      onclick="exportPrhDict()"
+                      class="text-sm font-bold text-gray-600 border-2 border-gray-300 rounded-lg px-2 py-2 hover:bg-gray-50 transition-colors bg-white"
+                    >
+                      📤 prh YAML 書き出し
+                    </button>
+                  </div>
+                  <p class="text-xs text-gray-500 leading-relaxed">
+                    textlint-rule-prh
+                    形式の辞書（JTF日本語標準スタイルガイド、ICS Media
+                    など）を読み込めます。書き出した YAML は VS Code や CI の
+                    textlint でそのまま利用できます。
+                  </p>
                   <button
                     onclick="dictManager.exportJSON()"
                     class="w-full text-sm font-bold text-gray-600 border-2 border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors bg-white mt-1"

@@ -52,6 +52,7 @@ class DictionaryManager {
       source: input.source || this._customSource(pack),
       ...(input.pattern ? { pattern: input.pattern } : {}),
       ...(input.replacement ? { replacement: input.replacement } : {}),
+      ...(input.mustEmpty ? { mustEmpty: input.mustEmpty } : {}),
     };
   }
 
@@ -128,6 +129,54 @@ class DictionaryManager {
     a.download = "hyoki_custom_rules.json";
     a.click();
     URL.revokeObjectURL(a.href);
+  }
+
+  /**
+   * prh (textlint-rule-prh) 形式の YAML をカスタム辞書へ取り込む。
+   * @param {string} text - YAML テキスト
+   * @param {{pack?: string, replace?: boolean, source?: object}} [options]
+   * @returns {{added: number, skipped: object[], imports: string[]}}
+   */
+  importPRH(text, options = {}) {
+    const prh = this._prh();
+    if (!prh) throw new Error("prh モジュールが読み込まれていません");
+    const pack = options.pack || "prh";
+    const existing = options.replace ? [] : this._loadCustom();
+    const { rules, skipped, imports } = prh.importPrhYAML(text, {
+      pack: "custom",
+      idPrefix: `custom.${pack}`,
+      source: { ...this._customSource("custom"), title: `prh 辞書 (${pack})` },
+    });
+    const normalized = rules
+      .map((rule, index) =>
+        this.normalizeRule(rule, existing.length + index, "custom"),
+      )
+      .filter(Boolean);
+    if (!normalized.length && !skipped.length) {
+      throw new Error("prh ルールが見つかりません");
+    }
+    this._saveCustom([...existing, ...normalized]);
+    return { added: normalized.length, skipped, imports };
+  }
+
+  /** カスタム辞書を prh 互換 YAML として書き出す（VS Code / CI へ持ち出す用）。 */
+  exportPRH(filename = "hyoki_custom_rules.prh.yml") {
+    const prh = this._prh();
+    if (!prh) throw new Error("prh モジュールが読み込まれていません");
+    const yaml = prh.rulesToPrhYAML(this._loadCustom());
+    const blob = new Blob([yaml], { type: "text/yaml;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  _prh() {
+    if (typeof PRH !== "undefined") return PRH;
+    if (typeof globalThis !== "undefined" && globalThis.PRH)
+      return globalThis.PRH;
+    return null;
   }
 
   async importJSON(file) {

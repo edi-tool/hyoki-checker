@@ -166,7 +166,7 @@ kuromoji は `INIT_KUROMOJI`/`KUROMOJI_ANALYZE` 呼び出し時に遅延 importS
 - 全位置×全長の窓走査 → 文字種・句読点で区切ったセグメント連結のみを候補化（断片「業づく」等が原理的に消滅）。
 - 包含関係（接頭/接尾/助詞付着）を除外、同字数の置換のみ照合、末尾1字ひらがな助詞を境界扱い。
 - 結果：ノイズ7件→0、真の誤字（子とも/サーパ/基づつ）のみ検出。31k字47ms。
-- 追加関数: _charClass / _segmentText / _isParticle、fuzzyAnalyze 全面改訂。
+- 追加関数: \_charClass / \_segmentText / \_isParticle、fuzzyAnalyze 全面改訂。
 
 > **注記（2026-07-17）**: 上記「ノイズ0」は限られたテスト文での結果であり、**一般の文章では再現しない**。
 > 誤字を含まない教育書ふうの文章で13件の誤検知が出るうえ、`common` の数え方の不整合により
@@ -176,7 +176,7 @@ kuromoji は `INIT_KUROMOJI`/`KUROMOJI_ANALYZE` 呼び出し時に遅延 importS
 
 - analyzeGroup に boundarySet 引数追加（トークン境界に整合する一致のみ計上）。
 - buildBoundarySet(text)：word_position からトークン境界集合を構築。
-- worker ANALYZE に boundaryAware フラグ、app は _kuromojiInitialized 時に付与＋init後 runCheck 再実行。
+- worker ANALYZE に boundaryAware フラグ、app は \_kuromojiInitialized 時に付与＋init後 runCheck 再実行。
 - 効果：「本州」内の「本」を除外（2→1）。ただし未知の固有名詞「子供会館」はKuromojiが子供|会館に分割するため対象外（限界）。
 
 ### 共通基盤の修正（先行）
@@ -189,7 +189,7 @@ kuromoji は `INIT_KUROMOJI`/`KUROMOJI_ANALYZE` 呼び出し時に遅延 importS
 ### 置換機能の実装（progress重大課題#2を解消）
 
 - 課題: 「修正済みWord出力」が置換せず原文をdocx化するだけだった（replacementLog宣言のみ）。
-- 対応: downloadCorrectedDocx を改修し、検出結果(_lastResults)の各グループの非推奨表記を推奨表記へ一括置換して出力。
+- 対応: downloadCorrectedDocx を改修し、検出結果(\_lastResults)の各グループの非推奨表記を推奨表記へ一括置換して出力。
 - replaceGroup(js/analyzer.js): プレースホルダ方式に修正。推奨表記を退避→非推奨語を長さ降順で置換→復元。「サーバ」が既存「サーバー」内を二重置換する不具合を解消。
 - ボタン: id=exportDocxBtn、検出>0かつ本文ありで表示。出力後 replacementBadge に統一箇所数を表示。
 - ボタン名: 「修正済みWordを出力」→「推奨表記に統一してWord出力」。
@@ -329,9 +329,31 @@ kuromoji は `INIT_KUROMOJI`/`KUROMOJI_ANALYZE` 呼び出し時に遅延 importS
 - 課題#27（ファジー検出の精度不足）は再設計待ち。非表示のまま維持する。
 - 課題#15（JTF全ルール取り込み）は例外条件の人手レビューが必要で機械的に進められない。
   現在は機械判定が安全な3ルールのみ収録。ライセンス面の障壁はない。
-- 課題#16（prh辞書）は未着手。YAMLパーサの依存追加可否と、正規表現ルール（prh）と
-  語リスト（現行`variants`）のデータモデル差異の解消が論点。ビルド時にJSONへ変換して
-  ブラウザには既存JSONのみ配る案が現行アーキテクチャと整合的。
+- 課題#16（prh辞書）は 2026-08-19 に対応（下記）。
+
+### 2026-08-19 prh (textlint-rule-prh) YAML 互換対応（課題#16）
+
+- `js/prh.js` を追加。外部依存なしで prh 辞書の YAML 部分集合を解析し、
+  `expected` / `pattern` / `patterns` / `options.wordBoundary` / `regexpMustEmpty` /
+  `specs` を構造化ルールへ変換する。逆変換（prh YAML 書き出し）も同ファイル。
+- `js/analyzer.js` に `mustEmpty`（prh の `regexpMustEmpty` 相当）を追加。
+  指定キャプチャグループが空の一致だけを指摘する。
+- `js/dictManager.js` に `importPRH()` / `exportPRH()` を追加。取り込みルールは
+  カスタム辞書（最優先）へ入り、`fixMode: confirm`（安全側）で固定。
+- UI（辞書設定 > 一括データ操作）に「prh YAML 読込 / 書き出し」を追加。
+  `index.html` の `?v=` と `APP_VERSION` を `20260819a` へ更新。
+- 実資産での確認: prh/rules `media/WEB+DB_PRESS.yml` は 1296 ルール中 1298 件へ変換
+  （スキップ3件）、`media/techbooster.yml` は 54 件すべて変換。
+- 判断: textlint 本体の Worker 実行はバンドラ導入が必要なため見送り、辞書互換に留める。
+  詳細と対応表は `docs/prh-compat.md`。
+- テスト: `tests/prh.test.js` を追加（全15件パス）。Chromium 実機で読込→解析→
+  書き出しまで動作確認済み。
+
+#### 未解決事項（prh）
+
+- `expected` のみのルール（prh 側でパターンを自動生成するもの）は未対応。取り込み時に
+  スキップ件数として通知する。
+- `imports` の再帰読み込みは行わない（任意 URL を取得しない方針）。参照先は個別に読み込む。
 
 ## 関連
 
