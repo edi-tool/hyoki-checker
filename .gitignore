@@ -1,2 +1,8 @@
 node_modules/
 .claude/
+
+# ローカル開発環境（backend/requirements.txt 用の仮想環境とテスト一時領域）
+.venv/
+.test-tmp/
+.pytest_cache/
+__pycache__/
