@@ -4,7 +4,7 @@ const GENERATED_RULES = {
   "packs": [
     {
       "id": "company",
-      "label": "社内標準",
+      "label": "新聞表記",
       "paths": [
         "packs/company/rules-01.json",
         "packs/company/rules-02.json",
