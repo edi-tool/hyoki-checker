@@ -22,6 +22,13 @@
 - 低コントラストの `text-gray-400` を `text-gray-500` に、文字色の `#f28c06` を `#b35f00` に。空の件数バッジを非表示。辞書エラーバナーの × に `aria-label`。
 - CSS は `style.css` の末尾にプレーン CSS で追加し `npm run build:css` で再生成。JS/CSS の `?v=` と `APP_VERSION` を `20260924a` に更新。
 
+## 2026-09-24 セッション（第2弾: アイコン・OGP・改行）
+
+- **アイコン**: 絵文字（📂📄📥📁📤⏳⚠）を他ツールと同じ線画 SVG とスピナーに置換（OS ごとの見た目の差をなくす）。
+- **OGP**: 共有カード用の `ogp.png`（1200×630、Noto Sans JP で生成）を追加し、`og:image` をファビコンから差し替え、`twitter:card` を `summary_large_image` に。
+- **改行**: body の `word-break: break-all` を `normal` + `overflow-wrap: anywhere` に変更。和文は従来どおり1字単位で折り返し、英単語（License、Word 等）は途中で割らない。
+- `?v=` と `APP_VERSION` を `20260924b` に更新。進捗メモ追記後に `npm run build:css` を実行（Tailwind は progress.md も走査するため）。
+
 ## 現在のアーキテクチャ
 
 | ファイル             | 役割                                                                                                                         |

@@ -17,8 +17,9 @@ body {
   line-height: 1.5;
   letter-spacing: -0.4px;
   font-feature-settings: "liga";
-  word-break: break-all;
-  overflow-wrap: break-word;
+  /* 和文は1字ごとに折り返せるので break-all は不要。英単語（License 等）を途中で割らない */
+  word-break: normal;
+  overflow-wrap: anywhere;
   line-break: strict;
 }
 
@@ -229,4 +230,35 @@ body {
   .side-panel { max-height: 80vh; }
   .tabs { gap: 2px; }
   .tab-btn { padding: 10px 8px; font-size: 13px; }
+}
+
+/* アイコン: 絵文字は OS ごとに見た目が変わるため、他ツールと同じ線画 SVG に統一 */
+.icon {
+  display: inline-block;
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 6px;
+  vertical-align: -0.2em;
+  flex-shrink: 0;
+}
+.drop-icon {
+  display: block;
+  width: 28px;
+  height: 28px;
+  margin: 0 auto 8px;
+  color: #f28c06;
+}
+.spinner-sm {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 8px;
+  vertical-align: -1px;
+  border: 2px solid #ffd9a8;
+  border-top-color: #f28c06;
+  border-radius: 50%;
+  animation: hyoki-spin 0.8s linear infinite;
+}
+@keyframes hyoki-spin {
+  to { transform: rotate(360deg); }
 }

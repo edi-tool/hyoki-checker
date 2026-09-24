@@ -31,7 +31,7 @@ async function fetchBackendAnalyze(text) {
 // ---- Worker 通信 ----
 // JSを更新したら APP_VERSION を変更し、worker/importScripts のキャッシュを破棄する
 // （index.html のローカル<script>の ?v= とも揃えること）
-const APP_VERSION = "20260924a";
+const APP_VERSION = "20260924b";
 const worker = new Worker(`js/worker.js?v=${APP_VERSION}`);
 const workerCallbackMap = new Map();
 let messageIdCounter = 0;
@@ -179,7 +179,7 @@ async function runCheck() {
     return;
   }
 
-  if (previewCountEl) previewCountEl.textContent = "⏳ 解析中...";
+  if (previewCountEl) previewCountEl.textContent = "解析中...";
 
   try {
     let results;
@@ -199,7 +199,7 @@ async function runCheck() {
     renderPreview(results);
   } catch (e) {
     console.error("解析エラー:", e);
-    if (previewCountEl) previewCountEl.textContent = "⚠ エラー";
+    if (previewCountEl) previewCountEl.textContent = "エラー";
   }
 }
 
