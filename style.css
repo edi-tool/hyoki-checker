@@ -184,3 +184,49 @@ body {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* ヘッダーを他ツール（h1 18px/600・サブ 13px）と揃え、所属（edi-tool）へのリンクを添える */
+.site-header { padding: 32px 16px 24px; }
+.header-title { font-size: 18px; font-weight: 600; letter-spacing: -0.4px; line-height: 1.5; }
+.header-subtitle { font-size: 13px; color: #6b6b6b; margin-top: 4px; line-height: 1.6; }
+.brand-link {
+  display: inline-block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b6b6b;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+.brand-link:hover { color: #b35f00; text-decoration: underline; }
+/* フッターを他ツール（12px・区切り線なし）と揃える */
+.site-footer { border-top: none; padding: 32px 16px; margin-top: 0; }
+.footer-content p { color: #6b6b6b; font-size: 12px; }
+.footer-content a { color: inherit; }
+.footer-content a:hover { color: #b35f00; }
+/* body の break-all だと英単語（License 等）が途中で折れる */
+.site-footer, .brand-link { word-break: normal; }
+/* 件数が未確定のときに空の丸だけが表示されるのを防ぐ */
+#previewCount:empty { display: none; }
+
+/* h-full（height:100%）は親の高さが確定しないため効かず、入力欄が数行に縮んでいた。
+   auto に戻して flex の stretch で左右の列を枠いっぱいまで伸ばす。 */
+.main-panel, .side-panel { height: auto; }
+/* PC: 作業領域を画面の高さに収め、入力・プレビュー・結果はそれぞれの枠内でスクロールさせる */
+@media (min-width: 1024px) {
+  .app-container { flex: none; min-height: 560px; height: calc(100vh - 150px); height: calc(100dvh - 150px); }
+}
+
+/* スマホ・タブレット: 右パネル（400px 固定）を下へ回して縦積みにする。
+   Tailwind の utilities はレイヤー内なので、このレイヤー外の指定が優先される。 */
+@media (max-width: 1023px) {
+  main { padding: 0 12px; }
+  .app-container { padding: 16px; min-height: 0; }
+  .workspace { flex-direction: column; }
+  .side-panel { width: 100%; min-height: 40vh; }
+  #inputText, #preview { min-height: 240px; }
+  #preview { max-height: 60vh; }
+  .side-panel { max-height: 80vh; }
+  .tabs { gap: 2px; }
+  .tab-btn { padding: 10px 8px; font-size: 13px; }
+}

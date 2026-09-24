@@ -31,7 +31,7 @@ async function fetchBackendAnalyze(text) {
 // ---- Worker 通信 ----
 // JSを更新したら APP_VERSION を変更し、worker/importScripts のキャッシュを破棄する
 // （index.html のローカル<script>の ?v= とも揃えること）
-const APP_VERSION = "20260819a";
+const APP_VERSION = "20260924a";
 const worker = new Worker(`js/worker.js?v=${APP_VERSION}`);
 const workerCallbackMap = new Map();
 let messageIdCounter = 0;
@@ -211,7 +211,7 @@ function renderResults(results) {
   updateExportButton();
   if (!results || results.length === 0) {
     resultsEl.innerHTML =
-      '<p class="text-sm text-gray-400 text-center py-10 font-medium">ゆらぎは検知されていません</p>';
+      '<p class="text-sm text-gray-500 text-center py-10 font-medium">ゆらぎは検知されていません</p>';
     countEl.textContent = "0 件";
     return;
   }
@@ -249,7 +249,7 @@ function renderResults(results) {
             `<button type="button" onclick="focusOccurrence(${resultIndex}, ${countIndex})"
                  class="flex justify-between text-xs py-1 px-1 -mx-1 rounded hover:bg-white text-left"
                  title="原文の次の出現箇所へ移動">
-          <span class="${word === r.recommended ? "text-[#f28c06] font-bold" : "text-gray-700"}">${esc(word)}${word === r.recommended ? "（基準）" : ""}</span>
+          <span class="${word === r.recommended ? "text-[#b35f00] font-bold" : "text-gray-700"}">${esc(word)}${word === r.recommended ? "（基準）" : ""}</span>
           <span class="font-bold text-gray-500 ml-4">${count}件 ↗</span>
         </button>`,
         )
@@ -307,7 +307,7 @@ function renderPreview(results) {
 
   if (!currentText) {
     previewEl.innerHTML =
-      '<span class="text-gray-400">ここにハイライト表示されます</span>';
+      '<span class="text-gray-500">ここにハイライト表示されます</span>';
     if (countEl) countEl.textContent = "";
     return;
   }
@@ -404,7 +404,7 @@ function renderKuromojiResults(results) {
   if (!el) return;
   if (!results || results.length === 0) {
     el.innerHTML =
-      '<p class="text-sm text-gray-400 text-center py-4">活用形のゆらぎは検知されませんでした</p>';
+      '<p class="text-sm text-gray-500 text-center py-4">活用形のゆらぎは検知されませんでした</p>';
     return;
   }
   const esc = typeof escapeHTML === "function" ? escapeHTML : (s) => s;
@@ -426,7 +426,7 @@ async function runFuzzyCheck(event) {
 
   if (!currentText.trim()) {
     resultsEl.innerHTML =
-      '<p class="text-sm text-gray-400 text-center py-4 font-medium">テキストを入力してください</p>';
+      '<p class="text-sm text-gray-500 text-center py-4 font-medium">テキストを入力してください</p>';
     return;
   }
 
@@ -455,7 +455,7 @@ async function runFuzzyCheck(event) {
 
     if (fuzzResults.length === 0) {
       resultsEl.innerHTML =
-        '<p class="text-sm text-gray-400 text-center py-4 font-medium">ファジーマッチは検出されませんでした</p>';
+        '<p class="text-sm text-gray-500 text-center py-4 font-medium">ファジーマッチは検出されませんでした</p>';
     } else {
       const esc = typeof escapeHTML === "function" ? escapeHTML : (s) => s;
       fuzzResults.forEach(({ dictWord, candidates }) => {
@@ -625,7 +625,7 @@ function renderCustomDictList() {
   const custom = dictManager.getCustom();
   if (custom.length === 0) {
     el.innerHTML =
-      '<p class="text-xs text-gray-400 p-2">カスタム辞書はありません</p>';
+      '<p class="text-xs text-gray-500 p-2">カスタム辞書はありません</p>';
     return;
   }
   const esc = typeof escapeHTML === "function" ? escapeHTML : (s) => s;
@@ -633,7 +633,7 @@ function renderCustomDictList() {
     .map(
       (rule, i) =>
         `<div class="flex justify-between items-center text-sm p-2 border-b border-gray-100 hover:bg-gray-50">
-      <span class="text-gray-700 font-medium">${esc(rule.variants.join(", "))}<small class="block text-gray-400">基準: ${esc(rule.preferred || "なし")} / ${esc(rule.fixMode)}</small></span>
+      <span class="text-gray-700 font-medium">${esc(rule.variants.join(", "))}<small class="block text-gray-500">基準: ${esc(rule.preferred || "なし")} / ${esc(rule.fixMode)}</small></span>
       <button onclick="dictManager.removeCustomGroup(${i}); renderCustomDictList(); runCheck();" class="text-red-400 hover:text-red-600 font-bold px-2 py-1 bg-red-50 rounded">削除</button>
     </div>`,
     )
@@ -649,7 +649,7 @@ function renderRulePackControls() {
       (
         pack,
       ) => `<label class="flex items-center justify-between gap-3 text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white">
-        <span><strong>${pack.label}</strong><small class="block text-gray-400">${pack.ruleCount}ルール</small></span>
+        <span><strong>${pack.label}</strong><small class="block text-gray-500">${pack.ruleCount}ルール</small></span>
         <input type="checkbox" ${pack.enabled ? "checked" : ""} onchange="toggleRulePack('${pack.id}', this.checked)" class="accent-[#f28c06]">
       </label>`,
     )

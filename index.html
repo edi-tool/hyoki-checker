@@ -61,18 +61,19 @@ lang: ja
     ></script>
 
     <!-- JS更新時は ?v= を一括で上げてキャッシュを破棄（js/app.js の APP_VERSION と揃える）-->
-    <script defer src="js/defaultDict.js?v=20260819a"></script>
-    <script defer src="js/prh.js?v=20260819a"></script>
-    <script defer src="js/dictManager.js?v=20260819a"></script>
-    <script defer src="js/documentText.js?v=20260819a"></script>
-    <script defer src="js/analyzer.js?v=20260819a"></script>
-    <script defer src="js/app.js?v=20260819a"></script>
+    <script defer src="js/defaultDict.js?v=20260924a"></script>
+    <script defer src="js/prh.js?v=20260924a"></script>
+    <script defer src="js/dictManager.js?v=20260924a"></script>
+    <script defer src="js/documentText.js?v=20260924a"></script>
+    <script defer src="js/analyzer.js?v=20260924a"></script>
+    <script defer src="js/app.js?v=20260924a"></script>
 
     <link rel="icon" href="favicon.png" type="image/png" />
-    <link rel="stylesheet" href="style.dist.css?v=20260717a" />
+    <link rel="stylesheet" href="style.dist.css?v=20260924a" />
   </head>
   <body>
     <header class="site-header">
+      <a class="brand-link" href="https://edi-tool.github.io/">edi-tool</a>
       <h1 class="header-title">表記統一さん</h1>
       <p class="header-subtitle">文章中の表記ゆれを検出・統一します</p>
     </header>
@@ -106,6 +107,8 @@ lang: ja
             </button>
           </div>
           <button
+            type="button"
+            aria-label="閉じる"
             onclick="
               document.getElementById('dictErrorBanner').classList.add('hidden')
             "
@@ -117,8 +120,8 @@ lang: ja
       </div>
 
       <div class="app-container mx-auto">
-        <div class="flex gap-6 min-h-0 flex-1">
-          <div class="flex-[1.8] flex flex-col gap-4 min-w-0 h-full">
+        <div class="workspace flex gap-6 min-h-0 flex-1">
+          <div class="main-panel flex-[1.8] flex flex-col gap-4 min-w-0 h-full">
             <div
               id="dropZone"
               class="drop-zone rounded-xl p-5 text-center cursor-pointer flex-shrink-0 shadow-sm"
@@ -128,7 +131,7 @@ lang: ja
               <div class="text-sm font-bold text-gray-700">
                 Word / PDF をドロップ、またはクリックして選択
               </div>
-              <div class="text-xs text-gray-400 mt-1.5 font-medium">
+              <div class="text-xs text-gray-500 mt-1.5 font-medium">
                 .docx / .pdf / .txt 形式に対応（文書は外部送信しません）
               </div>
               <input
@@ -147,7 +150,7 @@ lang: ja
 
             <div
               id="loading"
-              class="hidden text-center text-sm text-[#f28c06] font-bold py-1 bg-[#fff8f0] rounded-lg"
+              class="hidden text-center text-sm text-[#b35f00] font-bold py-1 bg-[#fff8f0] rounded-lg"
             >
               <span class="animate-pulse">⏳ 読み込み中...</span>
             </div>
@@ -170,7 +173,7 @@ lang: ja
               ></span>
               <button
                 onclick="clearAll()"
-                class="text-sm font-bold text-gray-400 hover:text-red-500 transition-colors px-2"
+                class="text-sm font-bold text-gray-500 hover:text-red-600 transition-colors px-2"
               >
                 クリア
               </button>
@@ -204,7 +207,7 @@ lang: ja
                   id="preview"
                   class="flex-1 overflow-y-auto border border-[#e0e0e0] rounded-xl p-4 text-[15px] bg-[#fafafa] leading-relaxed whitespace-pre-wrap break-words text-gray-800 shadow-inner"
                 >
-                  <span class="text-gray-400"
+                  <span class="text-gray-500"
                     >ここにハイライト表示されます</span
                   >
                 </div>
@@ -213,7 +216,7 @@ lang: ja
           </div>
 
           <div
-            class="w-[400px] flex flex-col flex-shrink-0 bg-white border border-[#e0e0e0] rounded-xl shadow-sm h-full overflow-hidden"
+            class="side-panel w-[400px] flex flex-col flex-shrink-0 bg-white border border-[#e0e0e0] rounded-xl shadow-sm h-full overflow-hidden"
           >
             <div class="tabs px-2 pt-2 bg-[#fafafa] border-b border-[#e0e0e0]">
               <button
@@ -270,7 +273,7 @@ lang: ja
               <div id="tab-results" class="tab-pane flex flex-col">
                 <div id="results" class="flex flex-col gap-3">
                   <p
-                    class="text-sm text-gray-400 text-center py-10 font-medium"
+                    class="text-sm text-gray-500 text-center py-10 font-medium"
                   >
                     ゆらぎは検知されていません
                   </p>
@@ -309,7 +312,7 @@ lang: ja
                 <button
                   id="kuromojiRunBtn"
                   onclick="runKuromojiAnalysis()"
-                  class="hidden border-2 border-[#f28c06] text-[#f28c06] hover:bg-[#fff8f0] text-sm rounded-lg px-4 py-2.5 font-bold transition-colors w-full"
+                  class="hidden border-2 border-[#f28c06] text-[#b35f00] hover:bg-[#fff8f0] text-sm rounded-lg px-4 py-2.5 font-bold transition-colors w-full"
                 >
                   再解析を実行
                 </button>
@@ -363,7 +366,7 @@ lang: ja
 
                 <div
                   id="fuzzyLoading"
-                  class="hidden text-sm text-[#f28c06] font-bold text-center animate-pulse py-2"
+                  class="hidden text-sm text-[#b35f00] font-bold text-center animate-pulse py-2"
                 >
                   ⏳ 解析中...
                 </div>
@@ -418,7 +421,7 @@ lang: ja
                   </p>
                   <div class="grid grid-cols-2 gap-2">
                     <label
-                      class="block text-center text-sm font-bold text-[#f28c06] border-2 border-[#f28c06] rounded-lg px-2 py-2 hover:bg-[#fff8f0] cursor-pointer transition-colors bg-white"
+                      class="block text-center text-sm font-bold text-[#b35f00] border-2 border-[#f28c06] rounded-lg px-2 py-2 hover:bg-[#fff8f0] cursor-pointer transition-colors bg-white"
                     >
                       📥 CSV/TSV 読込
                       <input
@@ -442,7 +445,7 @@ lang: ja
                   </div>
                   <div class="grid grid-cols-2 gap-2">
                     <label
-                      class="block text-center text-sm font-bold text-[#f28c06] border-2 border-[#f28c06] rounded-lg px-2 py-2 hover:bg-[#fff8f0] cursor-pointer transition-colors bg-white"
+                      class="block text-center text-sm font-bold text-[#b35f00] border-2 border-[#f28c06] rounded-lg px-2 py-2 hover:bg-[#fff8f0] cursor-pointer transition-colors bg-white"
                     >
                       📥 prh YAML 読込
                       <input
@@ -491,7 +494,10 @@ lang: ja
 
     <footer class="site-footer">
       <div class="footer-content">
-        <p>&copy; 2026 ISHIKAWA, Natsuki | MIT License</p>
+        <p>
+          <a href="https://edi-tool.github.io/">← edi-tool ツール一覧</a> |
+          &copy; 2026 ISHIKAWA, Natsuki | MIT License
+        </p>
       </div>
     </footer>
   </body>
