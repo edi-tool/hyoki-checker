@@ -29,6 +29,11 @@
 - **改行**: body の `word-break: break-all` を `normal` + `overflow-wrap: anywhere` に変更。和文は従来どおり1字単位で折り返し、英単語（License、Word 等）は途中で割らない。
 - `?v=` と `APP_VERSION` を `20260924b` に更新。進捗メモ追記後に `npm run build:css` を実行（Tailwind は progress.md も走査するため）。
 
+## 2026-09-24 セッション（第3弾: 辞書ラベル）
+
+- 外部公開ツールのため、デフォルト辞書のラベル「社内標準」を「新聞表記」に変更（`rules/manifest.json` を修正し `npm run build:rules` で再生成。`js/defaultDict.js`・`backend/dicts/default_dict.json` も同様）。
+- `?v=` と `APP_VERSION` を `20260924c` に更新。
+
 ## 2026-09-24 セッション（Render のビルド失敗を解消）
 
 - **原因**: Render の `hyoki-checker-api` はダッシュボードで作成した**ネイティブ Python 環境**のサービスで、`render.yaml`（Docker 指定）と `Dockerfile` を使っていない。

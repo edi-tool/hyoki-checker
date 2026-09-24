@@ -31,7 +31,7 @@ async function fetchBackendAnalyze(text) {
 // ---- Worker 通信 ----
 // JSを更新したら APP_VERSION を変更し、worker/importScripts のキャッシュを破棄する
 // （index.html のローカル<script>の ?v= とも揃えること）
-const APP_VERSION = "20260924b";
+const APP_VERSION = "20260924c";
 const worker = new Worker(`js/worker.js?v=${APP_VERSION}`);
 const workerCallbackMap = new Map();
 let messageIdCounter = 0;
