@@ -12,13 +12,13 @@ lang: ja
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f8f6f2" />
 
-    <title>表記統一さん | {{ page.title }}</title>
+    <title>{{ page.title }} | 表記統一さん</title>
     <meta name="description" content="{{ page.description }}" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="{{ site.url }}{{ site.baseurl }}/" />
 
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="表記統一さん | {{ page.title }}" />
+    <meta property="og:title" content="{{ page.title }} | 表記統一さん" />
     <meta property="og:description" content="{{ page.description }}" />
     <meta property="og:url" content="{{ site.url }}{{ site.baseurl }}/" />
     <meta
@@ -33,12 +33,50 @@ lang: ja
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "表記統一さん",
-        "description": "文章中の表記ゆれをブラウザ内で検出・統一するツール。テキストは外部送信しません。",
-        "applicationCategory": "UtilitiesApplication",
-        "inLanguage": "ja",
-        "isAccessibleForFree": true
+        "@graph": [
+          {
+            "@type": "WebApplication",
+            "@id": "https://edi-tool.github.io/hyoki-checker/#app",
+            "name": "表記統一さん",
+            "alternateName": "{{ page.title }}",
+            "url": "https://edi-tool.github.io/hyoki-checker/",
+            "description": "文章中の表記ゆれをブラウザ内で検出・統一するツール。テキストは外部送信しません。",
+            "applicationCategory": "UtilitiesApplication",
+            "operatingSystem": "Web",
+            "browserRequirements": "Requires JavaScript",
+            "inLanguage": "ja",
+            "isAccessibleForFree": true,
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "JPY"
+            },
+            "image": "https://edi-tool.github.io/hyoki-checker/ogp.png",
+            "isPartOf": {
+              "@id": "https://edi-tool.github.io/#website"
+            },
+            "publisher": {
+              "@id": "https://edi-tool.github.io/#organization"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "edi-tool",
+                "item": "https://edi-tool.github.io/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "表記統一さん",
+                "item": "https://edi-tool.github.io/hyoki-checker/"
+              }
+            ]
+          }
+        ]
       }
     </script>
 

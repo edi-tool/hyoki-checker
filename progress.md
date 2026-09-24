@@ -1,5 +1,10 @@
 # 進捗: Web Worker 経由の表記ゆれチェック
 
+## 2026-09-24 セッション（SEO）
+
+- `<title>`・`og:title` をキーワード先頭（「{機能名} | {ツール名}」）に変更
+- 構造化データを `@graph` 化: WebApplication に `url`・`operatingSystem`・`offers`（無料）・`isPartOf`/`publisher`（ハブの `#website`/`#organization`）を追加し、BreadcrumbList（edi-tool > ツール）を追加
+
 ## 現在の状態（2026-07-17 時点）
 
 | 項目       | 状態                                                                       |
