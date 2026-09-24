@@ -23,10 +23,12 @@ lang: ja
     <meta property="og:url" content="{{ site.url }}{{ site.baseurl }}/" />
     <meta
       property="og:image"
-      content="{{ site.url }}{{ site.baseurl }}/favicon.png"
+      content="{{ site.url }}{{ site.baseurl }}/ogp.png"
     />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:locale" content="ja_JP" />
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
 
     <script type="application/ld+json">
       {
@@ -61,15 +63,15 @@ lang: ja
     ></script>
 
     <!-- JS更新時は ?v= を一括で上げてキャッシュを破棄（js/app.js の APP_VERSION と揃える）-->
-    <script defer src="js/defaultDict.js?v=20260924a"></script>
-    <script defer src="js/prh.js?v=20260924a"></script>
-    <script defer src="js/dictManager.js?v=20260924a"></script>
-    <script defer src="js/documentText.js?v=20260924a"></script>
-    <script defer src="js/analyzer.js?v=20260924a"></script>
-    <script defer src="js/app.js?v=20260924a"></script>
+    <script defer src="js/defaultDict.js?v=20260924b"></script>
+    <script defer src="js/prh.js?v=20260924b"></script>
+    <script defer src="js/dictManager.js?v=20260924b"></script>
+    <script defer src="js/documentText.js?v=20260924b"></script>
+    <script defer src="js/analyzer.js?v=20260924b"></script>
+    <script defer src="js/app.js?v=20260924b"></script>
 
     <link rel="icon" href="favicon.png" type="image/png" />
-    <link rel="stylesheet" href="style.dist.css?v=20260924a" />
+    <link rel="stylesheet" href="style.dist.css?v=20260924b" />
   </head>
   <body>
     <header class="site-header">
@@ -87,7 +89,22 @@ lang: ja
           <div class="flex-1">
             <div class="flex items-center gap-2 mb-1">
               <span class="text-red-700 font-bold text-sm"
-                >⚠ 辞書に問題が見つかりました</span
+                ><svg
+                  class="icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                  ></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line></svg
+                >辞書に問題が見つかりました</span
               >
               <span
                 id="dictErrorSummary"
@@ -127,7 +144,23 @@ lang: ja
               class="drop-zone rounded-xl p-5 text-center cursor-pointer flex-shrink-0 shadow-sm"
               onclick="document.getElementById('fileInput').click()"
             >
-              <div class="text-3xl mb-2">📂</div>
+              <svg
+                class="drop-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                ></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="12" y1="18" x2="12" y2="12"></line>
+                <polyline points="9 15 12 12 15 15"></polyline>
+              </svg>
               <div class="text-sm font-bold text-gray-700">
                 Word / PDF をドロップ、またはクリックして選択
               </div>
@@ -152,7 +185,8 @@ lang: ja
               id="loading"
               class="hidden text-center text-sm text-[#b35f00] font-bold py-1 bg-[#fff8f0] rounded-lg"
             >
-              <span class="animate-pulse">⏳ 読み込み中...</span>
+              <span class="spinner-sm" aria-hidden="true"></span
+              ><span>読み込み中...</span>
             </div>
 
             <div
@@ -164,7 +198,23 @@ lang: ja
                 title="新しいWordファイルを作成します。元文書の書式・画像・変更履歴は引き継ぎません"
                 class="hidden flex items-center gap-1.5 text-sm btn-success rounded-md px-4 py-2 font-bold shadow-sm"
               >
-                📄 基準表記に統一したWordを作成
+                <svg
+                  class="icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                  ></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="8" y1="13" x2="16" y2="13"></line>
+                  <line x1="8" y1="17" x2="14" y2="17"></line></svg
+                >基準表記に統一したWordを作成
               </button>
               <div class="flex-1"></div>
               <span
@@ -368,7 +418,7 @@ lang: ja
                   id="fuzzyLoading"
                   class="hidden text-sm text-[#b35f00] font-bold text-center animate-pulse py-2"
                 >
-                  ⏳ 解析中...
+                  <span class="spinner-sm" aria-hidden="true"></span>解析中...
                 </div>
                 <div id="fuzzyResults" class="flex flex-col gap-3 mt-2"></div>
               </div>
@@ -423,7 +473,22 @@ lang: ja
                     <label
                       class="block text-center text-sm font-bold text-[#b35f00] border-2 border-[#f28c06] rounded-lg px-2 py-2 hover:bg-[#fff8f0] cursor-pointer transition-colors bg-white"
                     >
-                      📥 CSV/TSV 読込
+                      <svg
+                        class="icon"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+                        ></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line></svg
+                      >CSV/TSV 読込
                       <input
                         type="file"
                         accept=".tsv,.csv,.txt"
@@ -434,7 +499,22 @@ lang: ja
                     <label
                       class="block text-center text-sm font-bold text-gray-600 border-2 border-gray-300 rounded-lg px-2 py-2 hover:bg-gray-50 cursor-pointer transition-colors bg-white"
                     >
-                      📁 JSON 読込
+                      <svg
+                        class="icon"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+                        ></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line></svg
+                      >JSON 読込
                       <input
                         type="file"
                         accept=".json"
@@ -447,7 +527,22 @@ lang: ja
                     <label
                       class="block text-center text-sm font-bold text-[#b35f00] border-2 border-[#f28c06] rounded-lg px-2 py-2 hover:bg-[#fff8f0] cursor-pointer transition-colors bg-white"
                     >
-                      📥 prh YAML 読込
+                      <svg
+                        class="icon"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+                        ></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line></svg
+                      >prh YAML 読込
                       <input
                         type="file"
                         accept=".yml,.yaml"
@@ -459,7 +554,22 @@ lang: ja
                       onclick="exportPrhDict()"
                       class="text-sm font-bold text-gray-600 border-2 border-gray-300 rounded-lg px-2 py-2 hover:bg-gray-50 transition-colors bg-white"
                     >
-                      📤 prh YAML 書き出し
+                      <svg
+                        class="icon"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+                        ></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line></svg
+                      >prh YAML 書き出し
                     </button>
                   </div>
                   <p class="text-xs text-gray-500 leading-relaxed">
@@ -472,7 +582,22 @@ lang: ja
                     onclick="dictManager.exportJSON()"
                     class="w-full text-sm font-bold text-gray-600 border-2 border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors bg-white mt-1"
                   >
-                    📤 現在の辞書を JSON で書き出し
+                    <svg
+                      class="icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+                      ></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line></svg
+                    >現在の辞書を JSON で書き出し
                   </button>
                 </div>
 
