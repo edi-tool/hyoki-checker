@@ -29,6 +29,16 @@
 - **改行**: body の `word-break: break-all` を `normal` + `overflow-wrap: anywhere` に変更。和文は従来どおり1字単位で折り返し、英単語（License、Word 等）は途中で割らない。
 - `?v=` と `APP_VERSION` を `20260924b` に更新。進捗メモ追記後に `npm run build:css` を実行（Tailwind は progress.md も走査するため）。
 
+## 2026-09-24 セッション（Render のビルド失敗を解消）
+
+- **原因**: Render の `hyoki-checker-api` はダッシュボードで作成した**ネイティブ Python 環境**のサービスで、`render.yaml`（Docker 指定）と `Dockerfile` を使っていない。
+  ビルドコマンドはリポジトリ直下の `pip install -r requirements.txt` で、直下に同名ファイルがないため毎回
+  `ERROR: Could not open requirements file` で失敗していた（main への push ごとに自動デプロイされ失敗）。
+- **対応**: 直下に `requirements.txt`（`-r backend/requirements.txt` のみ）と `.python-version`（3.11、Dockerfile と揃える）を追加。
+  依存の追加・変更は引き続き `backend/requirements.txt` で行う。
+- **確認**: Python 3.11 の新規 venv で直下から `pip install -r requirements.txt` → 成功。`uvicorn backend.main:app` で起動し `/analyze`・`/dict/info` が応答。
+- **要確認（ダッシュボード）**: Start Command が `uvicorn backend.main:app --host 0.0.0.0 --port $PORT` になっていること。
+
 ## 現在のアーキテクチャ
 
 | ファイル             | 役割                                                                                                                         |

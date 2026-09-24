@@ -1,0 +1,3 @@
+# Render（ネイティブ Python 環境）はリポジトリ直下の requirements.txt を読むため、
+# 実体の backend/requirements.txt をここから参照する。依存の追加・変更は backend 側で行う。
+-r backend/requirements.txt
