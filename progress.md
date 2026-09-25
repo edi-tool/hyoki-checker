@@ -2,6 +2,7 @@
 
 ## 2026-09-24 セッション（SEO）
 
+- `og:site_name`（edi-tool）を追加
 - `<title>`・`og:title` をキーワード先頭（「{機能名} | {ツール名}」）に変更
 - 構造化データを `@graph` 化: WebApplication に `url`・`operatingSystem`・`offers`（無料）・`isPartOf`/`publisher`（ハブの `#website`/`#organization`）を追加し、BreadcrumbList（edi-tool > ツール）を追加
 
