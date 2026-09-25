@@ -5,3 +5,24 @@ baseurl: "/hyoki-checker"
 
 plugins:
   - jekyll-sitemap
+
+# 開発用ファイル・バックエンド・ルール原本・テストを公開ビルドから外す
+# （実行時に使う js/・dict/・cmaps/・style.dist.css と、NOTICE・THIRD_PARTY_LICENSES は公開のまま）
+exclude:
+  - CLAUDE.md
+  - AGENTS.md
+  - DESIGN.md
+  - progress.md
+  - README.md
+  - CHANGELOG.md
+  - package.json
+  - package-lock.json
+  - requirements.txt
+  - Dockerfile
+  - render.yaml
+  - backend/
+  - rules/
+  - scripts/
+  - tests/
+  - docs/
+  - node_modules/
