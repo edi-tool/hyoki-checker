@@ -27,6 +27,13 @@
 書式・画像・脚注・変更履歴は引き継ぎません。実務で書式を保つ場合は、結果カードから原文位置へ
 移動して Word 側で修正してください。
 
+## データの扱い
+
+- 貼り付けた文章・読み込んだファイルは、**ブラウザ内（Web Worker）で解析し、外部へ送信しません**。
+- 外部から読み込むライブラリ（cdn.jsdelivr.net、バージョン固定）：pdf.js（pdfjs-dist 6.1.200）、Mammoth.js 1.12.0、html-docx-js 0.3.1。Kuromoji.js と辞書（`dict/`）、PDF 用 CMap（`cmaps/`）はリポジトリに同梱しています。
+- カスタム辞書はブラウザの localStorage に保存します（端末の外には出ません）。
+- 下記の FastAPI バックエンドは任意機能で、公開版では無効です（`js/app.js` の `API_BASE` が空）。有効にすると 5,000 字を超える本文がそのサーバーへ送られるため、有効にする場合はこの節を更新してください。無効であることはテスト（`tests/privacy.test.js`）で確認しています。
+
 ## 技術構成
 
 | 区分                 | 内容                                                                                |
@@ -118,3 +125,9 @@ JS を変更した場合は `js/app.js` の `APP_VERSION` と `index.html` の�
 npm test                # フロントのテスト
 npm run validate:rules  # ルールパックの検証
 ```
+
+## 関連ツール・ライセンス
+
+- [edi-tool のツール一覧](https://edi-tool.github.io/) ／ 開発方針は [edi-tool 開発原則](https://github.com/edi-tool/.github/blob/main/PRINCIPLES.md)
+- 変更履歴は [CHANGELOG.md](CHANGELOG.md)
+- MIT License © 2026 ISHIKAWA, Natsuki（[LICENSE](LICENSE)）。ルールデータの個別条件は `NOTICE`・`THIRD_PARTY_LICENSES` を参照
