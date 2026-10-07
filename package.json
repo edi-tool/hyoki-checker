@@ -27,6 +27,6 @@
   },
   "dependencies": {
     "kuromoji": "^0.1.2",
-    "pdfjs-dist": "6.3.289"
+    "pdfjs-dist": "6.4.299"
   }
 }
