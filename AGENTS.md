@@ -16,6 +16,8 @@
 - セッション終了時に `progress.md` を更新。
 - `style.dist.css` は `npm run build:css` の生成物。Tailwind は progress.md などリポジトリ内の全ファイルをクラス候補として走査するため、
   **progress.md を編集した後にビルドする**（先にビルドすると CI の「生成物が最新か確認（CSS）」で落ちる）。
+  Windows でビルドすると色の値の末尾 1 桁だけが CI（Linux）と食い違うことがある（例: `.0796585` と `.0796584`）。
+  クラスを増減していないのに `style.dist.css` が 1 行だけ変わったら、コミットせず `git checkout -- style.dist.css` で戻す。
 - JS/CSS を変えたら `index.html` の `?v=` と `js/app.js` の `APP_VERSION` をそろえて上げる。
 - pdf.js は `package.json` の `pdfjs-dist`（固定バージョン）が正。Dependabot は `package.json` しか上げないので、その PR では `npm ci` → `npm run sync:pdfjs` を実行し、
   `index.html` の CDN・README・`cmaps/` をそろえてコミットする（そろっていないと `npm test` が落ちる）。マージ前に日本語 PDF の読込を実機で確認する。
