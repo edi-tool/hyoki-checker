@@ -27,3 +27,14 @@ test("CDN から読むライブラリはバージョンを固定している", (
   assert.ok(cdn.length >= 3);
   for (const p of cdn) assert.match(p, /^(@[^/]+\/)?[^/@]+@\d+\.\d+\.\d+\//, p);
 });
+
+test("pdf.js は package.json・CDN・README でバージョンがそろっている", () => {
+  // Dependabot は package.json だけを上げる。ずれたら `npm run sync:pdfjs` を実行する。
+  const version = JSON.parse(read("package.json")).dependencies["pdfjs-dist"];
+  assert.match(version, /^\d+\.\d+\.\d+$/, "pdfjs-dist はバージョンを固定する");
+  const cdn = [...read("index.html").matchAll(/pdfjs-dist@(\d+\.\d+\.\d+)/g)].map((m) => m[1]);
+  assert.equal(cdn.length, 2, "本体と worker の 2 か所");
+  for (const v of cdn) assert.equal(v, version, "index.html の CDN。npm run sync:pdfjs を実行する");
+  const readme = read("README.md").match(/pdfjs-dist (\d+\.\d+\.\d+)/);
+  assert.equal(readme && readme[1], version, "README の記載。npm run sync:pdfjs を実行する");
+});

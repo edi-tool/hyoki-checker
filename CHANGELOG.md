@@ -10,10 +10,12 @@
 
 - 公開ビルドで本文を外部送信しないこと（`API_BASE` が空）と CDN のバージョン固定を確認するテスト（`tests/privacy.test.js`）
 - README に「データの扱い」、関連ツール・ライセンスを追記
+- pdf.js のバージョンが `package.json`・CDN・README でそろっていることを確認するテストと、そろえるための `npm run sync:pdfjs`
 
 ### Changed
 
 - 開発用ドキュメント・バックエンド・ルール原本・テストを GitHub Pages の公開ビルドから除外
+- pdf.js を 6.4.299 へ更新（これまで CDN は 6.1.200、`package.json` は 6.3.289 でずれていた）。README の Mammoth.js の記載を実際の 1.13.0 に修正
 
 ### Fixed
 
