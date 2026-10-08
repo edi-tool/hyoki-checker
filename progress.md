@@ -402,6 +402,16 @@ kuromoji は `INIT_KUROMOJI`/`KUROMOJI_ANALYZE` 呼び出し時に遅延 importS
 
 ## 関連
 
+### 2026-10-08 pdf.js のバージョンずれ解消
+
+- これまで `index.html` の CDN は 6.1.200、`package.json` は 6.3.289 でずれていた（Dependabot は `package.json` しか上げないため）。
+  両方を 6.4.299 にそろえ、Dependabot の PR #41 を置き換えた。
+- `npm run sync:pdfjs`（`scripts/sync-pdfjs.mjs`）を追加。`package.json` のバージョンを CDN・README・`cmaps/` へ反映する。
+  ずれていると `tests/privacy.test.js` が落ちるので、今後の Dependabot PR は「CI が赤 → sync を実行してコミット」で気づける。
+- 実機確認（Chromium、ローカルサーバー）: 埋め込みフォントなし・定義済み CMap（UniJIS-UTF16-H）の日本語 PDF から本文を抽出できた。
+  本体・worker とも 6.4.299、コンソールエラーなし。`cmaps/` は 6.3.289 と 6.4.299 で差分なし。
+- JS・CSS の中身は変えていないため `?v=` と `APP_VERSION` は据え置き。
+
 ### 2026-07-15 セキュリティ更新
 
 - PDF.jsを脆弱性修正版の`pdfjs-dist 6.1.200`へ更新し、CDN・worker・npm依存を同一バージョンに固定。

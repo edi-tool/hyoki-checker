@@ -30,7 +30,7 @@
 ## データの扱い
 
 - 貼り付けた文章・読み込んだファイルは、**ブラウザ内（Web Worker）で解析し、外部へ送信しません**。
-- 外部から読み込むライブラリ（cdn.jsdelivr.net、バージョン固定）：pdf.js（pdfjs-dist 6.1.200）、Mammoth.js 1.12.0、html-docx-js 0.3.1。Kuromoji.js と辞書（`dict/`）、PDF 用 CMap（`cmaps/`）はリポジトリに同梱しています。
+- 外部から読み込むライブラリ（cdn.jsdelivr.net、バージョン固定）：pdf.js（pdfjs-dist 6.4.299）、Mammoth.js 1.13.0、html-docx-js 0.3.1。Kuromoji.js と辞書（`dict/`）、PDF 用 CMap（`cmaps/`）はリポジトリに同梱しています。
 - カスタム辞書はブラウザの localStorage に保存します（端末の外には出ません）。
 - 下記の FastAPI バックエンドは任意機能で、公開版では無効です（`js/app.js` の `API_BASE` が空）。有効にすると 5,000 字を超える本文がそのサーバーへ送られるため、有効にする場合はこの節を更新してください。無効であることはテスト（`tests/privacy.test.js`）で確認しています。
 
