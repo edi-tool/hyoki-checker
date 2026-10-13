@@ -9,28 +9,31 @@
     {
       "id": "company",
       "label": "新聞表記",
+      "description": "既定の基準。平仮名で書く語・送り仮名・単位・教育用語など",
       "paths": [
         "packs/company/rules-01.json",
         "packs/company/rules-02.json",
         "packs/company/rules-03.json",
-        "packs/company/rules-04.json"
+        "packs/company/rules-04.json",
+        "packs/company/rules-05.json"
       ],
       "priority": 300,
       "defaultEnabled": true,
       "source": {
         "pack": "company",
-        "title": "hyoki-checker existing default dictionary",
+        "title": "表記統一さん 既定辞書（新聞表記）",
         "url": "https://github.com/edi-tool/hyoki-checker",
         "license": "MIT",
         "attribution": "hyoki-checker contributors",
         "retrievedAt": "2026-07-14",
         "modified": true,
-        "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+        "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
       }
     },
     {
       "id": "jtf-3.0",
       "label": "JTF 3.0",
+      "description": "JTF日本語標準スタイルガイドから。カタカナ語末の長音など",
       "path": "packs/jtf-3.0/rules.json",
       "priority": 200,
       "defaultEnabled": false
@@ -38,6 +41,7 @@
     {
       "id": "bunka-official",
       "label": "文化庁・公用文",
+      "description": "「公用文作成の考え方」から。読点・「か所」など",
       "path": "packs/bunka/rules.json",
       "priority": 200,
       "defaultEnabled": false
@@ -45,6 +49,7 @@
     {
       "id": "consistency-only",
       "label": "文書内統一のみ",
+      "description": "正誤は決めず、文書内での混在だけを知らせる",
       "path": "packs/consistency-only/rules.json",
       "priority": 100,
       "defaultEnabled": false

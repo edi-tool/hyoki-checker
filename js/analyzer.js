@@ -44,12 +44,148 @@ function ruleVariants(input) {
  * @returns {{ group: string[], recommended: string, counts: {word:string, count:number}[], others: string[] }[]}
  */
 function analyze(text, dict) {
+  return analyzeText(text, dict);
+}
+
+/**
+ * analyze / analyzeAsync 共通の本体。行末で切れた語をつないだ解析用テキストで照合し、
+ * 検出位置は元テキストの位置へ戻して返す。
+ * @param {string} text
+ * @param {object[]} dict
+ * @param {Set<number>|null} [boundarySet] 解析用テキスト上の形態素境界
+ */
+function analyzeText(text, dict, boundarySet = null) {
+  const view = buildAnalysisView(text);
   const results = [];
   for (const group of dict) {
-    const r = analyzeGroup(text, group);
-    if (r) results.push(r);
+    const r = analyzeGroup(view.text, group, boundarySet);
+    if (r) results.push(remapResult(r, view));
   }
   return results;
+}
+
+// ---- 行またぎの連結 ----
+
+// 和文の途中に入った改行（PDF の行末・固定幅で折り返したテキスト）。前後がどちらも
+// 漢字・かな・長音のときだけ「語の途中かもしれない改行」とみなす。句読点やかっこで
+// 終わる行、空行（段落の区切り）、欧文の行は対象外。
+const _LINE_JOIN =
+  /(?<=[\p{sc=Han}\p{sc=Hiragana}\p{sc=Katakana}ー々])\r?\n(?=[\p{sc=Han}\p{sc=Hiragana}\p{sc=Katakana}ー々])/gu;
+
+/**
+ * 行末で切れた語（例「気づ⏎いた」）も照合できるよう、和文中の改行を取り除いた
+ * 解析用テキストを作る。cuts は「解析用テキストのどの位置で何文字取り除いたか」。
+ * @param {string} text
+ * @returns {{text: string, cutAt: number[], cutTotal: number[]}}
+ */
+function buildAnalysisView(text) {
+  const cutAt = []; // 解析用テキスト上の位置（この位置の直前で改行を取り除いた）
+  const cutTotal = []; // その時点までに取り除いた文字数の累計
+  if (!text.includes("\n")) return { text, cutAt, cutTotal };
+  let flat = "";
+  let last = 0;
+  let removed = 0;
+  _LINE_JOIN.lastIndex = 0;
+  let m;
+  while ((m = _LINE_JOIN.exec(text)) !== null) {
+    flat += text.slice(last, m.index);
+    removed += m[0].length;
+    cutAt.push(flat.length);
+    cutTotal.push(removed);
+    last = m.index + m[0].length;
+  }
+  flat += text.slice(last);
+  return { text: flat, cutAt, cutTotal };
+}
+
+/** 解析用テキスト上の位置 index より前（index を含む）で取り除いた文字数。 */
+function _removedUpTo(view, index) {
+  let lo = 0;
+  let hi = view.cutAt.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (view.cutAt[mid] <= index) lo = mid + 1;
+    else hi = mid;
+  }
+  return lo === 0 ? 0 : view.cutTotal[lo - 1];
+}
+
+/** 検出位置を元テキストの位置へ戻す（語の途中の改行は範囲に含める）。 */
+function remapResult(result, view) {
+  if (view.cutAt.length === 0) return result;
+  for (const occurrence of result.occurrences) {
+    const lastChar = occurrence.end - 1;
+    occurrence.start += _removedUpTo(view, occurrence.start);
+    occurrence.end = lastChar + _removedUpTo(view, lastChar) + 1;
+  }
+  return result;
+}
+
+// ---- 活用語尾 ----
+
+// inflect を指定したルールは、辞書形（variants）から語幹を取り、語幹 + 下の語尾で照合する。
+// これにより「気づく」のルールで「気づいた・気づき・気づかない」も検出できる。
+const INFLECTION_ENDINGS = {
+  "godan-ku": ["か", "き", "く", "け", "こ", "い"],
+  "godan-gu": ["が", "ぎ", "ぐ", "げ", "ご", "い"],
+  "godan-su": ["さ", "し", "す", "せ", "そ"],
+  "godan-tsu": ["た", "ち", "つ", "て", "と", "っ"],
+  "godan-bu": ["ば", "び", "ぶ", "べ", "ぼ", "ん"],
+  "godan-mu": ["ま", "み", "む", "め", "も", "ん"],
+  "godan-ru": ["ら", "り", "る", "れ", "ろ", "っ"],
+  "godan-u": ["わ", "い", "う", "え", "お", "っ"],
+  // 一段: 語幹の直後に来る主な形だけ（「出来事」のような別語を拾わないため）
+  ichidan: [
+    "る",
+    "れ",
+    "ろ",
+    "よ",
+    "た",
+    "て",
+    "な",
+    "ま",
+    "ず",
+    "ぬ",
+    "ら",
+    "さ",
+  ],
+  // 一段のうち、語幹だけで別語と紛れないもの（「現われ」「ふまえ」など）。後続を問わない
+  "ichidan-any": [""],
+  "i-adj": ["い", "く", "かっ", "けれ", "かろ"],
+};
+
+// 各活用型の辞書形の語尾（ルール検証で variants の末尾と突き合わせる）
+const INFLECTION_DICT_ENDING = {
+  "godan-ku": "く",
+  "godan-gu": "ぐ",
+  "godan-su": "す",
+  "godan-tsu": "つ",
+  "godan-bu": "ぶ",
+  "godan-mu": "む",
+  "godan-ru": "る",
+  "godan-u": "う",
+  ichidan: "る",
+  "ichidan-any": "る",
+  "i-adj": "い",
+};
+
+const _HAN_CHAR = /^[\p{sc=Han}々]$/u;
+
+function _escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function _isLatinLetter(ch) {
+  return /^[A-Za-z\uFF21-\uFF3A\uFF41-\uFF5A]$/.test(ch || "");
+}
+
+/** 置換文字列中の $1〜$99・$&・$$ を、一致結果から展開する。 */
+function _expandReplacement(template, match) {
+  return template.replace(/\$(\$|&|\d{1,2})/g, (_, key) => {
+    if (key === "$") return "$";
+    if (key === "&") return match[0];
+    return match[Number(key)] ?? "";
+  });
 }
 
 /**
@@ -86,8 +222,10 @@ function analyzeGroup(text, group, boundarySet = null) {
       }
       // prh の regexpMustEmpty 相当：指定グループが空のときだけ指摘する
       if (rule.mustEmpty && match[rule.mustEmpty]) continue;
+      // 一致した文字列だけで正規表現をかけ直すと、前後を見る条件（後読み・先読み）が
+      // 成り立たなくなるため、一致結果から置換文字列を組み立てる
       const replacement = rule.replacement
-        ? match[0].replace(new RegExp(rule.pattern, "u"), rule.replacement)
+        ? _expandReplacement(rule.replacement, match)
         : rule.preferred;
       occurrences.push({
         word: match[0],
@@ -114,34 +252,111 @@ function analyzeGroup(text, group, boundarySet = null) {
   );
   if (validGroup.length < 2) return null;
 
-  // 長い語を優先する交替パターンで1パス走査してカウント
-  const countMap = new Map(validGroup.map((w) => [w, 0]));
-  const sortedWords = [...validGroup].sort((a, b) => b.length - a.length);
-  const escapedWords = sortedWords.map((w) =>
-    w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+  // 活用するルールは語幹 + 活用語尾、しないルールは語そのもので照合する
+  const inflect = INFLECTION_ENDINGS[rule.inflect] ? rule.inflect : null;
+  const alternatives = validGroup.map((word) => {
+    if (!inflect || word.length < 2) {
+      return {
+        word,
+        stem: null,
+        length: word.length,
+        source: _escapeRegExp(word),
+      };
+    }
+    const stem = word.slice(0, -1);
+    const endings = [...INFLECTION_ENDINGS[inflect]]
+      .sort((a, b) => b.length - a.length)
+      .map(_escapeRegExp)
+      .join("|");
+    return {
+      word,
+      stem,
+      length: stem.length,
+      source: _escapeRegExp(stem) + (endings ? `(?:${endings})` : ""),
+      singleKanjiVerbStem: inflect.startsWith("godan-") && _HAN_CHAR.test(stem),
+    };
+  });
+  // 長い語（語幹）を優先する交替パターンで1パス走査してカウント
+  alternatives.sort((a, b) => b.length - a.length);
+  // 例外語（別の語として読み飛ばすもの。例「プレゼン」のルールに対する「プレゼント」）は
+  // 先頭に置き、一致しても数えずに文字だけ消費する
+  const exceptions = (rule.exceptions || [])
+    .filter((w) => typeof w === "string" && w.trim().length > 0)
+    .sort((a, b) => b.length - a.length)
+    .map(_escapeRegExp);
+  const scanRegex = new RegExp(
+    [
+      ...(exceptions.length ? [`(?:${exceptions.join("|")})`] : []),
+      ...alternatives.map((item) => `(${item.source})`),
+    ].join("|"),
+    "g",
   );
-  const scanRegex = new RegExp(`(${escapedWords.join("|")})`, "g");
+  const preferredStem =
+    inflect && rule.preferred && validGroup.includes(rule.preferred)
+      ? rule.preferred.slice(0, -1)
+      : null;
+
+  const countMap = new Map(validGroup.map((w) => [w, 0]));
+  const formsMap = new Map();
   const occurrences = [];
   let m;
   while ((m = scanRegex.exec(text)) !== null) {
-    // 形態素境界が与えられた場合、語境界に整合しない部分一致を除外
+    if (!m[0]) {
+      scanRegex.lastIndex++;
+      continue;
+    }
+    const alternative = alternatives.find((_, i) => m[i + 1] !== undefined);
+    if (!alternative) continue; // 例外語
+    const start = m.index;
+    const end = start + m[0].length;
+    // 英字で始まる・終わる語は、英単語の途中に一致したものを除外（例「g」と Google）
     if (
-      boundarySet &&
-      !(boundarySet.has(m.index) && boundarySet.has(m.index + m[0].length))
+      (_isLatinLetter(m[0][0]) && _isLatinLetter(text[start - 1])) ||
+      (_isLatinLetter(m[0][m[0].length - 1]) && _isLatinLetter(text[end]))
     )
       continue;
-    countMap.set(m[0], countMap.get(m[0]) + 1);
-    occurrences.push({
-      word: m[0],
-      start: m.index,
-      end: m.index + m[0].length,
-    });
+    // 語幹が漢字 1 字の五段動詞（落す・分る・持つ など）は、直前も漢字なら
+    // 熟語＋語尾（欠落し・自分ら・気持ち）とみなして除外する
+    if (
+      alternative.singleKanjiVerbStem &&
+      _HAN_CHAR.test(text[start - 1] || "")
+    )
+      continue;
+    // 形態素境界が与えられた場合、語境界に整合しない部分一致を除外。
+    // 活用形は語尾の途中で終わることがあるため、開始位置だけを確かめる
+    if (
+      boundarySet &&
+      !(
+        boundarySet.has(start) &&
+        (alternative.stem !== null || boundarySet.has(end))
+      )
+    )
+      continue;
+    const word = alternative.word;
+    countMap.set(word, countMap.get(word) + 1);
+    const occurrence = { word, start, end };
+    if (alternative.stem !== null) {
+      occurrence.surface = m[0];
+      if (!formsMap.has(word)) formsMap.set(word, new Set());
+      formsMap.get(word).add(m[0]);
+      // 語幹だけを基準表記のものへ差し替える（例「気づいた」→「気付いた」）
+      if (preferredStem !== null && word !== rule.preferred) {
+        occurrence.replacement =
+          preferredStem + m[0].slice(alternative.stem.length);
+      }
+    }
+    occurrences.push(occurrence);
   }
 
   // 辞書順インデックス（同数時の決定的なタイブレークに使用）
   const orderIndex = new Map(validGroup.map((w, i) => [w, i]));
   const found = validGroup
-    .map((word) => ({ word, count: countMap.get(word) }))
+    .map((word) => ({
+      word,
+      count: countMap.get(word),
+      // 活用するルールでは、実際に出てきた形を添える（辞書形だけでは原文と対応しないため）
+      ...(formsMap.has(word) ? { forms: [...formsMap.get(word)] } : {}),
+    }))
     .filter((c) => c.count > 0);
   if (found.length === 0) return null;
 
@@ -521,14 +736,17 @@ function fuzzyAnalyze(text, dict, maxDistance = 1) {
  * @param {number} chunkSize
  * @returns {Promise<{ group: string[], recommended: string, counts: {word:string, count:number}[], others: string[] }[]>}
  */
-async function analyzeAsync(text, dict, chunkSize = 50, boundarySet = null) {
+async function analyzeAsync(text, dict, chunkSize = 50, boundaryAware = false) {
+  // analyzeText() と同じ解析用テキスト（行またぎを連結したもの）を使う
+  const view = buildAnalysisView(text);
+  const boundarySet = boundaryAware ? buildBoundarySet(view.text) : null;
   const results = [];
   for (let i = 0; i < dict.length; i += chunkSize) {
     const chunk = dict.slice(i, i + chunkSize);
     for (const group of chunk) {
       // analyze() と同一ロジックを共有し、結果のブレを防ぐ
-      const r = analyzeGroup(text, group, boundarySet);
-      if (r) results.push(r);
+      const r = analyzeGroup(view.text, group, boundarySet);
+      if (r) results.push(remapResult(r, view));
     }
     await new Promise((r) => setTimeout(r, 0));
   }
@@ -592,68 +810,103 @@ function isKuromojiReady() {
  * @param {string[][]} dict
  * @returns {{ group: string[], recommendedWord: string, foundBases: { base: string, word: string, count: number, surfaces: string[] }[] }[]}
  */
+// 辞書の語 → 基本形（同じ語を解析のたびに形態素解析し直さないためのキャッシュ）
+const _baseFormCache = new Map();
+
+/** 1 形態素の語なら基本形を、複数形態素に分かれる語なら null を返す。 */
+function _singleTokenBaseForm(word) {
+  if (!_baseFormCache.has(word)) {
+    const wt = _tokenizer.tokenize(word);
+    const bf = wt.length === 1 ? wt[0].basic_form : null;
+    _baseFormCache.set(word, bf && bf !== "*" ? bf : null);
+  }
+  return _baseFormCache.get(word);
+}
+
 function kuromojiAnalyze(text, dict) {
   if (!_tokenizer) return [];
 
-  const tokens = _tokenizer.tokenize(text);
-  const results = [];
-
+  // 1. ルールごとに「基本形 → 辞書の語」を作り、基本形から引ける索引にまとめる
+  const entries = [];
+  const baseIndex = new Map();
   for (const group of dict) {
-    const words = ruleVariants(group);
-    if (words.length === 0) continue;
-
-    // 【追加】安全対策：空文字を除外
-    const validGroup = words.filter(
+    const rule = normalizeAnalysisRule(group);
+    // 正規表現ルールの variants は表示用の代表例で、語そのものではない
+    if (!rule || rule.type === "pattern") continue;
+    const validGroup = rule.variants.filter(
       (w) => typeof w === "string" && w.trim().length > 0,
     );
     if (validGroup.length < 2) continue;
-
     const baseToWord = new Map();
     for (const word of validGroup) {
-      const wt = _tokenizer.tokenize(word);
-      const bf = wt[0]?.basic_form;
-      if (bf && bf !== "*" && !baseToWord.has(bf)) {
-        baseToWord.set(bf, word);
-      }
+      // 1 形態素の語だけを対象にする。「身に付ける」のような複数形態素の語を先頭の
+      // 「身」で代表させると、無関係な「身」をすべて数えてしまう
+      const bf = _singleTokenBaseForm(word);
+      if (bf && !baseToWord.has(bf)) baseToWord.set(bf, word);
     }
-
     if (baseToWord.size < 2) continue;
-
-    const foundBases = new Map();
-    for (const token of tokens) {
-      const bf = token.basic_form;
-      if (!bf || bf === "*" || !baseToWord.has(bf)) continue;
-      if (!foundBases.has(bf))
-        foundBases.set(bf, { count: 0, surfaces: new Set() });
-      foundBases.get(bf).count++;
-      foundBases.get(bf).surfaces.add(token.surface_form);
+    const index =
+      entries.push({ rule, validGroup, baseToWord, found: new Map() }) - 1;
+    for (const bf of baseToWord.keys()) {
+      if (!baseIndex.has(bf)) baseIndex.set(bf, []);
+      baseIndex.get(bf).push(index);
     }
+  }
+  if (entries.length === 0) return [];
 
-    if (foundBases.size < 2) continue;
+  // 2. 本文を 1 回だけ走査し、該当する基本形の出現位置を集める
+  for (const token of _tokenizer.tokenize(text)) {
+    const targets = baseIndex.get(token.basic_form);
+    if (!targets || typeof token.word_position !== "number") continue;
+    const start = token.word_position - 1; // word_position は 1 始まり
+    const end = start + token.surface_form.length;
+    for (const index of targets) {
+      const found = entries[index].found;
+      if (!found.has(token.basic_form))
+        found.set(token.basic_form, {
+          count: 0,
+          surfaces: new Set(),
+          occurrences: [],
+        });
+      const data = found.get(token.basic_form);
+      data.count++;
+      data.surfaces.add(token.surface_form);
+      data.occurrences.push({ start, end });
+    }
+  }
 
-    const sorted = [...foundBases.entries()].sort(
-      (a, b) => b[1].count - a[1].count,
-    );
-
+  // 3. 2 種類以上の表記が混在しているルールだけを結果にする
+  const results = [];
+  for (const { rule, validGroup, baseToWord, found } of entries) {
+    if (found.size < 2) continue;
+    const sorted = [...found.entries()].sort((a, b) => b[1].count - a[1].count);
     results.push({
+      ruleId: rule.id,
       group: validGroup,
-      recommendedWord: baseToWord.get(sorted[0][0]),
+      // 基準表記（辞書の先頭）があればそれを、なければ最多の表記を示す
+      preferred: rule.preferred || null,
+      recommendedWord: rule.preferred || baseToWord.get(sorted[0][0]),
+      reason: rule.reason || "",
       foundBases: sorted.map(([bf, data]) => ({
         base: bf,
         word: baseToWord.get(bf),
         count: data.count,
         surfaces: [...data.surfaces],
+        occurrences: data.occurrences,
       })),
     });
   }
-
   return results;
 }
 
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     analyze,
+    analyzeText,
     analyzeGroup,
+    buildAnalysisView,
+    INFLECTION_ENDINGS,
+    INFLECTION_DICT_ENDING,
     normalizeAnalysisRule,
     ruleVariants,
     buildHighlightedHTML,

@@ -5,303 +5,324 @@ const GENERATED_RULES = {
     {
       "id": "company",
       "label": "新聞表記",
+      "description": "既定の基準。平仮名で書く語・送り仮名・単位・教育用語など",
       "paths": [
         "packs/company/rules-01.json",
         "packs/company/rules-02.json",
         "packs/company/rules-03.json",
-        "packs/company/rules-04.json"
+        "packs/company/rules-04.json",
+        "packs/company/rules-05.json"
       ],
       "priority": 300,
       "defaultEnabled": true,
       "source": {
         "pack": "company",
-        "title": "hyoki-checker existing default dictionary",
+        "title": "表記統一さん 既定辞書（新聞表記）",
         "url": "https://github.com/edi-tool/hyoki-checker",
         "license": "MIT",
         "attribution": "hyoki-checker contributors",
         "retrievedAt": "2026-07-14",
         "modified": true,
-        "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+        "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
       },
       "rules": [
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "補助動詞の「いく」は平仮名で書く。実際にその場所へ移動する意味の「行く」は漢字のままでよい。",
           "id": "company.0001",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "～ていく",
           "variants": [
             "～ていく",
             "～て行く"
           ],
+          "pattern": "(?:(?<!やっ|持っ|連れ|帰っ|戻っ|入っ|走っ|歩い|買っ|取っ|借り|集まっ|出|見)て|(?<!飛|運|呼)んで)行(?=[かきくけこ])",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "補助動詞の「くる」は平仮名で書く。実際にこちらへ移動する意味の「来る」は漢字のままでよい。",
           "id": "company.0002",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "～てくる",
           "variants": [
             "～てくる",
             "～て来る"
           ],
+          "pattern": "(?:(?<!やっ|持っ|連れ|帰っ|戻っ|入っ|走っ|歩い|買っ|取っ|借り|集まっ|出|見)て|(?<!飛|運|呼)んで)来(?=[るれたてなまいよず])",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "「試しに～する」の意味の補助動詞「みる」は平仮名で書く。実際に目で見る意味なら漢字のままでよい。",
           "id": "company.0003",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "～てみる",
           "variants": [
             "～てみる",
             "～て見る"
           ],
+          "pattern": "(?:やっ|考え|書い|試し|使っ|調べ|作っ|食べ|触っ|言っ|話し|聞い|読ん|解い|描い|歌っ|遊ん|数え|確かめ|取り組ん|挑戦し|体験し|実践し)[てで]見(?=[るたてなまよ])(?!た目)",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "補助動詞の「おく」は平仮名で書く。実際に物を置く意味なら漢字のままでよい。",
           "id": "company.0004",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "～ておく",
           "variants": [
             "～ておく",
             "～て置く"
           ],
+          "pattern": "(?:覚え|考え|決め|言っ|知っ|伝え|調べ|読ん|やっ|見|聞い|押さえ|踏まえ|準備し|用意し|確認し|予習し|復習し|把握し|理解し|整理し|共有し|説明し|連絡し|記録し)[てで]置(?=[かきくけこい])",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "補助動詞の「しまう」は平仮名で書く。",
           "id": "company.0005",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "～てしまう",
           "variants": [
             "～てしまう",
             "～て仕舞う"
           ],
+          "pattern": "(?:て|んで)仕舞(?=[わいうえおっ])",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "「かもしれない」は平仮名で書く。",
           "id": "company.0006",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "～かもしれない",
           "variants": [
             "～かもしれない",
             "～かも知れない"
           ],
+          "pattern": "かも知れ",
+          "replacement": "かもしれ",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "形式名詞の「ため」は平仮名で書く（行為・為替などの語は対象外）。",
           "id": "company.0007",
-          "type": "preferred",
-          "preferred": "～のために",
+          "type": "pattern",
+          "preferred": "ため",
           "variants": [
-            "～のために",
-            "～の為に"
+            "ため",
+            "為"
           ],
+          "pattern": "(?<=\\p{sc=Hiragana})為(?![すしさせ替る])",
+          "replacement": "ため",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "「～の場合」の意味の形式名詞は「とき」と書く。時点・時刻そのものを指す場合は「時」のままでよい。",
           "id": "company.0008",
-          "type": "preferred",
-          "preferred": "～のとき",
+          "type": "pattern",
+          "preferred": "とき",
           "variants": [
-            "～のとき",
-            "～の時"
+            "とき",
+            "時"
           ],
+          "pattern": "(?<=[るたいだなのうくすつぬむぶぐ])時(?=[にはもの、。でだ]|まで|から|こそ|など|って|$)",
+          "replacement": "とき",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "形式名詞の「ところ」は平仮名で書く。具体的な場所を指す場合は「所」のままでよい。",
           "id": "company.0009",
-          "type": "preferred",
-          "preferred": "～ところ",
+          "type": "pattern",
+          "preferred": "ところ",
           "variants": [
-            "～ところ",
-            "～所"
+            "ところ",
+            "所"
           ],
+          "pattern": "(?<=[たるいだ])所(?=[、。でがにはをもだ])",
+          "replacement": "ところ",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "接続詞の「ゆえに」は平仮名で書く（事故・縁故などの語は対象外）。",
           "id": "company.0010",
-          "type": "preferred",
-          "preferred": "～ゆえに",
+          "type": "pattern",
+          "preferred": "ゆえに",
           "variants": [
-            "～ゆえに",
-            "～故に"
+            "ゆえに",
+            "故に"
           ],
+          "pattern": "(?<!\\p{sc=Han})故に",
+          "replacement": "ゆえに",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "「～のとおり」「～したとおり」は平仮名で書く。道の意味の「通り」は漢字のままでよい。",
           "id": "company.0011",
-          "type": "preferred",
-          "preferred": "～とおり",
+          "type": "pattern",
+          "preferred": "とおり",
           "variants": [
-            "～とおり",
-            "～通り"
+            "とおり",
+            "通り"
           ],
+          "pattern": "(?<=[のたるう])通り(?![\\p{sc=Han}ぬすがかま])",
+          "replacement": "とおり",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "接尾語の「ごと」は平仮名で書く（毎日・毎回などの語は対象外）。",
           "id": "company.0012",
-          "type": "preferred",
-          "preferred": "～ごと",
+          "type": "pattern",
+          "preferred": "ごと",
           "variants": [
-            "～ごと",
-            "～毎"
+            "ごと",
+            "毎"
           ],
+          "pattern": "(?<=[\\p{sc=Han}\\p{sc=Hiragana}\\p{sc=Katakana}0-9０-９ー])毎(?=[にの、。])",
+          "replacement": "ごと",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0013",
           "type": "preferred",
           "preferred": "よろしく",
@@ -314,40 +335,42 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "補助動詞の「いたす」は平仮名で書く（一致・合致などの語は対象外）。",
           "id": "company.0014",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "いたします",
           "variants": [
             "いたします",
             "致します"
           ],
+          "pattern": "(?<![一合招誘拉馴極筆風雅])致(しま(?:す|した|して|せん)|して|し|す|さ|せ)",
+          "replacement": "いた$1",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0015",
           "type": "preferred",
           "preferred": "いただく",
@@ -355,22 +378,23 @@ const GENERATED_RULES = {
             "いただく",
             "頂く"
           ],
+          "inflect": "godan-ku",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0016",
           "type": "preferred",
           "preferred": "ください",
@@ -383,17 +407,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0017",
           "type": "preferred",
           "preferred": "誠に",
@@ -406,17 +430,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0018",
           "type": "preferred",
           "preferred": "おかげさまで",
@@ -430,17 +454,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0019",
           "type": "preferred",
           "preferred": "および",
@@ -448,22 +472,27 @@ const GENERATED_RULES = {
             "および",
             "及び"
           ],
+          "exceptions": [
+            "及びま",
+            "及び腰",
+            "及びもつ"
+          ],
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0020",
           "type": "preferred",
           "preferred": "または",
@@ -476,17 +505,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0021",
           "type": "preferred",
           "preferred": "かつ",
@@ -499,40 +528,42 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "接続詞の「したがって」は平仮名で書く。動詞の「～に従って」は対象外。",
           "id": "company.0022",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "したがって",
           "variants": [
             "したがって",
             "従って"
           ],
+          "pattern": "(?<!に)従って",
+          "replacement": "したがって",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0023",
           "type": "preferred",
           "preferred": "ならびに",
@@ -545,17 +576,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0024",
           "type": "preferred",
           "preferred": "なぜ",
@@ -568,40 +599,42 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "副詞の「ぜひ」は平仮名で書く。名詞の「是非（を問う）」は対象外。",
           "id": "company.0025",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "ぜひ",
           "variants": [
             "ぜひ",
             "是非"
           ],
+          "pattern": "是非(?![をのがはにも論])",
+          "replacement": "ぜひ",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0026",
           "type": "preferred",
           "preferred": "あらかじめ",
@@ -614,17 +647,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0027",
           "type": "preferred",
           "preferred": "かつて",
@@ -637,17 +670,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0028",
           "type": "preferred",
           "preferred": "すでに",
@@ -660,17 +693,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0029",
           "type": "preferred",
           "preferred": "まず",
@@ -683,40 +716,42 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "副詞の「さらに」は平仮名で書く（「変更に」などは対象外）。",
           "id": "company.0030",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "さらに",
           "variants": [
             "さらに",
             "更に"
           ],
+          "pattern": "(?<!\\p{sc=Han})更に",
+          "replacement": "さらに",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0031",
           "type": "preferred",
           "preferred": "すべて",
@@ -729,17 +764,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0032",
           "type": "preferred",
           "preferred": "ほとんど",
@@ -752,17 +787,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0033",
           "type": "preferred",
           "preferred": "いまだ",
@@ -775,17 +810,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0034",
           "type": "preferred",
           "preferred": "きわめて",
@@ -798,17 +833,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0035",
           "type": "preferred",
           "preferred": "できる",
@@ -816,45 +851,23 @@ const GENERATED_RULES = {
             "できる",
             "出来る"
           ],
+          "inflect": "ichidan",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
-          "id": "company.0036",
-          "type": "preferred",
-          "preferred": "する",
-          "variants": [
-            "する",
-            "為る"
-          ],
-          "category": "legacy",
-          "severity": "warning",
-          "fixMode": "confirm",
-          "source": {
-            "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
-            "url": "https://github.com/edi-tool/hyoki-checker",
-            "license": "MIT",
-            "attribution": "hyoki-checker contributors",
-            "retrievedAt": "2026-07-14",
-            "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
-          }
-        },
-        {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0037",
           "type": "preferred",
           "preferred": "わかる",
@@ -865,22 +878,66 @@ const GENERATED_RULES = {
             "判る",
             "解る"
           ],
+          "inflect": "godan-ru",
+          "exceptions": [
+            "分かれる",
+            "分かれて",
+            "分かれた",
+            "分かれま",
+            "分かれな",
+            "分かれ目",
+            "分かれ道",
+            "分かれ、",
+            "分れ",
+            "自分",
+            "半分",
+            "気分",
+            "部分",
+            "多分",
+            "十分",
+            "随分",
+            "大分",
+            "何分",
+            "存分",
+            "当分",
+            "幾分",
+            "余分",
+            "時分",
+            "性分",
+            "身分",
+            "処分",
+            "親分",
+            "子分",
+            "水分",
+            "成分",
+            "養分",
+            "塩分",
+            "糖分",
+            "節分",
+            "等分",
+            "配分",
+            "区分",
+            "通分",
+            "約分",
+            "言い分",
+            "取り分"
+          ],
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0038",
           "type": "preferred",
           "preferred": "よい",
@@ -890,22 +947,23 @@ const GENERATED_RULES = {
             "好い",
             "善い"
           ],
+          "inflect": "i-adj",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0039",
           "type": "preferred",
           "preferred": "よさ",
@@ -918,17 +976,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "興味・関心・自信・考えなど抽象的なものには「もつ」を使う。物を手に持つ場合は「持つ」のままでよい。",
           "id": "company.0040",
           "type": "preferred",
           "preferred": "もつ",
@@ -936,22 +994,57 @@ const GENERATED_RULES = {
             "もつ",
             "持つ"
           ],
+          "inflect": "godan-tsu",
+          "exceptions": [
+            "気持ち",
+            "持ち物",
+            "持ち味",
+            "持ち主",
+            "持ち場",
+            "持ち前",
+            "持ち手",
+            "持ち方",
+            "持ち時間",
+            "持ち帰",
+            "持ち上",
+            "持ち込",
+            "持ち運",
+            "持ち出",
+            "持ち寄",
+            "持ち回",
+            "持ち越",
+            "持ち合",
+            "持ち歩",
+            "持ちこた",
+            "金持ち",
+            "力持ち",
+            "手持ち",
+            "長持ち",
+            "面持ち",
+            "心持ち",
+            "日持ち",
+            "受け持",
+            "取り持",
+            "掛け持",
+            "子持ち",
+            "所持"
+          ],
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0041",
           "type": "preferred",
           "preferred": "ない",
@@ -959,22 +1052,23 @@ const GENERATED_RULES = {
             "ない",
             "無い"
           ],
+          "inflect": "i-adj",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0042",
           "type": "preferred",
           "preferred": "十分",
@@ -987,17 +1081,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0043",
           "type": "preferred",
           "preferred": "いえる",
@@ -1005,22 +1099,23 @@ const GENERATED_RULES = {
             "いえる",
             "言える"
           ],
+          "inflect": "ichidan",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0044",
           "type": "preferred",
           "preferred": "表す",
@@ -1028,22 +1123,23 @@ const GENERATED_RULES = {
             "表す",
             "表わす"
           ],
+          "inflect": "godan-su",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0045",
           "type": "preferred",
           "preferred": "現れる",
@@ -1051,22 +1147,23 @@ const GENERATED_RULES = {
             "現れる",
             "現われる"
           ],
+          "inflect": "ichidan-any",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0046",
           "type": "preferred",
           "preferred": "断る",
@@ -1074,22 +1171,23 @@ const GENERATED_RULES = {
             "断る",
             "断わる"
           ],
+          "inflect": "godan-ru",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0047",
           "type": "preferred",
           "preferred": "終わる",
@@ -1097,22 +1195,23 @@ const GENERATED_RULES = {
             "終わる",
             "終る"
           ],
+          "inflect": "godan-ru",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0048",
           "type": "preferred",
           "preferred": "変わる",
@@ -1120,22 +1219,23 @@ const GENERATED_RULES = {
             "変わる",
             "変る"
           ],
+          "inflect": "godan-ru",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0049",
           "type": "preferred",
           "preferred": "代わる",
@@ -1143,22 +1243,23 @@ const GENERATED_RULES = {
             "代わる",
             "代る"
           ],
+          "inflect": "godan-ru",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0050",
           "type": "preferred",
           "preferred": "行う",
@@ -1167,22 +1268,23 @@ const GENERATED_RULES = {
             "行なう",
             "おこなう"
           ],
+          "inflect": "godan-u",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0051",
           "type": "preferred",
           "preferred": "落とす",
@@ -1190,22 +1292,23 @@ const GENERATED_RULES = {
             "落とす",
             "落す"
           ],
+          "inflect": "godan-su",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0052",
           "type": "preferred",
           "preferred": "暮らす",
@@ -1213,22 +1316,23 @@ const GENERATED_RULES = {
             "暮らす",
             "暮す"
           ],
+          "inflect": "godan-su",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0053",
           "type": "preferred",
           "preferred": "もとづく",
@@ -1236,22 +1340,23 @@ const GENERATED_RULES = {
             "もとづく",
             "基づく"
           ],
+          "inflect": "godan-ku",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0054",
           "type": "preferred",
           "preferred": "もとに",
@@ -1264,19 +1369,19 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "数に続く「かげつ」は「か月」と書く。",
           "id": "company.0055",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "か月",
           "variants": [
             "か月",
@@ -1286,24 +1391,26 @@ const GENERATED_RULES = {
             "ケ月",
             "ヵ月"
           ],
+          "pattern": "(?<=[0-9０-９一二三四五六七八九十百千数何幾])[カヶケヵ箇個]月",
+          "replacement": "か月",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "数に続く「かこく」は「か国」と書く。",
           "id": "company.0056",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "か国",
           "variants": [
             "か国",
@@ -1312,24 +1419,26 @@ const GENERATED_RULES = {
             "箇国",
             "ケ国"
           ],
+          "pattern": "(?<=[0-9０-９一二三四五六七八九十百千数何幾])[カヶケヵ箇個]国",
+          "replacement": "か国",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "数に続く「かしょ」は「か所」と書く。「該当箇所」のような名詞の「箇所」は対象外。",
           "id": "company.0057",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "か所",
           "variants": [
             "か所",
@@ -1338,22 +1447,24 @@ const GENERATED_RULES = {
             "箇所",
             "ケ所"
           ],
+          "pattern": "(?<=[0-9０-９一二三四五六七八九十百千数何幾])[カヶケヵ箇個]所",
+          "replacement": "か所",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0058",
           "type": "preferred",
           "preferred": "パーセント",
@@ -1367,83 +1478,89 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "数に続く「かねん」は「か年」と書く。",
           "id": "company.0059",
-          "type": "preferred",
-          "preferred": "５か年",
+          "type": "pattern",
+          "preferred": "か年",
           "variants": [
-            "５か年",
-            "５ヵ年",
-            "５ヶ年"
+            "か年",
+            "ヵ年",
+            "ヶ年",
+            "カ年",
+            "箇年"
           ],
+          "pattern": "(?<=[0-9０-９一二三四五六七八九十百千数何幾])[カヶケヵ箇個]年",
+          "replacement": "か年",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "横書きで個数を数える場合は算用数字を使う。「一つ」は慣用的な表現（一つ一つ、何一つ など）が多いため対象外。",
           "id": "company.0060",
-          "type": "preferred",
-          "preferred": "１つ、２つ",
+          "type": "pattern",
+          "preferred": "２つ、３つ（算用数字）",
           "variants": [
-            "１つ、２つ",
-            "一つ、二つ"
+            "２つ、３つ",
+            "二つ、三つ"
           ],
+          "pattern": "(?<!\\p{sc=Han})[二三四五六七八九]つ(?=[の、。をがはにでもとず目]|$)",
           "category": "legacy",
-          "severity": "warning",
-          "fixMode": "confirm",
+          "severity": "info",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "横書きで人数を数える場合は算用数字を使う。「一人」は慣用的な表現（一人一人、一人で など）が多いため対象外。",
           "id": "company.0061",
-          "type": "preferred",
-          "preferred": "１人、２人",
+          "type": "pattern",
+          "preferred": "２人、３人（算用数字）",
           "variants": [
-            "１人、２人",
-            "一人、二人"
+            "２人、３人",
+            "二人、三人"
           ],
+          "pattern": "(?<!\\p{sc=Han})[二三四五六七八九十]人(?=[の、。をがはにでもとず]|ずつ|組|$)",
           "category": "legacy",
-          "severity": "warning",
-          "fixMode": "confirm",
+          "severity": "info",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
@@ -1462,17 +1579,17 @@ const GENERATED_RULES = {
           "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0063",
           "type": "preferred",
           "preferred": "子どもたち",
@@ -1487,17 +1604,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0064",
           "type": "preferred",
           "preferred": "一人一人",
@@ -1511,17 +1628,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0065",
           "type": "preferred",
           "preferred": "一つ一つ",
@@ -1535,17 +1652,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0066",
           "type": "preferred",
           "preferred": "在り方",
@@ -1558,40 +1675,44 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0067",
           "type": "preferred",
           "preferred": "当たって",
           "variants": [
             "当たって",
-            "あたって"
+            "あたって",
+            "当って"
+          ],
+          "exceptions": [
+            "さしあたって"
           ],
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0068",
           "type": "preferred",
           "preferred": "付ける",
@@ -1599,22 +1720,33 @@ const GENERATED_RULES = {
             "付ける",
             "つける"
           ],
+          "inflect": "ichidan",
+          "exceptions": [
+            "身につけ",
+            "くっつけ",
+            "やっつけ",
+            "かこつけ",
+            "こじつけ",
+            "しつけ",
+            "かけつけ",
+            "ぶつけ"
+          ],
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0069",
           "type": "preferred",
           "preferred": "気付く",
@@ -1622,22 +1754,23 @@ const GENERATED_RULES = {
             "気付く",
             "気づく"
           ],
+          "inflect": "godan-ku",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0070",
           "type": "preferred",
           "preferred": "身に付ける",
@@ -1645,22 +1778,23 @@ const GENERATED_RULES = {
             "身に付ける",
             "身につける"
           ],
+          "inflect": "ichidan-any",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0071",
           "type": "preferred",
           "preferred": "し合う",
@@ -1668,22 +1802,27 @@ const GENERATED_RULES = {
             "し合う",
             "しあう"
           ],
+          "inflect": "godan-u",
+          "exceptions": [
+            "しあわせ",
+            "しあさって"
+          ],
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0072",
           "type": "preferred",
           "preferred": "通して",
@@ -1696,17 +1835,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0073",
           "type": "preferred",
           "preferred": "我が国",
@@ -1719,40 +1858,41 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0074",
           "type": "preferred",
           "preferred": "取り組み",
           "variants": [
             "取り組み",
-            "取組"
+            "取組",
+            "取組み"
           ],
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0075",
           "type": "preferred",
           "preferred": "話し合い",
@@ -1765,40 +1905,46 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0076",
           "type": "preferred",
           "preferred": "関わる",
           "variants": [
             "関わる",
-            "かかわる"
+            "かかわる",
+            "係わる"
+          ],
+          "inflect": "godan-ru",
+          "exceptions": [
+            "にもかかわらず",
+            "にかかわらず"
           ],
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0077",
           "type": "preferred",
           "preferred": "育む",
@@ -1806,45 +1952,47 @@ const GENERATED_RULES = {
             "育む",
             "はぐくむ"
           ],
+          "inflect": "godan-mu",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0078",
           "type": "preferred",
-          "preferred": "踏まえて",
+          "preferred": "踏まえる",
           "variants": [
-            "踏まえて",
-            "ふまえて"
+            "踏まえる",
+            "ふまえる"
           ],
+          "inflect": "ichidan-any",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0079",
           "type": "preferred",
           "preferred": "目指す",
@@ -1852,22 +2000,23 @@ const GENERATED_RULES = {
             "目指す",
             "めざす"
           ],
+          "inflect": "godan-su",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0080",
           "type": "preferred",
           "preferred": "友達",
@@ -1880,17 +2029,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0081",
           "type": "preferred",
           "preferred": "手立て",
@@ -1903,17 +2052,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0082",
           "type": "preferred",
           "preferred": "働き",
@@ -1926,63 +2075,67 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0083",
           "type": "preferred",
           "preferred": "振り返る",
           "variants": [
             "振り返る",
-            "ふり返る"
+            "ふり返る",
+            "ふりかえる"
           ],
+          "inflect": "godan-ru",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0084",
           "type": "preferred",
           "preferred": "繰り返し",
           "variants": [
             "繰り返し",
-            "くりかえし"
+            "くりかえし",
+            "くり返し",
+            "繰返し"
           ],
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0085",
           "type": "preferred",
           "preferred": "見取る",
@@ -1990,22 +2143,26 @@ const GENERATED_RULES = {
             "見取る",
             "見とる"
           ],
+          "inflect": "godan-ru",
+          "exceptions": [
+            "見とれ"
+          ],
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0086",
           "type": "preferred",
           "preferred": "様々",
@@ -2018,17 +2175,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0087",
           "type": "preferred",
           "preferred": "例えば",
@@ -2041,40 +2198,42 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0088",
           "type": "preferred",
           "preferred": "生かす",
           "variants": [
             "生かす",
-            "いかす"
+            "いかす",
+            "活かす"
           ],
+          "inflect": "godan-su",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0089",
           "type": "preferred",
           "preferred": "皆",
@@ -2087,17 +2246,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0090",
           "type": "preferred",
           "preferred": "とらえる",
@@ -2105,68 +2264,73 @@ const GENERATED_RULES = {
             "とらえる",
             "捉える"
           ],
+          "inflect": "ichidan-any",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "形式名詞の「こと」は平仮名で書く（大事・食事・仕事などの語は対象外）。",
           "id": "company.0091",
-          "type": "preferred",
-          "preferred": "すること",
+          "type": "pattern",
+          "preferred": "こと",
           "variants": [
-            "すること",
-            "する事"
+            "こと",
+            "事"
           ],
+          "pattern": "(?<=[るたいうくすつぬむぶぐなのだ])(?<!習い|願い|笑い|争い|祝い|占い)事(?=[がをはにもでと、。]|です|だ|な[のど]|$)",
+          "replacement": "こと",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "動詞は「見いだす」と書く。名詞の「見出し（みだし）」は対象外。",
           "id": "company.0092",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "見いだす",
           "variants": [
             "見いだす",
             "見出す"
           ],
+          "pattern": "見出(す|せ|そ|さ|し(?=[たてま]))",
+          "replacement": "見いだ$1",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0093",
           "type": "preferred",
           "preferred": "ねらい",
@@ -2179,17 +2343,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0094",
           "type": "preferred",
           "preferred": "声かけ",
@@ -2202,13 +2366,13 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
@@ -2225,13 +2389,13 @@ const GENERATED_RULES = {
           "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
@@ -2248,13 +2412,13 @@ const GENERATED_RULES = {
           "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
@@ -2272,17 +2436,17 @@ const GENERATED_RULES = {
           "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0098",
           "type": "preferred",
           "preferred": "児童生徒",
@@ -2295,13 +2459,13 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
@@ -2318,13 +2482,13 @@ const GENERATED_RULES = {
           "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
@@ -2344,37 +2508,38 @@ const GENERATED_RULES = {
           "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0101",
           "type": "preferred",
-          "preferred": "つまずき",
+          "preferred": "つまずく",
           "variants": [
-            "つまずき",
-            "躓き",
-            "つまづき"
+            "つまずく",
+            "躓く",
+            "つまづく"
           ],
+          "inflect": "godan-ku",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
@@ -2392,13 +2557,13 @@ const GENERATED_RULES = {
           "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
@@ -2416,13 +2581,13 @@ const GENERATED_RULES = {
           "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
@@ -2439,13 +2604,13 @@ const GENERATED_RULES = {
           "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
@@ -2462,13 +2627,13 @@ const GENERATED_RULES = {
           "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
@@ -2487,13 +2652,13 @@ const GENERATED_RULES = {
           "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
@@ -2511,13 +2676,13 @@ const GENERATED_RULES = {
           "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
@@ -2534,13 +2699,13 @@ const GENERATED_RULES = {
           "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
@@ -2558,17 +2723,17 @@ const GENERATED_RULES = {
           "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0110",
           "type": "preferred",
           "preferred": "送り仮名",
@@ -2581,17 +2746,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0111",
           "type": "preferred",
           "preferred": "ふりがな",
@@ -2605,17 +2770,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0112",
           "type": "preferred",
           "preferred": "書き順",
@@ -2628,13 +2793,13 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
@@ -2652,36 +2817,36 @@ const GENERATED_RULES = {
           "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "学年の配当漢字や発達段階に合わせて使い分ける語。機械的には統一せず、混在している場合だけ知らせる。",
           "id": "company.0114",
-          "type": "preferred",
-          "preferred": "説明文",
+          "type": "contextual",
+          "preferred": null,
           "variants": [
             "説明文",
             "説明的な文章"
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
@@ -2698,13 +2863,13 @@ const GENERATED_RULES = {
           "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
@@ -2721,63 +2886,63 @@ const GENERATED_RULES = {
           "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "学年の配当漢字や発達段階に合わせて使い分ける語。機械的には統一せず、混在している場合だけ知らせる。",
           "id": "company.0117",
-          "type": "preferred",
-          "preferred": "修飾語",
+          "type": "contextual",
+          "preferred": null,
           "variants": [
             "修飾語",
             "くわしくする言葉"
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "学年の配当漢字や発達段階に合わせて使い分ける語。機械的には統一せず、混在している場合だけ知らせる。",
           "id": "company.0118",
-          "type": "preferred",
-          "preferred": "原稿用紙",
+          "type": "contextual",
+          "preferred": null,
           "variants": [
             "原稿用紙",
             "作文用紙"
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0119",
           "type": "preferred",
           "preferred": "ローマ字",
@@ -2790,43 +2955,43 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "学年の配当漢字や発達段階に合わせて使い分ける語。機械的には統一せず、混在している場合だけ知らせる。",
           "id": "company.0120",
-          "type": "preferred",
-          "preferred": "漢字",
+          "type": "contextual",
+          "preferred": null,
           "variants": [
             "漢字",
             "かん字"
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "学年の配当漢字や発達段階に合わせて使い分ける語。機械的には統一せず、混在している場合だけ知らせる。",
           "id": "company.0121",
-          "type": "preferred",
-          "preferred": "足し算",
+          "type": "contextual",
+          "preferred": null,
           "variants": [
             "足し算",
             "たし算",
@@ -2834,23 +2999,23 @@ const GENERATED_RULES = {
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "学年の配当漢字や発達段階に合わせて使い分ける語。機械的には統一せず、混在している場合だけ知らせる。",
           "id": "company.0122",
-          "type": "preferred",
-          "preferred": "引き算",
+          "type": "contextual",
+          "preferred": null,
           "variants": [
             "引き算",
             "ひき算",
@@ -2858,23 +3023,23 @@ const GENERATED_RULES = {
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "学年の配当漢字や発達段階に合わせて使い分ける語。機械的には統一せず、混在している場合だけ知らせる。",
           "id": "company.0123",
-          "type": "preferred",
-          "preferred": "掛け算",
+          "type": "contextual",
+          "preferred": null,
           "variants": [
             "掛け算",
             "かけ算",
@@ -2882,23 +3047,23 @@ const GENERATED_RULES = {
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "学年の配当漢字や発達段階に合わせて使い分ける語。機械的には統一せず、混在している場合だけ知らせる。",
           "id": "company.0124",
-          "type": "preferred",
-          "preferred": "割り算",
+          "type": "contextual",
+          "preferred": null,
           "variants": [
             "割り算",
             "わり算",
@@ -2906,46 +3071,46 @@ const GENERATED_RULES = {
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "学年の配当漢字や発達段階に合わせて使い分ける語。機械的には統一せず、混在している場合だけ知らせる。",
           "id": "company.0125",
-          "type": "preferred",
-          "preferred": "筆算",
+          "type": "contextual",
+          "preferred": null,
           "variants": [
             "筆算",
             "ひっ算"
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "学年の配当漢字や発達段階に合わせて使い分ける語。機械的には統一せず、混在している場合だけ知らせる。",
           "id": "company.0126",
-          "type": "preferred",
-          "preferred": "繰り上がり",
+          "type": "contextual",
+          "preferred": null,
           "variants": [
             "繰り上がり",
             "くり上がり",
@@ -2953,23 +3118,23 @@ const GENERATED_RULES = {
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "学年の配当漢字や発達段階に合わせて使い分ける語。機械的には統一せず、混在している場合だけ知らせる。",
           "id": "company.0127",
-          "type": "preferred",
-          "preferred": "繰り下がり",
+          "type": "contextual",
+          "preferred": null,
           "variants": [
             "繰り下がり",
             "くり下がり",
@@ -2977,23 +3142,23 @@ const GENERATED_RULES = {
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "学年の配当漢字や発達段階に合わせて使い分ける語。機械的には統一せず、混在している場合だけ知らせる。",
           "id": "company.0128",
-          "type": "preferred",
-          "preferred": "文章題",
+          "type": "contextual",
+          "preferred": null,
           "variants": [
             "文章題",
             "文章問題",
@@ -3001,68 +3166,68 @@ const GENERATED_RULES = {
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "学年の配当漢字や発達段階に合わせて使い分ける語。機械的には統一せず、混在している場合だけ知らせる。",
           "id": "company.0129",
-          "type": "preferred",
-          "preferred": "図形",
+          "type": "contextual",
+          "preferred": null,
           "variants": [
             "図形",
             "かたち"
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "学年の配当漢字や発達段階に合わせて使い分ける語。機械的には統一せず、混在している場合だけ知らせる。",
           "id": "company.0130",
-          "type": "preferred",
-          "preferred": "立体",
+          "type": "contextual",
+          "preferred": null,
           "variants": [
             "立体",
             "はこのかたち"
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "単位記号は数字の直後にあるものだけを対象にする（英単語の一部は対象外）。",
           "id": "company.0131",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "リットル",
           "variants": [
             "リットル",
@@ -3070,192 +3235,207 @@ const GENERATED_RULES = {
             "l",
             "ℓ"
           ],
+          "pattern": "(?<=(?<![A-Za-z0-9０-９.,])[0-9０-９][0-9０-９.,]*\\s?)[LlℓＬｌ](?![A-Za-zＡ-Ｚａ-ｚ0-9-])",
+          "replacement": "リットル",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "単位記号は数字の直後にあるものだけを対象にする（英単語の一部は対象外）。",
           "id": "company.0132",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "デシリットル",
           "variants": [
             "デシリットル",
             "dL",
             "dl"
           ],
+          "pattern": "(?<=(?<![A-Za-z0-9０-９.,])[0-9０-９][0-9０-９.,]*\\s?)(?:dL|dl|ｄＬ|㎗)(?![A-Za-z])",
+          "replacement": "デシリットル",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "単位記号は数字の直後にあるものだけを対象にする（英単語の一部は対象外）。",
           "id": "company.0133",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "ミリリットル",
           "variants": [
             "ミリリットル",
             "mL",
             "ml"
           ],
+          "pattern": "(?<=(?<![A-Za-z0-9０-９.,])[0-9０-９][0-9０-９.,]*\\s?)(?:mL|ml|ｍＬ|㎖)(?![A-Za-z])",
+          "replacement": "ミリリットル",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "単位記号は数字の直後にあるものだけを対象にする（英単語の一部は対象外）。",
           "id": "company.0134",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "センチメートル",
           "variants": [
             "センチメートル",
             "cm",
             "センチ"
           ],
+          "pattern": "(?<=(?<![A-Za-z0-9０-９.,])[0-9０-９][0-9０-９.,]*\\s?)(?:cm|ｃｍ|㎝|センチ(?![ァ-ヶー]))(?![A-Za-z])",
+          "replacement": "センチメートル",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "単位記号は数字の直後にあるものだけを対象にする（英単語の一部は対象外）。",
           "id": "company.0135",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "ミリメートル",
           "variants": [
             "ミリメートル",
             "mm",
             "ミリ"
           ],
+          "pattern": "(?<=(?<![A-Za-z0-9０-９.,])[0-9０-９][0-9０-９.,]*\\s?)(?:mm|ｍｍ|㎜|ミリ(?![ァ-ヶー]))(?![A-Za-z])",
+          "replacement": "ミリメートル",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "単位記号は数字の直後にあるものだけを対象にする（英単語の一部は対象外）。",
           "id": "company.0136",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "キロメートル",
           "variants": [
             "キロメートル",
-            "km",
-            "キロ"
+            "km"
           ],
+          "pattern": "(?<=(?<![A-Za-z0-9０-９.,])[0-9０-９][0-9０-９.,]*\\s?)(?:km|ｋｍ|㎞)(?![A-Za-z])",
+          "replacement": "キロメートル",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "単位記号は数字の直後にあるものだけを対象にする（英単語の一部は対象外）。",
           "id": "company.0137",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "グラム",
           "variants": [
             "グラム",
             "g",
             "ｇ"
           ],
+          "pattern": "(?<=(?<![A-Za-z0-9０-９.,])[0-9０-９][0-9０-９.,]*\\s?)[gｇ](?![A-Za-zＡ-Ｚａ-ｚ0-9])",
+          "replacement": "グラム",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "単位記号は数字の直後にあるものだけを対象にする（英単語の一部は対象外）。",
           "id": "company.0138",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "キログラム",
           "variants": [
             "キログラム",
             "kg",
             "ｋｇ"
           ],
+          "pattern": "(?<=(?<![A-Za-z0-9０-９.,])[0-9０-９][0-9０-９.,]*\\s?)(?:kg|ｋｇ|㎏)(?![A-Za-z])",
+          "replacement": "キログラム",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "単位記号は数字の直後にあるものだけを対象にする（英単語の一部は対象外）。",
           "id": "company.0139",
-          "type": "preferred",
+          "type": "pattern",
           "preferred": "平方メートル",
           "variants": [
             "平方メートル",
@@ -3263,22 +3443,24 @@ const GENERATED_RULES = {
             "㎡",
             "平米"
           ],
+          "pattern": "(?<=(?<![A-Za-z0-9０-９.,])[0-9０-９][0-9０-９.,]*\\s?)(?:m2|m²|㎡|ｍ２|平米)",
+          "replacement": "平方メートル",
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0140",
           "type": "preferred",
           "preferred": "マーケティング",
@@ -3291,17 +3473,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0141",
           "type": "preferred",
           "preferred": "プレゼンテーション",
@@ -3310,22 +3492,27 @@ const GENERATED_RULES = {
             "プレゼンション",
             "プレゼン"
           ],
+          "exceptions": [
+            "プレゼント",
+            "プレゼンス",
+            "プレゼンター"
+          ],
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0142",
           "type": "preferred",
           "preferred": "コンサルタント",
@@ -3338,89 +3525,63 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "送り仮名の付け方に複数の慣用があるため統一先は決めず、文書内での混在だけを知らせる。",
           "id": "company.0143",
-          "type": "preferred",
-          "preferred": "売上",
+          "type": "consistency",
+          "preferred": null,
           "variants": [
-            "売上",
             "売り上げ",
             "売上げ"
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "送り仮名の付け方に複数の慣用があるため統一先は決めず、文書内での混在だけを知らせる。",
           "id": "company.0144",
-          "type": "preferred",
-          "preferred": "買上",
+          "type": "consistency",
+          "preferred": null,
           "variants": [
-            "買上",
             "買い上げ",
             "買上げ"
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
-          "id": "company.0145",
-          "type": "preferred",
-          "preferred": "支払",
-          "variants": [
-            "支払",
-            "支払い",
-            "支払ひ"
-          ],
-          "category": "legacy",
-          "severity": "warning",
-          "fixMode": "confirm",
-          "source": {
-            "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
-            "url": "https://github.com/edi-tool/hyoki-checker",
-            "license": "MIT",
-            "attribution": "hyoki-checker contributors",
-            "retrievedAt": "2026-07-14",
-            "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
-          }
-        },
-        {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0146",
           "type": "preferred",
           "preferred": "割合",
@@ -3433,41 +3594,42 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "送り仮名の付け方に複数の慣用があるため統一先は決めず、文書内での混在だけを知らせる。",
           "id": "company.0147",
-          "type": "preferred",
-          "preferred": "組合せ",
+          "type": "consistency",
+          "preferred": null,
           "variants": [
-            "組合せ",
             "組み合わせ",
-            "組合"
+            "組合せ",
+            "組み合せ",
+            "組合わせ"
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0148",
           "type": "preferred",
           "preferred": "取扱説明書",
@@ -3481,20 +3643,20 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "指す会社や場面が異なる語。機械的には統一せず、混在している場合だけ知らせる。",
           "id": "company.0149",
-          "type": "preferred",
-          "preferred": "弊社",
+          "type": "contextual",
+          "preferred": null,
           "variants": [
             "弊社",
             "当社",
@@ -3502,143 +3664,138 @@ const GENERATED_RULES = {
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "書き言葉（貴社）と話し言葉（御社）で使い分ける語。混在している場合だけ知らせる。",
           "id": "company.0150",
-          "type": "preferred",
-          "preferred": "貴社",
+          "type": "contextual",
+          "preferred": null,
           "variants": [
             "貴社",
             "御社"
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "送り仮名の付け方に複数の慣用があるため統一先は決めず、文書内での混在だけを知らせる。",
           "id": "company.0151",
-          "type": "preferred",
-          "preferred": "引越",
+          "type": "consistency",
+          "preferred": null,
           "variants": [
-            "引越",
-            "引越し",
             "引っ越し",
-            "引っ越"
+            "引越し"
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "送り仮名の付け方に複数の慣用があるため統一先は決めず、文書内での混在だけを知らせる。",
           "id": "company.0152",
-          "type": "preferred",
-          "preferred": "見積",
+          "type": "consistency",
+          "preferred": null,
           "variants": [
-            "見積",
-            "見積り",
-            "見積もり"
+            "見積もり",
+            "見積り"
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "送り仮名の付け方に複数の慣用があるため統一先は決めず、文書内での混在だけを知らせる。",
           "id": "company.0153",
-          "type": "preferred",
-          "preferred": "振込",
+          "type": "consistency",
+          "preferred": null,
           "variants": [
-            "振込",
             "振り込み",
             "振込み"
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "送り仮名の付け方に複数の慣用があるため統一先は決めず、文書内での混在だけを知らせる。",
           "id": "company.0154",
-          "type": "preferred",
-          "preferred": "申込",
+          "type": "consistency",
+          "preferred": null,
           "variants": [
-            "申込",
             "申し込み",
             "申込み"
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "場所・係を指す「受付」と、動作を指す「受け付け」で使い分けることがある。混在している場合だけ知らせる。",
           "id": "company.0155",
-          "type": "preferred",
-          "preferred": "受付",
+          "type": "contextual",
+          "preferred": null,
           "variants": [
             "受付",
             "受け付け",
@@ -3646,140 +3803,146 @@ const GENERATED_RULES = {
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "送り仮名の付け方に複数の慣用があるため統一先は決めず、文書内での混在だけを知らせる。",
           "id": "company.0156",
-          "type": "preferred",
-          "preferred": "打合",
+          "type": "consistency",
+          "preferred": null,
           "variants": [
-            "打合",
             "打ち合わせ",
             "打合せ",
-            "打ち合せ"
+            "打ち合せ",
+            "打合わせ"
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "送り仮名の付け方に複数の慣用があるため統一先は決めず、文書内での混在だけを知らせる。",
           "id": "company.0157",
-          "type": "preferred",
-          "preferred": "問合",
+          "type": "consistency",
+          "preferred": null,
           "variants": [
-            "問合",
             "問い合わせ",
             "問合せ",
-            "問い合せ"
+            "問い合せ",
+            "問合わせ"
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "送り仮名の付け方に複数の慣用があるため統一先は決めず、文書内での混在だけを知らせる。",
           "id": "company.0158",
-          "type": "preferred",
-          "preferred": "取扱",
+          "type": "consistency",
+          "preferred": null,
           "variants": [
-            "取扱",
             "取り扱い",
             "取扱い"
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "送り仮名の付け方に複数の慣用があるため統一先は決めず、文書内での混在だけを知らせる。",
           "id": "company.0159",
-          "type": "preferred",
-          "preferred": "手続",
+          "type": "consistency",
+          "preferred": null,
           "variants": [
-            "手続",
-            "手続き"
+            "手続き",
+            "手続"
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "送り仮名の付け方に複数の慣用があるため統一先は決めず、文書内での混在だけを知らせる。",
           "id": "company.0160",
-          "type": "preferred",
-          "preferred": "届出",
+          "type": "consistency",
+          "preferred": null,
           "variants": [
-            "届出",
-            "届け出"
+            "届け出",
+            "届出"
+          ],
+          "exceptions": [
+            "届け出る",
+            "届け出て",
+            "届け出た",
+            "届け出な",
+            "届け出ま"
           ],
           "category": "legacy",
           "severity": "warning",
-          "fixMode": "confirm",
+          "fixMode": "none",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0161",
           "type": "preferred",
           "preferred": "サーバー",
@@ -3792,17 +3955,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0162",
           "type": "preferred",
           "preferred": "コンピューター",
@@ -3815,17 +3978,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0163",
           "type": "preferred",
           "preferred": "ユーザー",
@@ -3833,22 +3996,25 @@ const GENERATED_RULES = {
             "ユーザー",
             "ユーザ"
           ],
+          "exceptions": [
+            "ユーザビリティ"
+          ],
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0164",
           "type": "preferred",
           "preferred": "プリンター",
@@ -3861,17 +4027,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0165",
           "type": "preferred",
           "preferred": "ルーター",
@@ -3884,17 +4050,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0166",
           "type": "preferred",
           "preferred": "モニター",
@@ -3902,22 +4068,25 @@ const GENERATED_RULES = {
             "モニター",
             "モニタ"
           ],
+          "exceptions": [
+            "モニタリング"
+          ],
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0167",
           "type": "preferred",
           "preferred": "スキャナー",
@@ -3930,17 +4099,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0168",
           "type": "preferred",
           "preferred": "フォルダー",
@@ -3953,17 +4122,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0169",
           "type": "preferred",
           "preferred": "アダプター",
@@ -3976,17 +4145,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0170",
           "type": "preferred",
           "preferred": "プロセッサー",
@@ -3999,17 +4168,17 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0171",
           "type": "preferred",
           "preferred": "センサー",
@@ -4017,22 +4186,25 @@ const GENERATED_RULES = {
             "センサー",
             "センサ"
           ],
+          "exceptions": [
+            "センサス"
+          ],
           "category": "legacy",
           "severity": "warning",
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         },
         {
-          "reason": "旧辞書から移行したルール。自動置換せず確認を要する。",
+          "reason": "",
           "id": "company.0172",
           "type": "preferred",
           "preferred": "ブラウザー",
@@ -4045,13 +4217,1019 @@ const GENERATED_RULES = {
           "fixMode": "confirm",
           "source": {
             "pack": "company",
-            "title": "hyoki-checker existing default dictionary",
+            "title": "表記統一さん 既定辞書（新聞表記）",
             "url": "https://github.com/edi-tool/hyoki-checker",
             "license": "MIT",
             "attribution": "hyoki-checker contributors",
             "retrievedAt": "2026-07-14",
             "modified": true,
-            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。"
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "名詞に付く「～どおり」は平仮名で書く。",
+          "id": "company.0173",
+          "type": "pattern",
+          "preferred": "～どおり",
+          "variants": [
+            "～どおり",
+            "～通り"
+          ],
+          "pattern": "(思い|予定|従来|文字|時間|計画|元|普段|ふだん|いつも|今まで|これまで|指示|期待|予想|希望|約束|予告|例年|注文|命令|理論|規定|手順|設計|想定)通り",
+          "replacement": "$1どおり",
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "「キロ」だけでは長さ（キロメートル）か重さ（キログラム）かが決まらない。必要に応じて書き分ける。",
+          "id": "company.0174",
+          "type": "pattern",
+          "preferred": null,
+          "variants": [
+            "キロメートル",
+            "キログラム",
+            "キロ"
+          ],
+          "pattern": "(?<=(?<![A-Za-z0-9０-９.,])[0-9０-９][0-9０-９.,]*\\s?)キロ(?![ァ-ヶー])",
+          "category": "hiragana",
+          "severity": "info",
+          "fixMode": "none",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "形式名詞の「わけ」は平仮名で書く（翻訳・言い訳などの語は対象外）。",
+          "id": "company.0175",
+          "type": "pattern",
+          "preferred": "わけ",
+          "variants": [
+            "わけ",
+            "訳"
+          ],
+          "pattern": "(?<=[るたいなう])(?<!言い)訳(?=[ですがはにも、。だ]|では|じゃ)",
+          "replacement": "わけ",
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "「筈」は常用漢字表にない漢字（表外字）のため、平仮名で書く。",
+          "id": "company.0176",
+          "type": "preferred",
+          "preferred": "はず",
+          "variants": [
+            "はず",
+            "筈"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "「儘」は常用漢字表にない漢字（表外字）のため、平仮名で書く。",
+          "id": "company.0177",
+          "type": "preferred",
+          "preferred": "まま",
+          "variants": [
+            "まま",
+            "儘"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "「迄」は常用漢字表にない漢字（表外字）のため、平仮名で書く。",
+          "id": "company.0178",
+          "type": "preferred",
+          "preferred": "まで",
+          "variants": [
+            "まで",
+            "迄"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "助詞の「ほど」は平仮名で書く（程度・日程などの語は対象外）。",
+          "id": "company.0179",
+          "type": "pattern",
+          "preferred": "ほど",
+          "variants": [
+            "ほど",
+            "程"
+          ],
+          "pattern": "(?<=[るたいのなれくうすつむぶぐだ])程(?=[、。でだにのはも]|です|$)",
+          "replacement": "ほど",
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "「～のように」「～のような」の「よう」は平仮名で書く（皆様・様子などは対象外）。",
+          "id": "company.0180",
+          "type": "pattern",
+          "preferred": "よう",
+          "variants": [
+            "よう",
+            "様"
+          ],
+          "pattern": "(?<=[のるたいなじ])様(?=[にな]|で[すあ]|だ)",
+          "replacement": "よう",
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "「～という＋名詞」のように内容を説明する「という」は平仮名で書く。実際に口に出して言う意味なら漢字のままでよい。",
+          "id": "company.0181",
+          "type": "pattern",
+          "preferred": "という",
+          "variants": [
+            "という",
+            "と言う"
+          ],
+          "pattern": "と言う(?=[\\p{sc=Han}\\p{sc=Katakana}]|こと|もの|の[はがをもにでだ]|わけ|ふう|よう|ところ)",
+          "replacement": "という",
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "「貰」は常用漢字表にない漢字（表外字）のため、平仮名で書く。",
+          "id": "company.0182",
+          "type": "preferred",
+          "preferred": "もらう",
+          "variants": [
+            "もらう",
+            "貰う"
+          ],
+          "inflect": "godan-u",
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "補助的に使う「ほしい」は平仮名で書く。物が欲しい意味なら漢字のままでよい。",
+          "id": "company.0183",
+          "type": "pattern",
+          "preferred": "～てほしい",
+          "variants": [
+            "～てほしい",
+            "～て欲しい"
+          ],
+          "pattern": "(て|[んい]で)欲し(?=[いくかけ])",
+          "replacement": "$1ほし",
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "「～にすぎない」は平仮名で書く。",
+          "id": "company.0184",
+          "type": "pattern",
+          "preferred": "～にすぎない",
+          "variants": [
+            "～にすぎない",
+            "～に過ぎない"
+          ],
+          "pattern": "に過ぎ(?=な|ませ|ず)",
+          "replacement": "にすぎ",
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "「於」は常用漢字表にない漢字（表外字）のため、平仮名で書く。",
+          "id": "company.0185",
+          "type": "pattern",
+          "preferred": "～において",
+          "variants": [
+            "～において",
+            "～に於いて",
+            "～における",
+            "～に於ける"
+          ],
+          "pattern": "に於(いて|ける)",
+          "replacement": "にお$1",
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "「～とともに」は平仮名で書く。",
+          "id": "company.0186",
+          "type": "preferred",
+          "preferred": "とともに",
+          "variants": [
+            "とともに",
+            "と共に"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "「勿」は常用漢字表にない漢字（表外字）のため、平仮名で書く。",
+          "id": "company.0187",
+          "type": "preferred",
+          "preferred": "もちろん",
+          "variants": [
+            "もちろん",
+            "勿論"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0188",
+          "type": "preferred",
+          "preferred": "たくさん",
+          "variants": [
+            "たくさん",
+            "沢山"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0189",
+          "type": "preferred",
+          "preferred": "ちょうど",
+          "variants": [
+            "ちょうど",
+            "丁度"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0190",
+          "type": "preferred",
+          "preferred": "やはり",
+          "variants": [
+            "やはり",
+            "矢張り"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "「或」は常用漢字表にない漢字（表外字）のため、平仮名で書く。",
+          "id": "company.0191",
+          "type": "preferred",
+          "preferred": "あるいは",
+          "variants": [
+            "あるいは",
+            "或いは",
+            "或は"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0192",
+          "type": "preferred",
+          "preferred": "すなわち",
+          "variants": [
+            "すなわち",
+            "即ち"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0193",
+          "type": "preferred",
+          "preferred": "ただし",
+          "variants": [
+            "ただし",
+            "但し"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0194",
+          "type": "pattern",
+          "preferred": "なお",
+          "variants": [
+            "なお",
+            "尚"
+          ],
+          "pattern": "(?<!\\p{sc=Han})尚(?=[、,，\\s])",
+          "replacement": "なお",
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0195",
+          "type": "pattern",
+          "preferred": "ついに",
+          "variants": [
+            "ついに",
+            "遂に"
+          ],
+          "pattern": "(?<!\\p{sc=Han})遂に",
+          "replacement": "ついに",
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0196",
+          "type": "preferred",
+          "preferred": "いかに",
+          "variants": [
+            "いかに",
+            "如何に"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0197",
+          "type": "preferred",
+          "preferred": "いろいろ",
+          "variants": [
+            "いろいろ",
+            "色々",
+            "色色"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0198",
+          "type": "preferred",
+          "preferred": "とりあえず",
+          "variants": [
+            "とりあえず",
+            "取り敢えず",
+            "取りあえず"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0199",
+          "type": "preferred",
+          "preferred": "あえて",
+          "variants": [
+            "あえて",
+            "敢えて"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0200",
+          "type": "preferred",
+          "preferred": "おおむね",
+          "variants": [
+            "おおむね",
+            "概ね"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0201",
+          "type": "preferred",
+          "preferred": "あくまで",
+          "variants": [
+            "あくまで",
+            "飽くまで",
+            "飽く迄"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0202",
+          "type": "preferred",
+          "preferred": "いずれ",
+          "variants": [
+            "いずれ",
+            "何れ"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0203",
+          "type": "preferred",
+          "preferred": "どこ",
+          "variants": [
+            "どこ",
+            "何処"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0204",
+          "type": "preferred",
+          "preferred": "それぞれ",
+          "variants": [
+            "それぞれ",
+            "夫々",
+            "其々"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0205",
+          "type": "preferred",
+          "preferred": "ふさわしい",
+          "variants": [
+            "ふさわしい",
+            "相応しい"
+          ],
+          "inflect": "i-adj",
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "「嬉」は常用漢字表にない漢字（表外字）のため、平仮名で書く。",
+          "id": "company.0206",
+          "type": "preferred",
+          "preferred": "うれしい",
+          "variants": [
+            "うれしい",
+            "嬉しい"
+          ],
+          "inflect": "i-adj",
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0207",
+          "type": "preferred",
+          "preferred": "ありがとう",
+          "variants": [
+            "ありがとう",
+            "有難う",
+            "有り難う"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0208",
+          "type": "pattern",
+          "preferred": "ございます",
+          "variants": [
+            "ございます",
+            "御座います"
+          ],
+          "pattern": "御座い(?=ま)",
+          "replacement": "ござい",
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "「謂」は常用漢字表にない漢字（表外字）のため、平仮名で書く。",
+          "id": "company.0209",
+          "type": "preferred",
+          "preferred": "いわゆる",
+          "variants": [
+            "いわゆる",
+            "所謂"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0210",
+          "type": "preferred",
+          "preferred": "しばらく",
+          "variants": [
+            "しばらく",
+            "暫く"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0211",
+          "type": "preferred",
+          "preferred": "ようやく",
+          "variants": [
+            "ようやく",
+            "漸く"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "公用文・新聞表記ともに平仮名で書くのが一般的。",
+          "id": "company.0212",
+          "type": "preferred",
+          "preferred": "ますます",
+          "variants": [
+            "ますます",
+            "益々",
+            "益益"
+          ],
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "「分かりやすい」などの接尾語「やすい」は平仮名で書く。",
+          "id": "company.0213",
+          "type": "pattern",
+          "preferred": "～やすい",
+          "variants": [
+            "～やすい",
+            "～易い"
+          ],
+          "pattern": "(?<=\\p{sc=Hiragana})易([いくさ]|かっ|けれ)",
+          "replacement": "やす$1",
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
+          }
+        },
+        {
+          "reason": "複数を表す接尾語の「たち」は平仮名で書く（「友達」は対象外）。",
+          "id": "company.0214",
+          "type": "pattern",
+          "preferred": "～たち",
+          "variants": [
+            "～たち",
+            "～達"
+          ],
+          "pattern": "(?<=私|僕|君|彼|彼女|児童|生徒|先生|教師|友人|仲間|自分|人|者|親|大人)達(?![成筆観])",
+          "replacement": "たち",
+          "category": "hiragana",
+          "severity": "warning",
+          "fixMode": "confirm",
+          "source": {
+            "pack": "company",
+            "title": "表記統一さん 既定辞書（新聞表記）",
+            "url": "https://github.com/edi-tool/hyoki-checker",
+            "license": "MIT",
+            "attribution": "hyoki-checker contributors",
+            "retrievedAt": "2026-07-14",
+            "modified": true,
+            "notes": "旧 string[][] 辞書から構造化。既存ルールは安全のため confirm を既定とした。2026-10-13 に検出条件を見直し、常用漢字表（平成22年内閣告示）にない漢字・読みを平仮名で書く語を追加した。"
           }
         }
       ]
@@ -4059,6 +5237,7 @@ const GENERATED_RULES = {
     {
       "id": "jtf-3.0",
       "label": "JTF 3.0",
+      "description": "JTF日本語標準スタイルガイドから。カタカナ語末の長音など",
       "path": "packs/jtf-3.0/rules.json",
       "priority": 200,
       "defaultEnabled": false,
@@ -4137,6 +5316,7 @@ const GENERATED_RULES = {
     {
       "id": "bunka-official",
       "label": "文化庁・公用文",
+      "description": "「公用文作成の考え方」から。読点・「か所」など",
       "path": "packs/bunka/rules.json",
       "priority": 200,
       "defaultEnabled": false,
@@ -4196,6 +5376,7 @@ const GENERATED_RULES = {
     {
       "id": "consistency-only",
       "label": "文書内統一のみ",
+      "description": "正誤は決めず、文書内での混在だけを知らせる",
       "path": "packs/consistency-only/rules.json",
       "priority": 100,
       "defaultEnabled": false,

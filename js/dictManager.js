@@ -92,6 +92,7 @@ class DictionaryManager {
       .map((pack) => ({
         id: pack.id,
         label: pack.label,
+        description: pack.description || "",
         enabled: Boolean(enabled[pack.id]),
         ruleCount: pack.rules?.length || 0,
       }));

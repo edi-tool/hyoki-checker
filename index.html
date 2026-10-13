@@ -94,23 +94,27 @@ lang: ja
     </script>
     <script
       defer
-      src="https://cdn.jsdelivr.net/npm/mammoth@1.13.0/mammoth.browser.min.js" integrity="sha384-8NWE3bZDrmRI4IePMoQaEoLhAQ1MmRMJkdNgnGiHRFanTqsFKr0TmK6aSZvFJ/PO" crossorigin="anonymous"
+      src="https://cdn.jsdelivr.net/npm/mammoth@1.13.0/mammoth.browser.min.js"
+      integrity="sha384-8NWE3bZDrmRI4IePMoQaEoLhAQ1MmRMJkdNgnGiHRFanTqsFKr0TmK6aSZvFJ/PO"
+      crossorigin="anonymous"
     ></script>
     <script
       defer
-      src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js" integrity="sha384-TtrQp5nveof/QP1+f/OLiEHL3GuOIRyl3IfsGxu5X45VO2vHeT4HRNmQuTR3Ea3w" crossorigin="anonymous"
+      src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"
+      integrity="sha384-TtrQp5nveof/QP1+f/OLiEHL3GuOIRyl3IfsGxu5X45VO2vHeT4HRNmQuTR3Ea3w"
+      crossorigin="anonymous"
     ></script>
 
     <!-- JS更新時は ?v= を一括で上げてキャッシュを破棄（js/app.js の APP_VERSION と揃える）-->
-    <script defer src="js/defaultDict.js?v=20260924c"></script>
-    <script defer src="js/prh.js?v=20260924c"></script>
-    <script defer src="js/dictManager.js?v=20260924c"></script>
-    <script defer src="js/documentText.js?v=20260924c"></script>
-    <script defer src="js/analyzer.js?v=20260924c"></script>
-    <script defer src="js/app.js?v=20260924c"></script>
+    <script defer src="js/defaultDict.js?v=20261013a"></script>
+    <script defer src="js/prh.js?v=20261013a"></script>
+    <script defer src="js/dictManager.js?v=20261013a"></script>
+    <script defer src="js/documentText.js?v=20261013a"></script>
+    <script defer src="js/analyzer.js?v=20261013a"></script>
+    <script defer src="js/app.js?v=20261013a"></script>
 
     <link rel="icon" href="favicon.png" type="image/png" />
-    <link rel="stylesheet" href="style.dist.css?v=20260924c" />
+    <link rel="stylesheet" href="style.dist.css?v=20261013a" />
   </head>
   <body>
     <header class="site-header">
@@ -373,10 +377,10 @@ lang: ja
                 <div
                   class="bg-[#fff8f0] border border-[#ffe0b2] p-3 rounded-lg text-sm text-[#d97706] leading-relaxed"
                 >
-                  「みて /
-                  見て」のような活用形ゆれを、形態素解析を用いて検出します。<br />
+                  文章を単語に区切って（形態素解析）、「気づいた /
+                  気付いた」のように活用した形の表記の混在を調べます。<br />
                   <span class="text-xs opacity-80"
-                    >※初回のみ辞書ファイル（約7MB）の取得が必要です。</span
+                    >※最初に解析用の辞書（約7MB）を読み込みます。本文は外部へ送信しません。</span
                   >
                 </div>
 
@@ -387,7 +391,7 @@ lang: ja
                   <span
                     class="inline-block w-3 h-3 rounded-full bg-gray-300"
                   ></span
-                  >未初期化
+                  >まだ読み込んでいません
                 </div>
 
                 <button
@@ -395,16 +399,37 @@ lang: ja
                   onclick="initAndRunKuromoji()"
                   class="btn-primary text-sm rounded-lg px-4 py-3 font-bold w-full shadow-sm"
                 >
-                  Kuromoji を初期化して解析
+                  辞書を読み込んで調べる
                 </button>
 
-                <button
-                  id="kuromojiRunBtn"
-                  onclick="runKuromojiAnalysis()"
-                  class="hidden border-2 border-[#f28c06] text-[#b35f00] hover:bg-[#fff8f0] text-sm rounded-lg px-4 py-2.5 font-bold transition-colors w-full"
+                <label class="flex items-center gap-2 text-xs text-gray-600">
+                  <input
+                    type="checkbox"
+                    id="kuromojiAutoLoad"
+                    class="accent-[#f28c06]"
+                    onchange="setKuromojiAutoLoad(this.checked)"
+                  />
+                  次回から、ページを開いたときに自動で読み込む
+                </label>
+
+                <div
+                  id="kuromojiOptions"
+                  class="hidden flex-col gap-1.5 bg-gray-50 p-3 rounded-lg border border-gray-200"
                 >
-                  再解析を実行
-                </button>
+                  <label class="flex items-center gap-2 text-xs text-gray-600">
+                    <input
+                      type="checkbox"
+                      id="kuromojiBoundary"
+                      class="accent-[#f28c06]"
+                      checked
+                      onchange="runCheck()"
+                    />
+                    検知結果タブでも、単語の区切りに合わない一致を除外する
+                  </label>
+                  <p class="text-xs text-gray-500">
+                    例：「本州」の中の「本」のような、語の途中への一致を指摘しなくなります。指摘が減りすぎると感じたら外してください。
+                  </p>
+                </div>
 
                 <div
                   id="kuromojiResults"
@@ -485,13 +510,13 @@ lang: ja
                     >新しいゆらぎグループを追加</label
                   >
                   <p class="text-xs text-gray-500 mb-1">
-                    先頭を基準表記にします。安全のため追加ルールは「要確認」となり、自動置換しません。
+                    基準にしたい表記を先頭に書き、指摘したい表記を「、」か「,」で区切って続けます。追加したルールは「要確認」となり、自動置換はしません。
                   </p>
                   <input
                     id="newRuleInput"
                     type="text"
                     class="border border-[#e0e0e0] rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[#f28c06] focus:ring-2 focus:ring-[#f28c06]/20 bg-white"
-                    placeholder="例: ウェブ,ウエブ,Web"
+                    placeholder="例: Web、ウェブ、ウエブ"
                     onkeydown="if (event.key === 'Enter') addCustomRule();"
                   />
                   <button
@@ -500,6 +525,12 @@ lang: ja
                   >
                     追加する
                   </button>
+                  <p
+                    id="dictStatus"
+                    class="hidden text-xs text-gray-600"
+                    role="status"
+                    aria-live="polite"
+                  ></p>
                 </div>
 
                 <div class="flex flex-col gap-3">
@@ -636,7 +667,7 @@ lang: ja
                       ></path>
                       <polyline points="17 8 12 3 7 8"></polyline>
                       <line x1="12" y1="3" x2="12" y2="15"></line></svg
-                    >現在の辞書を JSON で書き出し
+                    >カスタム辞書を JSON で書き出し
                   </button>
                 </div>
 

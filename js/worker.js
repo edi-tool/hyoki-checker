@@ -36,10 +36,9 @@ self.onmessage = async function (e) {
     switch (type) {
       case 'ANALYZE': {
         // Kuromoji初期化済み かつ 高精度モード要求時のみ形態素境界で部分一致を除外
-        const boundarySet = (payload.boundaryAware && isKuromojiReady())
-          ? buildBoundarySet(payload.text || '')
-          : null;
-        const results = await analyzeAsync(payload.text || '', payload.dict || [], 50, boundarySet);
+        // 境界は analyzeAsync が解析用テキスト（行またぎ連結後）に対して求める
+        const boundaryAware = Boolean(payload.boundaryAware && isKuromojiReady());
+        const results = await analyzeAsync(payload.text || '', payload.dict || [], 50, boundaryAware);
         send(id, results);
         break;
       }

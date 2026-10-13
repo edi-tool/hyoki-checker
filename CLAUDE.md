@@ -19,6 +19,9 @@
   Windows でビルドすると色の値の末尾 1 桁だけが CI（Linux）と食い違うことがある（例: `.0796585` と `.0796584`）。
   クラスを増減していないのに `style.dist.css` が 1 行だけ変わったら、コミットせず `git checkout -- style.dist.css` で戻す。
 - JS/CSS を変えたら `index.html` の `?v=` と `js/app.js` の `APP_VERSION` をそろえて上げる。
+- ルールの原本は `rules/packs/`。直したら `npm run validate:rules` → `npm run build:rules`。誤検知・見逃しを直すときは、そのルールに `hit`／`miss` の例を足して再発を防ぐ
+  （活用は `inflect`、別語の読み飛ばしは `exceptions`、前後の条件が要るものは `type: "pattern"`。書き方は README「ルールの書き方」）。
+  検出精度の回帰は `tests/detection-corpus.js` で固定している。
 - pdf.js は `package.json` の `pdfjs-dist`（固定バージョン）が正。Dependabot は `package.json` しか上げないので、その PR では `npm ci` → `npm run sync:pdfjs` を実行し、
   `index.html` の CDN・README・`cmaps/` をそろえてコミットする（そろっていないと `npm test` が落ちる）。マージ前に日本語 PDF の読込を実機で確認する。
 - Render の `hyoki-checker-api` はダッシュボードで作成した**ネイティブ Python 環境**で、`render.yaml`・`Dockerfile` は使われない。
