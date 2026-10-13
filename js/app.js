@@ -11,7 +11,13 @@ let _lastResults = [];
 let ignoredGroups = new Set();
 let _checkVersion = 0;
 let _kuromojiInitialized = false;
+let _kuromojiResults = [];
 const occurrenceCursor = new Map();
+// 形態素解析（Beta）で扱う本文の上限。Worker 内で動くため画面は固まらないが、
+// 極端に長い文書で待ち時間が延びすぎないようにする
+const KUROMOJI_LIMIT = 200000;
+// 「次回から自動で読み込む」の設定（この端末の localStorage にだけ保存する）
+const KUROMOJI_AUTO_KEY = "hyoki_kuromoji_auto";
 
 // ---- バックエンドAPI設定 ----
 const API_BASE = ""; // デプロイ時に 'https://your-api.fly.dev' を設定
@@ -31,7 +37,7 @@ async function fetchBackendAnalyze(text) {
 // ---- Worker 通信 ----
 // JSを更新したら APP_VERSION を変更し、worker/importScripts のキャッシュを破棄する
 // （index.html のローカル<script>の ?v= とも揃えること）
-const APP_VERSION = "20260924c";
+const APP_VERSION = "20261013a";
 const worker = new Worker(`js/worker.js?v=${APP_VERSION}`);
 const workerCallbackMap = new Map();
 let messageIdCounter = 0;
@@ -189,18 +195,64 @@ async function runCheck() {
       results = await postToWorker("ANALYZE", {
         text: currentText,
         dict: dictManager.getAll(),
-        // Kuromoji初期化済みなら形態素境界で部分一致を除外し高精度化
-        boundaryAware: _kuromojiInitialized,
+        // 形態素解析を読み込み済みで、利用者が切っていなければ、語の区切りに
+        // 合わない部分一致を除外する
+        boundaryAware: isBoundaryAwareEnabled(),
       });
     }
-    results = results.filter((r) => !ignoredGroups.has(r.group.join(",")));
+    results = results.filter((r) => !ignoredGroups.has(resultKey(r)));
+    // 原文で先に出てくる指摘から順に並べる（読み進めながら確認しやすいように）
+    const firstFlagged = (r) => {
+      const others = new Set(r.others || []);
+      const hit = (r.occurrences || []).find((item) => others.has(item.word));
+      return hit ? hit.start : Infinity;
+    };
+    results.sort((a, b) => firstFlagged(a) - firstFlagged(b));
     if (version !== _checkVersion) return;
     renderResults(results);
     renderPreview(results);
+    // 活用形タブ（Beta）も、本文が変わるたびに自動で更新する
+    if (_kuromojiInitialized) runKuromojiAnalysis();
   } catch (e) {
     console.error("解析エラー:", e);
     if (previewCountEl) previewCountEl.textContent = "エラー";
   }
+}
+
+/** 指摘を隠す・戻すときの目印（ルール ID。無い場合は表記の並び）。 */
+function resultKey(result) {
+  return result.ruleId || result.group.join(",");
+}
+
+/** この指摘を、本文を読み込み直すまで一覧とハイライトから外す。 */
+function ignoreResult(resultIndex) {
+  const result = _lastResults[resultIndex];
+  if (!result) return;
+  ignoredGroups.add(resultKey(result));
+  runCheck();
+}
+
+function restoreIgnored() {
+  ignoredGroups.clear();
+  runCheck();
+}
+
+function isBoundaryAwareEnabled() {
+  const toggle = document.getElementById("kuromojiBoundary");
+  return _kuromojiInitialized && (!toggle || toggle.checked);
+}
+
+/** 原文（textarea）上の範囲を選択し、見える位置までスクロールする。 */
+function selectRangeInInput(start, end) {
+  const input = document.getElementById("inputText");
+  input.focus();
+  input.setSelectionRange(start, end);
+  const lineHeight = parseFloat(getComputedStyle(input).lineHeight) || 24;
+  const linesBefore = currentText.slice(0, start).split("\n").length - 1;
+  input.scrollTop = Math.max(
+    0,
+    linesBefore * lineHeight - input.clientHeight / 3,
+  );
 }
 
 function renderResults(results) {
@@ -209,8 +261,13 @@ function renderResults(results) {
   // 出力時に参照する最新の検出結果を保持し、エクスポートボタンの表示を切り替える
   _lastResults = results || [];
   updateExportButton();
+  // 隠した指摘があるときは、戻すための行を先頭に出す
+  const restoreHtml = ignoredGroups.size
+    ? `<button type="button" onclick="restoreIgnored()" class="text-xs text-[#b35f00] font-bold text-left hover:bg-gray-50 rounded px-1 py-1">隠した指摘を戻す（${ignoredGroups.size}件）</button>`
+    : "";
   if (!results || results.length === 0) {
     resultsEl.innerHTML =
+      restoreHtml +
       '<p class="text-sm text-gray-500 text-center py-10 font-medium">ゆらぎは検知されていません</p>';
     countEl.textContent = "0 件";
     return;
@@ -218,7 +275,7 @@ function renderResults(results) {
   countEl.textContent = `${results.length} 件`;
 
   const esc = typeof escapeHTML === "function" ? escapeHTML : (s) => s;
-  let html = "";
+  let html = restoreHtml;
   results.forEach((r, resultIndex) => {
     const groupLabel = r.group.map(esc).join(" ・ ");
     const typeLabels = {
@@ -229,7 +286,13 @@ function renderResults(results) {
       pattern: "パターン",
       spelling: "スペル",
     };
-    const statusLabel = typeLabels[r.type] || "表記ルール";
+    // 正規表現で書いたルールも、利用者から見れば「基準表記」か「文脈確認」のどちらか
+    const statusLabel =
+      r.type === "pattern"
+        ? r.recommended
+          ? typeLabels.preferred
+          : typeLabels.contextual
+        : typeLabels[r.type] || "表記ルール";
     const statusClass = r.isInconsistent
       ? "bg-red-50 text-red-700 border-red-200"
       : "bg-yellow-50 text-yellow-800 border-yellow-200";
@@ -249,7 +312,7 @@ function renderResults(results) {
             `<button type="button" onclick="focusOccurrence(${resultIndex}, ${countIndex})"
                  class="flex justify-between text-xs py-1 px-1 -mx-1 rounded hover:bg-white text-left"
                  title="原文の次の出現箇所へ移動">
-          <span class="${word === r.recommended ? "text-[#b35f00] font-bold" : "text-gray-700"}">${esc(word)}${word === r.recommended ? "（基準）" : ""}</span>
+          <span class="${word === r.recommended ? "text-[#b35f00] font-bold" : "text-gray-700"}">${esc(word)}${word === r.recommended ? "（基準）" : ""}${formsLabel(r.counts[countIndex], esc)}</span>
           <span class="font-bold text-gray-500 ml-4">${count}件 ↗</span>
         </button>`,
         )
@@ -270,9 +333,20 @@ function renderResults(results) {
       <div class="text-xs text-gray-500">修正: <strong>${fixLabel}</strong></div>
       ${r.reason ? `<div class="text-xs text-gray-600 bg-gray-50 rounded p-2">${esc(r.reason)}</div>` : ""}
       <div class="bg-gray-50 border border-gray-200 rounded p-2 flex flex-col">${countsHtml}</div>
+      <button type="button" onclick="ignoreResult(${resultIndex})" class="text-xs text-gray-500 text-left hover:bg-gray-50 rounded px-1 py-1" title="本文を読み込み直すまで、この指摘を一覧とハイライトから外します">この指摘を隠す</button>
     </div>`;
   });
   resultsEl.innerHTML = html;
+}
+
+/** 活用するルールで実際に出てきた形（例: 気づい・気づき）。辞書形だけでは原文と対応しないため添える。 */
+function formsLabel(countItem, esc) {
+  const forms = (countItem?.forms || []).filter(
+    (form) => form !== countItem.word,
+  );
+  if (forms.length === 0) return "";
+  const shown = forms.slice(0, 4).map(esc).join("・");
+  return `<span class="block text-[11px] text-gray-500 font-medium">原文: ${shown}${forms.length > 4 ? " ほか" : ""}</span>`;
 }
 
 /** 結果カードで選んだ表記の次の出現位置を textarea 上で選択する。 */
@@ -288,16 +362,18 @@ function focusOccurrence(resultIndex, countIndex) {
   const nextIndex = occurrenceCursor.get(key) || 0;
   const match = matches[nextIndex % matches.length];
   occurrenceCursor.set(key, nextIndex + 1);
+  selectRangeInInput(match.start, match.end);
+}
 
-  const input = document.getElementById("inputText");
-  input.focus();
-  input.setSelectionRange(match.start, match.end);
-  const lineHeight = parseFloat(getComputedStyle(input).lineHeight) || 24;
-  const linesBefore = currentText.slice(0, match.start).split("\n").length - 1;
-  input.scrollTop = Math.max(
-    0,
-    linesBefore * lineHeight - input.clientHeight / 3,
-  );
+/** 活用形タブ（Beta）の表記をクリックしたとき、原文の次の出現位置へ移動する。 */
+function focusKuromojiOccurrence(resultIndex, baseIndex) {
+  const item = _kuromojiResults[resultIndex]?.foundBases?.[baseIndex];
+  if (!item?.occurrences?.length) return;
+  const key = `kuromoji:${resultIndex}:${baseIndex}`;
+  const nextIndex = occurrenceCursor.get(key) || 0;
+  const match = item.occurrences[nextIndex % item.occurrences.length];
+  occurrenceCursor.set(key, nextIndex + 1);
+  selectRangeInInput(match.start, match.end);
 }
 
 function renderPreview(results) {
@@ -334,55 +410,90 @@ async function initAndRunKuromoji() {
     btn.disabled = true;
     btn.textContent = "読み込み中...";
   }
-  setKuromojiStatus("loading", "辞書ファイルを取得中...");
+  setKuromojiStatus(
+    "loading",
+    "解析用の辞書（約7MB）を読み込んでいます。10〜30秒ほどかかります",
+  );
   try {
     await postToWorker("INIT_KUROMOJI", {});
     _kuromojiInitialized = true;
-    setKuromojiStatus("ready", "準備完了");
+    setKuromojiStatus(
+      "ready",
+      "読み込み済み。本文を変えると自動で解析し直します",
+    );
     if (btn) btn.classList.add("hidden");
-    const runBtn = document.getElementById("kuromojiRunBtn");
-    if (runBtn) runBtn.classList.remove("hidden");
-    runKuromojiAnalysis();
-    // 形態素境界が使えるようになったので本体の検知結果を高精度で再解析
+    const options = document.getElementById("kuromojiOptions");
+    if (options) options.classList.remove("hidden");
+    // 語の区切りが使えるようになったので、検知結果も解析し直す
+    // （runCheck の最後で活用形タブも更新される）
     runCheck();
   } catch (e) {
-    setKuromojiStatus("error", "初期化失敗: " + e.message);
+    setKuromojiStatus(
+      "error",
+      "読み込みに失敗しました。通信状態を確かめて、もう一度お試しください（" +
+        e.message +
+        "）",
+    );
     if (btn) {
       btn.disabled = false;
-      btn.textContent = "Kuromoji を初期化して解析";
+      btn.textContent = "もう一度読み込む";
     }
   }
 }
 
+/** 「次回から自動で読み込む」の切り替え（設定はこの端末にだけ保存）。 */
+function setKuromojiAutoLoad(enabled) {
+  try {
+    if (enabled) localStorage.setItem(KUROMOJI_AUTO_KEY, "1");
+    else localStorage.removeItem(KUROMOJI_AUTO_KEY);
+  } catch {
+    // 保存できない環境（プライベートブラウズなど）では、今回だけ有効にする
+  }
+}
+
+function isKuromojiAutoLoad() {
+  try {
+    return localStorage.getItem(KUROMOJI_AUTO_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function setKuromojiMessage(text, isError = false) {
+  const el = document.getElementById("kuromojiResults");
+  if (!el) return;
+  _kuromojiResults = [];
+  el.innerHTML = `<p class="text-sm ${isError ? "text-red-500 font-bold" : "text-gray-500"} text-center py-4">${text}</p>`;
+}
+
 async function runKuromojiAnalysis() {
   if (!_kuromojiInitialized) return;
+  const text = currentText;
 
-  // 【修正】安全装置：文字数制限（形態素解析の負荷軽減）
-  if (currentText.length > 10000) {
-    alert(
-      "【Beta機能制限】\n活用形解析は処理負荷が高いため、現在は10,000文字以下のテキストのみ対応しています。（現在の文字数: " +
-        currentText.length +
-        "文字）",
+  if (!text.trim()) {
+    setKuromojiMessage("本文を入力すると、ここに結果が出ます");
+    return;
+  }
+  // 長すぎる文書は、ポップアップで止めずにタブ内で知らせる
+  if (text.length > KUROMOJI_LIMIT) {
+    setKuromojiMessage(
+      `本文が長いため、このタブの解析は行っていません（${text.length.toLocaleString()}文字。上限は${KUROMOJI_LIMIT.toLocaleString()}文字）。章ごとに分けてお試しください。検知結果タブはそのまま使えます。`,
+      true,
     );
-    const el = document.getElementById("kuromojiResults");
-    if (el)
-      el.innerHTML =
-        '<p class="text-sm text-red-500 text-center py-4 font-bold">文字数制限を超過したため解析をスキップしました。</p>';
     return;
   }
 
   try {
     const results = await postToWorker("KUROMOJI_ANALYZE", {
-      text: currentText,
+      text,
       dict: dictManager.getAll(),
     });
+    // 解析中に本文が変わっていたら、古い結果は捨てる（位置がずれるため）
+    if (text !== currentText) return;
     renderKuromojiResults(results);
   } catch (e) {
     console.error(e);
-    const el = document.getElementById("kuromojiResults");
-    if (el)
-      el.innerHTML =
-        '<p class="text-sm text-red-500 text-center py-4 font-bold">解析中にエラーが発生しました。</p>';
+    setKuromojiMessage("解析中にエラーが発生しました。", true);
   }
 }
 
@@ -403,15 +514,33 @@ function renderKuromojiResults(results) {
   const el = document.getElementById("kuromojiResults");
   if (!el) return;
   if (!results || results.length === 0) {
-    el.innerHTML =
-      '<p class="text-sm text-gray-500 text-center py-4">活用形のゆらぎは検知されませんでした</p>';
+    setKuromojiMessage(
+      "活用した形を含めても、表記の混在は見つかりませんでした",
+    );
     return;
   }
+  _kuromojiResults = results;
   const esc = typeof escapeHTML === "function" ? escapeHTML : (s) => s;
-  let html = "";
-  results.forEach((r) => {
+  // 検知結果タブと同じ見た目・同じ操作（表記を押すと原文の出現箇所へ移動）にそろえる
+  let html = `<p class="text-xs text-gray-500">${results.length}件の語で表記が混在しています。表記を押すと原文の出現箇所へ移動します。</p>`;
+  results.forEach((r, resultIndex) => {
+    const rows = r.foundBases
+      .map((item, baseIndex) => {
+        const isPreferred = item.word === r.preferred;
+        const surfaces = item.surfaces.slice(0, 4).map(esc).join("・");
+        return `<button type="button" onclick="focusKuromojiOccurrence(${resultIndex}, ${baseIndex})"
+                 class="flex justify-between text-xs py-1 px-1 -mx-1 rounded hover:bg-white text-left"
+                 title="原文の次の出現箇所へ移動">
+          <span class="${isPreferred ? "text-[#b35f00] font-bold" : "text-gray-700"}">${esc(item.word)}${isPreferred ? "（基準）" : ""}<span class="block text-[11px] text-gray-500 font-medium">原文: ${surfaces}${item.surfaces.length > 4 ? " ほか" : ""}</span></span>
+          <span class="font-bold text-gray-500 ml-4">${item.count}件 ↗</span>
+        </button>`;
+      })
+      .join("");
     html += `<div class="p-3 border border-[#ffe0b2] bg-white rounded-xl shadow-sm flex flex-col gap-1.5">
-      <div class="text-sm font-bold text-[#0f0f0f]">基本形: <span class="text-[#d97706]">${esc(r.recommendedWord)}</span></div>
+      <div class="text-sm font-bold text-[#0f0f0f]">${r.group.map(esc).join(" ・ ")}</div>
+      <div class="text-xs text-gray-500">推奨表記: <strong class="text-[#d97706]">${esc(r.preferred || "指定なし（文書内で統一）")}</strong></div>
+      ${r.reason ? `<div class="text-xs text-gray-600 bg-gray-50 rounded p-2">${esc(r.reason)}</div>` : ""}
+      <div class="bg-gray-50 border border-gray-200 rounded p-2 flex flex-col">${rows}</div>
     </div>`;
   });
   el.innerHTML = html;
@@ -496,6 +625,7 @@ function clearAll() {
   if (fuzzResults) fuzzResults.innerHTML = "";
   const kuroResults = document.getElementById("kuromojiResults");
   if (kuroResults) kuroResults.innerHTML = "";
+  _kuromojiResults = [];
 }
 
 /** 検出グループが存在する時のみエクスポートボタンを表示する。 */
@@ -603,19 +733,44 @@ function toggleDictErrorDetail() {
   if (list) list.classList.toggle("hidden");
 }
 
+/** 辞書設定タブの操作結果を、ポップアップではなくタブ内に表示する。 */
+function setDictStatus(text, isError = false) {
+  const el = document.getElementById("dictStatus");
+  if (!el) {
+    if (isError) alert(text);
+    return;
+  }
+  el.textContent = text;
+  el.classList.toggle("hidden", !text);
+  el.classList.toggle("text-red-500", isError);
+  el.classList.toggle("text-gray-600", !isError);
+}
+
 function addCustomRule() {
   const input = document.getElementById("newRuleInput");
-  const words = input.value
-    .split(",")
-    .map((s) => s.trim())
-    .filter((s) => s);
+  // 日本語入力のままでも登録できるよう、全角カンマ・読点・タブも区切りとして受け付ける
+  const words = [
+    ...new Set(
+      input.value
+        .split(/[,，、\t]/)
+        .map((s) => s.trim())
+        .filter((s) => s),
+    ),
+  ];
   if (words.length >= 2) {
     dictManager.addCustomGroup(words);
     input.value = "";
     renderCustomDictList();
     runCheck();
+    setDictStatus(
+      `「${words[0]}」を基準表記として登録しました（${words.slice(1).join("・")} を指摘します）`,
+    );
   } else {
-    alert("カンマ区切りで2語以上入力してください（例: Web,ウェブ）");
+    setDictStatus(
+      "基準表記と、指摘したい表記を、カンマか読点で区切って2語以上入力してください（例: Web、ウェブ）",
+      true,
+    );
+    input.focus();
   }
 }
 
@@ -629,11 +784,16 @@ function renderCustomDictList() {
     return;
   }
   const esc = typeof escapeHTML === "function" ? escapeHTML : (s) => s;
+  const fixLabels = {
+    auto: "自動修正可",
+    confirm: "要確認",
+    none: "自動修正なし",
+  };
   el.innerHTML = custom
     .map(
       (rule, i) =>
         `<div class="flex justify-between items-center text-sm p-2 border-b border-gray-100 hover:bg-gray-50">
-      <span class="text-gray-700 font-medium">${esc(rule.variants.join(", "))}<small class="block text-gray-500">基準: ${esc(rule.preferred || "なし")} / ${esc(rule.fixMode)}</small></span>
+      <span class="text-gray-700 font-medium">${esc(rule.variants.join("、"))}<small class="block text-gray-500">基準: ${esc(rule.preferred || "なし")} ／ ${fixLabels[rule.fixMode] || "要確認"}</small></span>
       <button onclick="dictManager.removeCustomGroup(${i}); renderCustomDictList(); runCheck();" class="text-red-400 hover:text-red-600 font-bold px-2 py-1 bg-red-50 rounded">削除</button>
     </div>`,
     )
@@ -649,7 +809,7 @@ function renderRulePackControls() {
       (
         pack,
       ) => `<label class="flex items-center justify-between gap-3 text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white">
-        <span><strong>${pack.label}</strong><small class="block text-gray-500">${pack.ruleCount}ルール</small></span>
+        <span><strong>${pack.label}</strong><small class="block text-gray-500">${pack.description ? `${pack.description}（${pack.ruleCount}ルール）` : `${pack.ruleCount}ルール`}</small></span>
         <input type="checkbox" ${pack.enabled ? "checked" : ""} onchange="toggleRulePack('${pack.id}', this.checked)" class="accent-[#f28c06]">
       </label>`,
     )
@@ -668,8 +828,11 @@ async function importCustomDict(e) {
     await dictManager.importJSON(e.target.files[0]);
     renderCustomDictList();
     runCheck();
+    setDictStatus(
+      `JSON を読み込み、カスタム辞書を${dictManager.getCustom().length}件に置き換えました`,
+    );
   } catch (err) {
-    alert("読み込み失敗: " + err.message);
+    setDictStatus("読み込めませんでした: " + err.message, true);
   } finally {
     e.target.value = "";
   }
@@ -682,11 +845,17 @@ async function importTSVCSV(e) {
     const separator = e.target.files[0].name.toLowerCase().endsWith(".csv")
       ? ","
       : "\t";
-    dictManager.importDelimited(text, separator);
+    const added = dictManager.importDelimited(text, separator);
     renderCustomDictList();
     runCheck();
+    setDictStatus(
+      added > 0
+        ? `${added}件を追加しました（各行の先頭が基準表記です）`
+        : "追加できる行がありませんでした。1行に2語以上を、タブ（.tsv）またはカンマ（.csv）で区切ってください",
+      added === 0,
+    );
   } catch (err) {
-    alert("読み込み失敗: " + err.message);
+    setDictStatus("読み込めませんでした: " + err.message, true);
   } finally {
     e.target.value = "";
   }
@@ -708,9 +877,9 @@ async function importPrhDict(e) {
       notes.push(
         `imports（${result.imports.join(", ")}）は参照先ファイルを個別に読み込んでください`,
       );
-    alert(notes.join("\n"));
+    setDictStatus(notes.join("。"));
   } catch (err) {
-    alert("読み込み失敗: " + err.message);
+    setDictStatus("読み込めませんでした: " + err.message, true);
   } finally {
     e.target.value = "";
   }
@@ -763,4 +932,11 @@ document.addEventListener("DOMContentLoaded", () => {
   renderRulePackControls();
   renderCustomDictList();
   runCheck();
+
+  // 前回「次回から自動で読み込む」を選んでいれば、形態素解析を先に読み込んでおく
+  if (isKuromojiAutoLoad()) {
+    const autoLoad = document.getElementById("kuromojiAutoLoad");
+    if (autoLoad) autoLoad.checked = true;
+    initAndRunKuromoji();
+  }
 });

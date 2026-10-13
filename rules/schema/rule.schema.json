@@ -40,6 +40,37 @@
     "pattern": { "type": "string" },
     "replacement": { "type": "string" },
     "mustEmpty": { "type": "integer", "minimum": 1 },
+    "inflect": {
+      "description": "活用させて照合する。variants は辞書形で書き、語幹 + 活用語尾で検出する（js/analyzer.js の INFLECTION_ENDINGS）。",
+      "enum": [
+        "godan-ku",
+        "godan-gu",
+        "godan-su",
+        "godan-tsu",
+        "godan-bu",
+        "godan-mu",
+        "godan-ru",
+        "godan-u",
+        "ichidan",
+        "ichidan-any",
+        "i-adj"
+      ]
+    },
+    "exceptions": {
+      "description": "別の語として読み飛ばす文字列（例: 「プレゼン」のルールに対する「プレゼント」）。",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "hit": {
+      "description": "検証専用。このルールで指摘が出るはずの例。生成物には含めない。",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "miss": {
+      "description": "検証専用。このルールで指摘が出てはいけない例。生成物には含めない。",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
     "source": {
       "oneOf": [
         { "type": "string", "minLength": 1 },

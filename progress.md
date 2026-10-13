@@ -1,5 +1,57 @@
 # 進捗: Web Worker 経由の表記ゆれチェック
 
+## 2026-10-13 セッション（検出ロジックと既定辞書の見直し、Beta タブの使い勝手）
+
+先行ツール（textlint 15.8 / prh 6.1 / textlint-rule-preset-ja-technical-writing 12 / JTF プリセット 3.0.3 / kuromoji 0.1.2 / lindera-wasm 2.1）を確認したうえで、
+「バニラ JS・辞書ベース・ブラウザ完結」の方針は変えず、検出の取りこぼしと誤検知を減らした。
+
+### 見つかった問題（改修前）
+
+- **辞書形しか検出できない**: 「気付く／気づく」のルールが「気づいた・気づき」に反応しない（Kuromoji を読み込まない限り）。
+- **絶対に一致しないルール**: 「～ていく／～て行く」など先頭に「～」が付いた 12 ルールと、「１つ、２つ／一つ、二つ」「５か年／５ヵ年」は、その文字列どおりにしか一致しなかった。
+- **部分一致の誤検知**: 単位の `g`・`L`・`mm` が英単語（Google・HTML・command）に、「ミリ」がファミリーに、「プレゼン」がプレゼントに、「致します」が一致しますに、「更に」が変更にに、「故に」が事故にに、「箇所」が該当箇所に一致していた。
+- **誤った推奨**: 「打ち合わせ → 打合」「問い合わせ → 問合」「かたち → 図形」のように、統一先として不適切なものがあった。
+- **PDF の行末で切れた語**（「気づ⏎いた」）を検出できなかった。
+- 検証コーパス（`tests/detection-corpus.js`、誤検知しやすい語を意図的に集めた 70 行）での成績: 指摘すべき表記 25/61、誤検知の回避 24/44。
+
+### 解析エンジン（`js/analyzer.js`）
+
+- **`inflect`**: ルールに活用型（`godan-ku`・`ichidan`・`i-adj` など 11 種）を指定すると、辞書形から語幹を取り「語幹＋活用語尾」で照合する。
+  結果の `counts` には実際に出てきた形（`forms`）を添え、置換は語幹だけを差し替える（気づいた → 気付いた）。
+  語幹が漢字 1 字の五段動詞（落す・分る・持つ）は、直前が漢字なら熟語＋語尾（欠落し・自分ら・気持ち）とみなして除外する。
+- **`exceptions`**: 別語として読み飛ばす文字列（「プレゼン」に対する「プレゼント」）。数えずに文字だけ消費する。
+- **英字の語境界**: 英字で始まる・終わる語は、英単語の途中への一致を除外。
+- **行またぎ**: 和文どうしの改行を取り除いた解析用テキストで照合し、検出位置は元テキストへ戻す（`buildAnalysisView` / `remapResult`）。空行・句読点の後ろ・欧文の行はつながない。
+- **pattern ルールの置換**: 一致結果から `$1` などを展開する方式に変更（一致文字列に正規表現をかけ直す旧方式は、前後を見る条件があると置換されなかった）。
+- **Kuromoji**: 複数形態素の語（身に付ける）を先頭の形態素で代表させていた誤りを修正。本文を 1 回だけ走査し、出現位置つきで返す。
+
+### 既定辞書（`rules/packs/company/`）
+
+- 172 → 212 ルール。活用を指定 30、正規表現へ書き換え 33、例外語を追加 13、削除 2（「する／為る」「支払／支払い／支払ひ」）、追加 42（`rules-05.json`）。
+- 複合語の送り仮名（打ち合わせ・申し込み など 12 ルール）は統一先を決めない `consistency` に、学年で使い分ける用語（たし算／足し算、かたち／図形 など 14 ルール）と弊社／当社・貴社／御社・受付／受け付けは `contextual` に変更。
+- 追加 42 ルールは、常用漢字表にない漢字・読みを平仮名で書く語（勿論・或いは・筈・所謂 など）と、形式名詞・補助動詞（～の様に・～て欲しい・～に過ぎない など）。
+  「表外字」と理由に書いたものは、常用漢字さんの常用漢字リストと突き合わせて確認した（移行スクリプトで検証）。
+- **ルールの自己テスト**: 各ルールに `hit`（指摘が出るはずの例）・`miss`（出てはいけない例）を書ける。`npm run validate:rules` が実際の解析エンジンで検証し、生成物（`js/defaultDict.js`）には含めない。現在 423 例。
+- 改修後の検証コーパスの成績: 指摘すべき表記 61/61、誤検知の回避 44/44。リポジトリ群の Markdown（約 205 万字）で目視確認し、誤検知の多かった「～て見る」「～て置く」「～て行く」は対象の動詞を絞った。
+
+### 画面
+
+- **検知結果**: 原文の出現順に並べ替え。活用するルールは実際の形（原文: 気づい・気づき）を表示。「この指摘を隠す」「隠した指摘を戻す」を追加（`ignoredGroups` は以前から変数だけあり、操作する画面が無かった）。
+  出典表示を「表記統一さん 既定辞書（新聞表記）」に、開発者向けの定型文（旧辞書から移行したルール…）は非表示に。
+- **活用形タブ（Beta）**: 結果が「基本形: ○○」だけだったのを、表記ごとの件数・実際の形・クリックで原文へ移動、に変更。本文を変えると自動で再解析（「再解析」ボタンは廃止）。
+  上限を 1 万字 → 20 万字に上げ、超過時はポップアップではなくタブ内に表示。「次回から自動で読み込む」（localStorage `hyoki_kuromoji_auto`）を追加。
+  読み込み後に検知結果タブへ語の区切りが反映されることを明示し、チェックボックスで切れるようにした。
+- **辞書設定タブ（Beta）**: ルールパックに説明を表示。カスタムルールは読点「、」・全角カンマでも区切れる。読み込み・追加の結果はタブ内に表示（alert をやめた）。
+
+### 注意点（次回以降）
+
+- `style.dist.css` は変更なし。追加したマークアップは既存のクラスだけで組んだ（未使用だったクラスを足すと再生成が必要になる。ドキュメントにクラス名を書くだけでも Tailwind が拾うので注意）。削除した「再解析」ボタンだけが使っていた `py-2.5` は、この行に文字として残っているため生成物にも残る（Tailwind は progress.md も走査する）。Windows で `npm run build:css` を実行すると既知の末尾 1 桁の差（`.0796585`）が出るので、今回も `.0796584` へ戻して差分なしを確認した。
+- 活用の語尾は主な形だけ（`INFLECTION_ENDINGS`）。「気づけば」のような仮定形は五段の「け」で拾えるが、一段動詞の「出来れば」は「れ」で拾う、といった近似。
+- 「持つ → もつ」は活用形も指摘するようになったため、物を手に持つ場合の指摘が増える（要確認・理由欄で説明）。多すぎる場合は `company.0040` の `inflect` を外す。
+- `backend/`（任意・未接続）は `inflect`・`exceptions` を解釈しない。Python の `re` が解釈できない正規表現（`\p{sc=Han}`・可変長の後読み）のルールは読み飛ばす。
+- `backend/__pycache__/*.pyc` が Git に追跡されたままになっている（`.gitignore` には記載済み）。`git rm -r --cached backend/__pycache__ backend/tests/__pycache__` で外せる。
+- `npm audit` の high 4 件は開発用の `@tailwindcss/cli` → `@parcel/watcher` → `micromatch` → `braces` 由来（公開物には含まれない）。`npm audit fix --force` は tailwind を 4.3.0 へ下げるため適用していない。
+
 ## 2026-10-01 セッション（保守）
 
 - mammoth を 1.12.0 → 1.13.0 に更新（変更履歴付き Word の「移動」段落の読み取り改善。呼び出しは `await` のみで Promise 実装変更の影響なし）。
@@ -24,7 +76,7 @@
 | PR         | open なし                                                                  |
 | open Issue | #15（JTF全ルール）、#16（prh辞書）、#27（ファジー精度）                    |
 | 動作形態   | フロント単体（`js/app.js` の `API_BASE` は空。backend は任意構成で未接続） |
-| テスト     | `npm test` 9件、`npm run validate:rules` 5パック179ルール、backend pytest  |
+| テスト     | `npm test` 29件、`npm run validate:rules` 5パック219ルール・423例、backend pytest 14件（2026-10-13 更新） |
 | Tailwind   | 4.3.2（`style.dist.css` はコミット管理。CI無しのため手動再生成が必要）     |
 
 古いコミット履歴表（`ff48812` 等）は情報が古くなったため削除した。履歴は `git log` を参照。
@@ -67,7 +119,7 @@
 | `js/app.js`          | **新規** UIロジック全体：Worker通信・イベント登録・描画関数・初期化（DOMContentLoaded）                                      |
 | `js/worker.js`       | Worker: `ANALYZE` / `FUZZY` / `INIT_KUROMOJI` / `KUROMOJI_ANALYZE` を処理                                                    |
 | `js/analyzer.js`     | `analyze` / `analyzeAsync` / `fuzzyAnalyze` / `kuromojiAnalyze` / `buildHighlightedHTML` / `escapeHTML`                      |
-| `js/defaultDict.js`  | **生成ファイル**（`GENERATED_RULES`／5パック179ルール）。原本は `rules/packs/`、`npm run build:rules` で生成。直接編集しない |
+| `js/defaultDict.js`  | **生成ファイル**（`GENERATED_RULES`／5パック219ルール）。原本は `rules/packs/`、`npm run build:rules` で生成。直接編集しない |
 | `js/dictManager.js`  | カスタム辞書管理（localStorage + JSON/TSV/CSV import、パックON/OFF）                                                         |
 | `js/documentText.js` | PDF.js の断片から改行・語間を復元してテキスト化                                                                              |
 
@@ -84,10 +136,10 @@
 
 | type               | payload                       | 戻り値                                         |
 | ------------------ | ----------------------------- | ---------------------------------------------- |
-| `ANALYZE`          | `{ text, dict }`              | `[{ group, recommended, counts[], others[] }]` |
+| `ANALYZE`          | `{ text, dict, boundaryAware }` | `[{ group, recommended, counts[], others[] }]` |
 | `FUZZY`            | `{ text, dict, maxDistance }` | `[{ dictWord, group, candidates[] }]`          |
 | `INIT_KUROMOJI`    | `{}`                          | `true`                                         |
-| `KUROMOJI_ANALYZE` | `{ text, dict }`              | `[{ group, recommendedWord, foundBases[] }]`   |
+| `KUROMOJI_ANALYZE` | `{ text, dict }`              | `[{ ruleId, group, preferred, foundBases[{ word, count, surfaces, occurrences }] }]` |
 
 kuromoji は `INIT_KUROMOJI`/`KUROMOJI_ANALYZE` 呼び出し時に遅延 importScripts（CDN失敗時も ANALYZE/FUZZY は継続動作）。
 

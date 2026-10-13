@@ -8,11 +8,13 @@
 
 - **ブラウザ完結**: テキストは外部送信されず、解析はすべてブラウザ内（Web Worker）で実行
 - **多様な入力**: `.docx` / `.pdf` / `.txt` 読込・直接貼り付けに対応
+- **活用形も検出**: 「気付く」のルールで「気づいた・気づき・気づかない」まで指摘（形態素解析の読み込みは不要）
+- **行末で切れた語も検出**: PDF の行末で「気づ／いた」と分かれた語もつないで照合
 - **2種の検出**: 辞書ベース／Kuromoji 活用形解析（Beta）
   （ファジー（近似一致）は精度不足のため非表示。実装は維持。[#12](https://github.com/edi-tool/hyoki-checker/issues/12) / [#27](https://github.com/edi-tool/hyoki-checker/issues/27)）
 - **カスタム辞書**: 自社の表記基準を追加（localStorage 保存、JSON/TSV/CSV インポート）
 - **基準表記を明示**: 辞書グループの先頭を基準とし、多数派に流されず判定
-- **原文位置へ移動**: 結果の表記をクリックすると該当箇所を順番に選択
+- **原文位置へ移動**: 結果の表記をクリックすると該当箇所を順番に選択。不要な指摘は「この指摘を隠す」で一覧から外せる
 - **基準表記へ統一**: 実際に検出した位置だけを一括置換し、新しい `.docx` を出力
 
 ## 使い方
@@ -49,7 +51,8 @@
 `js/defaultDict.js` とバックエンド用 `backend/dicts/default_dict.json` を同時生成します。
 生成ファイルは直接編集しません。
 
-- `company`: 既存辞書を構造化して移行。初期ON、旧ルールは安全のため原則 `confirm`
+- `company`（画面上の名前は「新聞表記」）: 既定の辞書。初期ON、安全のため原則 `confirm`（要確認）。
+  平仮名で書く語・補助動詞・形式名詞、送り仮名、単位、教育用語など 212 ルール
 - `jtf-3.0`: JTF 3.0から加工した少数ルール。初期OFF
 - `bunka-official`: 文化審議会資料を参照した少数ルール。初期OFF、自動修正なし
 - `consistency-only`: 正誤を決めず、文書内の混在だけを通知。初期OFF
@@ -57,6 +60,41 @@
 `fixMode: auto` のルールだけが一括Word出力の置換対象です。`confirm`、`none`、
 文脈依存、Sudachi・ファジー由来の候補は自動置換しません。旧カスタム辞書の
 `string[][]` は読み込み時に構造化し、`confirm` として移行します。
+
+### ルールの書き方
+
+`rules/packs/<パック>/*.json` に、次の形で書きます（必須項目は `rules/schema/rule.schema.json`）。
+
+```json
+{
+  "id": "company.0069",
+  "type": "preferred",
+  "preferred": "気付く",
+  "variants": ["気付く", "気づく"],
+  "inflect": "godan-ku",
+  "category": "legacy",
+  "severity": "warning",
+  "fixMode": "confirm",
+  "source": "company",
+  "hit": ["間違いに気づいた", "よさに気づき"],
+  "miss": ["気付いた"]
+}
+```
+
+| 項目                     | 用途                                                                                                                                                                                                 |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `inflect`                | 活用させて照合する。`variants` は辞書形で書く。`godan-ku`（書く）・`godan-gu`・`godan-su`・`godan-tsu`・`godan-bu`・`godan-mu`・`godan-ru`・`godan-u`・`ichidan`・`ichidan-any`・`i-adj` |
+| `exceptions`             | 別の語として読み飛ばす文字列（「プレゼン」のルールに対する「プレゼント」）                                                                                                                           |
+| `type: "pattern"`        | 前後の条件が必要なとき。`pattern` に正規表現（`u` フラグ。後読み・`\p{sc=Han}` 可）、`replacement` に置換文字列（`$1` 可）。`variants` は画面に出す代表例                                         |
+| `type: "consistency"`    | 統一先を決めず、2 種類以上が混在したときだけ知らせる                                                                                                                                                 |
+| `type: "contextual"`     | 意味や場面で使い分ける語。混在したときだけ知らせ、置換しない                                                                                                                                         |
+| `hit` / `miss`           | そのルールの自己テスト。`hit` は指摘が出るはずの例、`miss` は出てはいけない例。`npm run validate:rules` が検証し、配布物（`js/defaultDict.js`）には含めない                                         |
+
+`ichidan` は語幹の直後に来る主な形（る・た・て・ない・ます…）だけに一致し、`ichidan-any` は後続を問いません
+（「出来る」は「出来事」を拾わないよう前者、「現われる」「ふまえる」は後者）。
+語幹が漢字 1 字の五段動詞（落す・分る・持つ）は、直前が漢字のとき熟語＋語尾（欠落し・自分ら・気持ち）とみなして除外します。
+
+検出精度は `tests/detection-corpus.js`（指摘すべき表記と、誤検知しやすい語を集めた例文）で固定しています。
 
 ## prh 形式辞書の読み書き
 
@@ -79,6 +117,7 @@ prh 辞書をそのまま利用できます。逆に「📤 prh YAML 書き出�
 - [Mammoth.js](https://github.com/mwilliamson/mammoth.js) のブラウザ版で `.docx` をプレーンテキスト化
 - [kuromoji.js](https://github.com/takuyaa/kuromoji.js) を Web Worker で遅延読込し、形態素境界と活用形を補助判定
 - [textlint](https://github.com/textlint/textlint) は日本語校正の参考実装として調査。汎用ルールエンジンのため、現状は軽量な辞書ベース処理を維持
+  （2026-10-13 再確認: textlint 15.8.0 / prh 6.1.0。ルールごとの例で辞書を検証する考え方は prh の `specs` を参考に、`hit`／`miss` として取り入れた）
 
 いずれも文書本文を外部APIへ送らず、ブラウザ内で処理します。CDNからライブラリ本体を取得する
 場合はありますが、読み込んだ文書データは送信しません。
@@ -122,8 +161,8 @@ JS を変更した場合は `js/app.js` の `APP_VERSION` と `index.html` の�
 ### 検証コマンド
 
 ```sh
-npm test                # フロントのテスト
-npm run validate:rules  # ルールパックの検証
+npm test                # フロントのテスト（検出精度の回帰テストを含む）
+npm run validate:rules  # ルールパックの検証（各ルールの hit / miss 例も実行）
 ```
 
 ## 関連ツール・ライセンス

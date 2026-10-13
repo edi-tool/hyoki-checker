@@ -4,100 +4,130 @@
     "type": "preferred",
     "preferred": "表す",
     "variants": ["表す", "表わす"],
+    "inflect": "godan-su",
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "source": "company",
+    "hit": ["表わした", "表わす"],
+    "miss": ["表面", "表した"]
   },
   {
     "id": "company.0045",
     "type": "preferred",
     "preferred": "現れる",
     "variants": ["現れる", "現われる"],
+    "inflect": "ichidan-any",
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "source": "company",
+    "hit": ["現われた", "現われ、"],
+    "miss": ["現れた", "現在"]
   },
   {
     "id": "company.0046",
     "type": "preferred",
     "preferred": "断る",
     "variants": ["断る", "断わる"],
+    "inflect": "godan-ru",
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "source": "company",
+    "hit": ["断わった", "断わる"],
+    "miss": ["断った", "判断"]
   },
   {
     "id": "company.0047",
     "type": "preferred",
     "preferred": "終わる",
     "variants": ["終わる", "終る"],
+    "inflect": "godan-ru",
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "source": "company",
+    "hit": ["授業の終りに", "終った"],
+    "miss": ["終了", "終わり"]
   },
   {
     "id": "company.0048",
     "type": "preferred",
     "preferred": "変わる",
     "variants": ["変わる", "変る"],
+    "inflect": "godan-ru",
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "source": "company",
+    "hit": ["変った", "変り"],
+    "miss": ["変化", "変える", "変わった"]
   },
   {
     "id": "company.0049",
     "type": "preferred",
     "preferred": "代わる",
     "variants": ["代わる", "代る"],
+    "inflect": "godan-ru",
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "source": "company",
+    "hit": ["代りに"],
+    "miss": ["時代", "代表", "代わり"]
   },
   {
     "id": "company.0050",
     "type": "preferred",
     "preferred": "行う",
     "variants": ["行う", "行なう", "おこなう"],
+    "inflect": "godan-u",
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "source": "company",
+    "hit": ["実験を行なった", "おこなう", "行ないます"],
+    "miss": ["行った", "銀行", "行う"]
   },
   {
     "id": "company.0051",
     "type": "preferred",
     "preferred": "落とす",
     "variants": ["落とす", "落す"],
+    "inflect": "godan-su",
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "source": "company",
+    "hit": ["落した"],
+    "miss": ["落下", "落ち着く", "落とした"]
   },
   {
     "id": "company.0052",
     "type": "preferred",
     "preferred": "暮らす",
     "variants": ["暮らす", "暮す"],
+    "inflect": "godan-su",
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "source": "company",
+    "hit": ["暮している", "暮し"],
+    "miss": ["夕暮れ", "暮らし"]
   },
   {
     "id": "company.0053",
     "type": "preferred",
     "preferred": "もとづく",
     "variants": ["もとづく", "基づく"],
+    "inflect": "godan-ku",
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "source": "company",
+    "hit": ["経験に基づいて", "基づき"],
+    "miss": ["基本", "もとづいて"]
   },
   {
     "id": "company.0054",
@@ -111,33 +141,48 @@
   },
   {
     "id": "company.0055",
-    "type": "preferred",
+    "type": "pattern",
     "preferred": "か月",
     "variants": ["か月", "カ月", "ヶ月", "箇月", "ケ月", "ヵ月"],
+    "pattern": "(?<=[0-9０-９一二三四五六七八九十百千数何幾])[カヶケヵ箇個]月",
+    "replacement": "か月",
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "reason": "数に続く「かげつ」は「か月」と書く。",
+    "source": "company",
+    "hit": ["3ヶ月", "数カ月", "6箇月"],
+    "miss": ["3か月", "来月"]
   },
   {
     "id": "company.0056",
-    "type": "preferred",
+    "type": "pattern",
     "preferred": "か国",
     "variants": ["か国", "カ国", "ヶ国", "箇国", "ケ国"],
+    "pattern": "(?<=[0-9０-９一二三四五六七八九十百千数何幾])[カヶケヵ箇個]国",
+    "replacement": "か国",
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "reason": "数に続く「かこく」は「か国」と書く。",
+    "source": "company",
+    "hit": ["5カ国", "数ヶ国"],
+    "miss": ["5か国", "外国"]
   },
   {
     "id": "company.0057",
-    "type": "preferred",
+    "type": "pattern",
     "preferred": "か所",
     "variants": ["か所", "カ所", "ヶ所", "箇所", "ケ所"],
+    "pattern": "(?<=[0-9０-９一二三四五六七八九十百千数何幾])[カヶケヵ箇個]所",
+    "replacement": "か所",
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "reason": "数に続く「かしょ」は「か所」と書く。「該当箇所」のような名詞の「箇所」は対象外。",
+    "source": "company",
+    "hit": ["5箇所", "数ヶ所", "3カ所"],
+    "miss": ["該当箇所", "修正箇所を", "3か所"]
   },
   {
     "id": "company.0058",
@@ -151,33 +196,46 @@
   },
   {
     "id": "company.0059",
-    "type": "preferred",
-    "preferred": "５か年",
-    "variants": ["５か年", "５ヵ年", "５ヶ年"],
+    "type": "pattern",
+    "preferred": "か年",
+    "variants": ["か年", "ヵ年", "ヶ年", "カ年", "箇年"],
+    "pattern": "(?<=[0-9０-９一二三四五六七八九十百千数何幾])[カヶケヵ箇個]年",
+    "replacement": "か年",
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "reason": "数に続く「かねん」は「か年」と書く。",
+    "source": "company",
+    "hit": ["2ヵ年計画", "5ヶ年"],
+    "miss": ["5か年", "来年"]
   },
   {
     "id": "company.0060",
-    "type": "preferred",
-    "preferred": "１つ、２つ",
-    "variants": ["１つ、２つ", "一つ、二つ"],
+    "type": "pattern",
+    "preferred": "２つ、３つ（算用数字）",
+    "variants": ["２つ、３つ", "二つ、三つ"],
+    "pattern": "(?<!\\p{sc=Han})[二三四五六七八九]つ(?=[の、。をがはにでもとず目]|$)",
     "category": "legacy",
-    "severity": "warning",
-    "fixMode": "confirm",
-    "source": "company"
+    "severity": "info",
+    "fixMode": "none",
+    "reason": "横書きで個数を数える場合は算用数字を使う。「一つ」は慣用的な表現（一つ一つ、何一つ など）が多いため対象外。",
+    "source": "company",
+    "hit": ["二つの方法", "三つに分ける"],
+    "miss": ["一つ一つ", "瓜二つ", "何一つ", "2つの"]
   },
   {
     "id": "company.0061",
-    "type": "preferred",
-    "preferred": "１人、２人",
-    "variants": ["１人、２人", "一人、二人"],
+    "type": "pattern",
+    "preferred": "２人、３人（算用数字）",
+    "variants": ["２人、３人", "二人、三人"],
+    "pattern": "(?<!\\p{sc=Han})[二三四五六七八九十]人(?=[の、。をがはにでもとず]|ずつ|組|$)",
     "category": "legacy",
-    "severity": "warning",
-    "fixMode": "confirm",
-    "source": "company"
+    "severity": "info",
+    "fixMode": "none",
+    "reason": "横書きで人数を数える場合は算用数字を使う。「一人」は慣用的な表現（一人一人、一人で など）が多いため対象外。",
+    "source": "company",
+    "hit": ["三人で話し合う", "二人の児童"],
+    "miss": ["一人一人", "二人三脚", "大人", "十人十色", "3人で"]
   },
   {
     "id": "company.0062",
@@ -233,51 +291,77 @@
     "id": "company.0067",
     "type": "preferred",
     "preferred": "当たって",
-    "variants": ["当たって", "あたって"],
+    "variants": ["当たって", "あたって", "当って"],
+    "exceptions": ["さしあたって"],
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "source": "company",
+    "hit": ["指導にあたって"],
+    "miss": ["さしあたって", "当たって"]
   },
   {
     "id": "company.0068",
     "type": "preferred",
     "preferred": "付ける",
     "variants": ["付ける", "つける"],
+    "inflect": "ichidan",
+    "exceptions": [
+      "身につけ",
+      "くっつけ",
+      "やっつけ",
+      "かこつけ",
+      "こじつけ",
+      "しつけ",
+      "かけつけ",
+      "ぶつけ"
+    ],
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "source": "company",
+    "hit": ["気をつけて", "名前をつける", "しるしをつけた"],
+    "miss": ["くっつけて", "やっつける", "ぶつけた", "付ける"]
   },
   {
     "id": "company.0069",
     "type": "preferred",
     "preferred": "気付く",
     "variants": ["気付く", "気づく"],
+    "inflect": "godan-ku",
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "source": "company",
+    "hit": ["間違いに気づいた", "よさに気づき", "気づかせる", "気づく"],
+    "miss": ["気付いた"]
   },
   {
     "id": "company.0070",
     "type": "preferred",
     "preferred": "身に付ける",
     "variants": ["身に付ける", "身につける"],
+    "inflect": "ichidan-any",
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "source": "company",
+    "hit": ["身につけて", "身につけ、", "身につける"],
+    "miss": ["身に付けて"]
   },
   {
     "id": "company.0071",
     "type": "preferred",
     "preferred": "し合う",
     "variants": ["し合う", "しあう"],
+    "inflect": "godan-u",
+    "exceptions": ["しあわせ", "しあさって"],
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "source": "company",
+    "hit": ["話しあって", "話しあう"],
+    "miss": ["しあわせ", "話し合って"]
   },
   {
     "id": "company.0072",
@@ -303,7 +387,7 @@
     "id": "company.0074",
     "type": "preferred",
     "preferred": "取り組み",
-    "variants": ["取り組み", "取組"],
+    "variants": ["取り組み", "取組", "取組み"],
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
@@ -323,41 +407,54 @@
     "id": "company.0076",
     "type": "preferred",
     "preferred": "関わる",
-    "variants": ["関わる", "かかわる"],
+    "variants": ["関わる", "かかわる", "係わる"],
+    "inflect": "godan-ru",
+    "exceptions": ["にもかかわらず", "にかかわらず"],
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "source": "company",
+    "hit": ["学級全体にかかわる", "かかわって", "係わる"],
+    "miss": ["にもかかわらず", "雨にかかわらず", "関わる"]
   },
   {
     "id": "company.0077",
     "type": "preferred",
     "preferred": "育む",
     "variants": ["育む", "はぐくむ"],
+    "inflect": "godan-mu",
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "source": "company",
+    "hit": ["思いをはぐくみ", "はぐくんで", "はぐくむ"],
+    "miss": ["育む"]
   },
   {
     "id": "company.0078",
     "type": "preferred",
-    "preferred": "踏まえて",
-    "variants": ["踏まえて", "ふまえて"],
+    "preferred": "踏まえる",
+    "variants": ["踏まえる", "ふまえる"],
+    "inflect": "ichidan-any",
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "source": "company",
+    "hit": ["目標をふまえ、", "ふまえて"],
+    "miss": ["踏まえて"]
   },
   {
     "id": "company.0079",
     "type": "preferred",
     "preferred": "目指す",
     "variants": ["目指す", "めざす"],
+    "inflect": "godan-su",
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "source": "company",
+    "hit": ["ゴールをめざして", "めざす"],
+    "miss": ["目指して"]
   },
   {
     "id": "company.0080",
@@ -393,17 +490,20 @@
     "id": "company.0083",
     "type": "preferred",
     "preferred": "振り返る",
-    "variants": ["振り返る", "ふり返る"],
+    "variants": ["振り返る", "ふり返る", "ふりかえる"],
+    "inflect": "godan-ru",
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "source": "company",
+    "hit": ["学習をふり返って", "ふりかえる"],
+    "miss": ["振り返って"]
   },
   {
     "id": "company.0084",
     "type": "preferred",
     "preferred": "繰り返し",
-    "variants": ["繰り返し", "くりかえし"],
+    "variants": ["繰り返し", "くりかえし", "くり返し", "繰返し"],
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
@@ -414,10 +514,14 @@
     "type": "preferred",
     "preferred": "見取る",
     "variants": ["見取る", "見とる"],
+    "inflect": "godan-ru",
+    "exceptions": ["見とれ"],
     "category": "legacy",
     "severity": "warning",
     "fixMode": "confirm",
-    "source": "company"
+    "source": "company",
+    "hit": ["姿を見とって", "見とる"],
+    "miss": ["見とれる", "見取る"]
   },
   {
     "id": "company.0086",
