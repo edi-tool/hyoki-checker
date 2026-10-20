@@ -1,5 +1,11 @@
 # 進捗: Web Worker 経由の表記ゆれチェック
 
+## 2026-10-20 セッション（PR・ブランチの整理と dependabot の設定）
+
+- マージ済みの `feat/detection-accuracy`（#44）が残っていたが、ブランチ自動削除の設定とあわせて解消済み。オープンPRは0件。
+- `.github/dependabot.yml` を月1回・1PR（groups）・上限2件に変更（#45、edi-tool.github.io と同じ方針）。pdfjs-dist を含む更新PRでは従来どおり `npm ci` → `npm run sync:pdfjs` で CDN・README・`cmaps/` をそろえる旨をコメントに明記。
+- リポジトリ横断の記録は Editorial-Workspace の `docs/261020_repository_maintenance.md`。
+
 ## 2026-10-20 セッション（同義語辞書の更新確認）
 
 - Sudachi 同義語辞書の上流に v20260723・v20261015 の更新があったため、v20261015 の `synonyms.txt` から `backend/dicts/synonym_variants.json` を再生成（fbc7654、22,148 → 22,377 クラスタ）。
