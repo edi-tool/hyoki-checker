@@ -1,7 +1,12 @@
+# 依存の更新提案。PR を溜めないよう、月1回・1つの PR にまとめる（edi-tool 共通方針）。
+# pdfjs-dist の更新PRでは CLAUDE.md の手順（npm ci → npm run sync:pdfjs）で CDN・cmaps をそろえる。
 version: 2
 updates:
   - package-ecosystem: npm
     directory: "/"
     schedule:
-      interval: weekly
-    open-pull-requests-limit: 5
+      interval: monthly
+    groups:
+      npm:
+        patterns: ["*"]
+    open-pull-requests-limit: 2
