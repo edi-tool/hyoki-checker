@@ -12,6 +12,7 @@ Sudachi公式同義語辞書（synonyms.txt）を読み込み、同一語彙素�
     python backend/build_synonym_dict.py [CSVパス]
 
 CSVパス省略時は環境変数 SUDACHI_SYNONYMS、次に %TEMP%/sudachi_synonyms.txt を参照する。
+再生成したら、NOTICE の Sudachi 節にある Version（タグ名・生成日・クラスタ数）を更新する。
 """
 
 import csv

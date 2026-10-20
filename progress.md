@@ -1,5 +1,12 @@
 # 進捗: Web Worker 経由の表記ゆれチェック
 
+## 2026-10-20 セッション（同義語辞書の更新確認）
+
+- Sudachi 同義語辞書の上流に v20260723・v20261015 の更新があったため、v20261015 の `synonyms.txt` から `backend/dicts/synonym_variants.json` を再生成（fbc7654、22,148 → 22,377 クラスタ）。
+- 取得した `synonyms.txt` が v20261015 と同一（git blob 一致）であること、作業フォルダで再生成した JSON がコミット済みのものと完全一致することを確認。`pytest backend/tests` 14件合格。
+- 生成元の版を NOTICE の Sudachi 節（Version）に記録し、`build_synonym_dict.py` の docstring に「再生成したら Version を更新する」を追記。
+- 上流の確認記録は editorial-prompts-dev の `docs/upstream-registry.md`。
+
 ## 2026-10-13 セッション（検出ロジックと既定辞書の見直し、Beta タブの使い勝手）
 
 先行ツール（textlint 15.8 / prh 6.1 / textlint-rule-preset-ja-technical-writing 12 / JTF プリセット 3.0.3 / kuromoji 0.1.2 / lindera-wasm 2.1）を確認したうえで、

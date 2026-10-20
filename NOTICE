@@ -7,6 +7,7 @@ This product includes third-party materials listed below.
 Sudachi Synonym Dictionary (Sudachi 同義語辞書)
 ----------------------------------------------------------------------
 Source  : https://github.com/WorksApplications/SudachiDict
+Version : v20261015 (src/main/text/synonyms.txt, 2026-10-20 生成, 22,377 クラスタ)
 Copyright (c) 2017- Works Applications Co., Ltd.
 License : Apache License, Version 2.0
           (full text: THIRD_PARTY_LICENSES/SudachiDict-Apache-2.0.txt)

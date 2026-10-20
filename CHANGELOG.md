@@ -28,6 +28,7 @@
 - 単位記号（L・g・cm など）は数字の直後にあるものだけを対象に
 - 開発用ドキュメント・バックエンド・ルール原本・テストを GitHub Pages の公開ビルドから除外
 - pdf.js を 6.4.299 へ更新（これまで CDN は 6.1.200、`package.json` は 6.3.289 でずれていた）。README の Mammoth.js の記載を実際の 1.13.0 に修正
+- バックエンドの同義語辞書（`backend/dicts/synonym_variants.json`）を Sudachi 同義語辞書 v20261015 から再生成（22,148 → 22,377 クラスタ）。生成元の版を NOTICE に記録するようにした
 
 ### Fixed
 
