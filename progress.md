@@ -1,5 +1,9 @@
 # 進捗: Web Worker 経由の表記ゆれチェック
 
+## 2026-10-30 セッション（コードスキャン指摘の解消）
+
+- CodeQL `js/xss-through-dom`（`js/app.js` のプレビュー）: `escapeHTML` が読めないときの代替が本文をそのまま `innerHTML` に入れていた。`textContent` に変更。`?v=`・`APP_VERSION` を 20261030a に。`npm test` 29件合格。
+
 ## 2026-10-20 セッション（PR・ブランチの整理と dependabot の設定）
 
 - マージ済みの `feat/detection-accuracy`（#44）が残っていたが、ブランチ自動削除の設定とあわせて解消済み。オープンPRは0件。

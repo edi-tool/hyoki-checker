@@ -37,7 +37,7 @@ async function fetchBackendAnalyze(text) {
 // ---- Worker 通信 ----
 // JSを更新したら APP_VERSION を変更し、worker/importScripts のキャッシュを破棄する
 // （index.html のローカル<script>の ?v= とも揃えること）
-const APP_VERSION = "20261013a";
+const APP_VERSION = "20261030a";
 const worker = new Worker(`js/worker.js?v=${APP_VERSION}`);
 const workerCallbackMap = new Map();
 let messageIdCounter = 0;
@@ -388,10 +388,12 @@ function renderPreview(results) {
     return;
   }
   if (!results || results.length === 0) {
-    previewEl.innerHTML =
-      typeof escapeHTML === "function"
-        ? escapeHTML(currentText).replace(/\n/g, "<br>")
-        : currentText;
+    if (typeof escapeHTML === "function") {
+      previewEl.innerHTML = escapeHTML(currentText).replace(/\n/g, "<br>");
+    } else {
+      // escapeHTML が読めないときも本文を HTML として解釈させない
+      previewEl.textContent = currentText;
+    }
     if (countEl) countEl.textContent = "ゆらぎなし";
     return;
   }
