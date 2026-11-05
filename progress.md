@@ -1,5 +1,11 @@
 # 進捗: Web Worker 経由の表記ゆれチェック
 
+## 2026-11-05 セッション（edi-tool 共通デザインの適用）
+
+- edi-tool/.github の `DESIGN.md`（共通トークン）に合わせた。`style.css` 先頭に共通トークンとダークモードを追加し、Tailwind の配色変数（`--color-white`・`--color-gray-*` など）をダーク時に置き換えた。`--text-xs` を 13px に。
+- 基準未満だった配色を修正: 主ボタンの白字×オレンジ（2.3:1）→ 墨字、成功ボタン #43a047（白字 3.3:1）→ #2e7d32、推奨表記の文字色 #d97706（白地 3.2:1）とタブ・強調のオレンジ文字 → `--accent-ink`。フォーカス枠を 3px・`--focus` に（Tailwind の outline 打ち消しより優先）。
+- `index.html`・`js/app.js` の任意値クラス（色の直書き）をトークン参照に置換。10px・11px の任意値は text-xs に。`?v=`・`APP_VERSION` を 20261105a に。
+
 ## 2026-10-30 セッション（コードスキャン指摘の解消）
 
 - CodeQL `js/xss-through-dom`（`js/app.js` のプレビュー）: `escapeHTML` が読めないときの代替が本文をそのまま `innerHTML` に入れていた。`textContent` に変更。`?v=`・`APP_VERSION` を 20261030a に。`npm test` 29件合格。

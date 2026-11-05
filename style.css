@@ -1,12 +1,93 @@
 @import "tailwindcss";
 
 /* =========================================
+   共通デザイントークン（edi-tool 全ツール共通。正本: edi-tool/.github の DESIGN.md）
+   ※ レイヤー外の :root なので、Tailwind の @layer theme の値より優先される
+========================================= */
+:root {
+  --bg: #f8f6f2;
+  --surface: #fff;
+  --surface-2: #f1eee8;
+  --border: #e0e0e0;
+  --control-border: #8c877e; /* 入力欄・ボタンの輪郭（白地 3.57:1） */
+  --text: #0f0f0f;
+  --text-sub: #5f5b54; /* 背景上 6.25:1 */
+  --accent: #f28c06;
+  --accent-dark: #d97a00;
+  --accent-soft: #fff8f0;
+  --accent-line: #ffd9a8;
+  --accent-text: #b35f00; /* 白地の太字・大きい文字だけ（白地 4.61:1） */
+  --accent-ink: #9a5200; /* 小さい文字のアクセント（背景上 5.43:1・淡色上 5.57:1） */
+  --on-accent: #1a1100; /* アクセント地の文字（7.59:1） */
+  --focus: #9a5200;
+  --danger: #c62828;
+  --danger-soft: #fdf0ef;
+  --ok: #2e7d32;
+  --ok-soft: #e8f5e9;
+  --ok-line: #a5d6a7;
+  --violet-text: #6a1b9a;
+  --violet-soft: #f3e5f5;
+  --violet-line: #ce93d8;
+  --text-xs: 0.8125rem; /* Tailwind の text-xs（12px）を 13px に。13px 未満を使わない */
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1b19;
+    --surface: #26241f;
+    --surface-2: #2f2c26;
+    --border: #46423a;
+    --control-border: #8a8476;
+    --text: #f3f1ec;
+    --text-sub: #b9b4a8;
+    --accent-soft: #33281a;
+    --accent-line: #6b4a1f;
+    --accent-text: #ffb24d;
+    --accent-ink: #ffb24d;
+    --focus: #ffb24d;
+    --danger: #ff8a80;
+    --danger-soft: #3a2120;
+    --ok: #81c784;
+    --ok-soft: #1f3322;
+    --ok-line: #3f6b44;
+    --violet-text: #ce93d8;
+    --violet-soft: #2e2236;
+    --violet-line: #5a3d66;
+    /* Tailwind の配色をダーク用に置き換える（bg-white・text-gray-500 などをそのまま使えるように） */
+    --color-white: #26241f;
+    --color-gray-50: #2b2924;
+    --color-gray-100: #2f2c26;
+    --color-gray-200: #46423a;
+    --color-gray-300: #5a554b;
+    --color-gray-400: #9a9486;
+    --color-gray-500: #b9b4a8;
+    --color-gray-600: #cdc8bc;
+    --color-gray-700: #dedad0;
+    --color-gray-800: #f3f1ec;
+    --color-red-50: #3a2120;
+    --color-red-100: #4a2624;
+    --color-red-200: #6b2f2c;
+    --color-red-400: #ff8a80;
+    --color-red-500: #ff8a80;
+    --color-red-600: #ff9e96;
+    --color-red-700: #ffb3ad;
+    --color-orange-100: #33281a;
+    --color-orange-300: #6b4a1f;
+    --color-orange-600: #ffb24d;
+    --color-yellow-50: #332e18;
+    --color-yellow-200: #5c5222;
+    --color-yellow-400: #e6c14d;
+    --color-yellow-800: #f2d98a;
+  }
+}
+
+/* =========================================
    ベースの設定
 ========================================= */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: #f8f6f2; /* アプリ本体のトーンを崩さないよう背景色を維持 */
-  color: #333;
+  background-color: var(--bg);
+  color: var(--text);
   margin: 0;
   padding: 0;
   display: flex;
@@ -41,14 +122,14 @@ main {
 .header-title {
   font-size: 2rem;
   font-weight: bold;
-  color: #2c3e50;
+  color: var(--text);
   margin: 0;
   letter-spacing: 0.05em;
 }
 
 .header-subtitle {
   font-size: 0.9rem;
-  color: #6c757d;
+  color: var(--text-sub);
   margin-top: 0.5rem;
   margin-bottom: 0;
 }
@@ -60,30 +141,29 @@ main {
   text-align: center;
   padding: 2rem 1rem;
   margin-top: 3rem;
-  background-color: #f8f9fa;
-  border-top: 1px solid #e9ecef;
+  background-color: transparent;
+  border-top: 1px solid var(--border);
 }
 
 .footer-content p {
   margin: 0.25rem 0;
   font-size: 0.875rem;
-  color: #6c757d;
+  color: var(--text-sub);
 }
 
 .footer-note {
   font-size: 0.8rem;
-  color: #adb5bd;
+  color: var(--text-sub);
 }
 
 /* =========================================
    アプリ本体 (Cards Component) のデザイン
 ========================================= */
 .app-container {
-  background-color: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
   padding: 28px 32px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   width: 100%;
   max-width: 1300px;
   
@@ -97,33 +177,33 @@ main {
 
 /* File Input & Dropzone Styling */
 .drop-zone {
-  border: 2px dashed #d4d4d4;
-  background-color: #fafafa;
+  border: 2px dashed var(--control-border);
+  background-color: var(--surface-2);
   transition: all 0.2s ease;
 }
 .drop-zone:hover, .drop-zone.dragover {
-  border-color: #f28c06;
-  background-color: #fff8f0;
+  border-color: var(--accent);
+  background-color: var(--accent-soft);
 }
 
 /* Buttons */
 .btn-primary {
-  background-color: #f28c06;
-  color: white;
+  background-color: var(--accent);
+  color: var(--on-accent); /* 白字はオレンジ地で 2.3:1 しかない */
   transition: background-color 0.2s;
   border: none;
 }
 .btn-primary:hover {
-  background-color: #d97706;
+  background-color: var(--accent-dark);
 }
 .btn-success {
-  background-color: #43a047;
-  color: white;
+  background-color: #2e7d32;
+  color: #fff; /* 白字 5.13:1（#43a047 では 3.3:1） */
   transition: background-color 0.2s;
   border: none;
 }
 .btn-success:hover {
-  background-color: #388e3c;
+  background-color: #1b5e20;
 }
 
 /* Tabs Styling */
@@ -131,13 +211,14 @@ main {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  border-bottom: 2px solid #e0e0e0;
+  border-bottom: 2px solid var(--border);
 }
 .tab-btn {
   padding: 12px 18px;
   border: 1px solid transparent;
   background-color: transparent;
-  color: #757575;
+  color: var(--text-sub);
+  min-height: 44px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
@@ -148,13 +229,13 @@ main {
   font-family: inherit;
 }
 .tab-btn:hover {
-  color: #0f0f0f;
-  background-color: #f5f5f5;
+  color: var(--text);
+  background-color: var(--surface-2);
 }
 .tab-btn.active {
-  color: #f28c06;
-  border-bottom: 3px solid #f28c06;
-  background-color: #fff;
+  color: var(--accent-ink);
+  border-bottom: 3px solid var(--accent);
+  background-color: var(--surface);
 }
 
 /* Highlight Override */
@@ -169,19 +250,20 @@ main {
 /* Scrollbars */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--control-border); }
 
 /* =========================================
-   共通デザイン統一（事務ツール5種で統一）
+   共通デザイン統一（edi-tool 全ツール共通）
    ※ プレーンCSS。Tailwindがそのまま通すので build:css の出力に含まれる
 ========================================= */
 body {
   font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", Meiryo, Roboto, sans-serif;
 }
-.header-title { color: #0f0f0f; }
-.site-footer { background-color: transparent; border-top: 1px solid #e0e0e0; }
-:focus-visible { outline: 2px solid #f28c06; outline-offset: 2px; }
+.header-title { color: var(--text); }
+.site-footer { background-color: transparent; border-top: 1px solid var(--border); }
+/* Tailwind の focus:outline-none（レイヤー内）より、このレイヤー外の指定が優先される */
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
@@ -189,22 +271,22 @@ body {
 /* ヘッダーを他ツール（h1 18px/600・サブ 13px）と揃え、所属（edi-tool）へのリンクを添える */
 .site-header { padding: 32px 16px 24px; }
 .header-title { font-size: 18px; font-weight: 600; letter-spacing: -0.4px; line-height: 1.5; }
-.header-subtitle { font-size: 13px; color: #6b6b6b; margin-top: 4px; line-height: 1.6; }
+.header-subtitle { font-size: 13px; color: var(--text-sub); margin-top: 4px; line-height: 1.6; }
 .brand-link {
   display: inline-block;
   margin-bottom: 4px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  color: #6b6b6b;
+  color: var(--text-sub);
   text-decoration: none;
   letter-spacing: 0.02em;
 }
-.brand-link:hover { color: #b35f00; text-decoration: underline; }
-/* フッターを他ツール（12px・区切り線なし）と揃える */
+.brand-link:hover { color: var(--accent-ink); text-decoration: underline; }
+/* フッターを他ツール（13px・区切り線なし）と揃える */
 .site-footer { border-top: none; padding: 32px 16px; margin-top: 0; }
-.footer-content p { color: #6b6b6b; font-size: 12px; }
+.footer-content p { color: var(--text-sub); font-size: 13px; }
 .footer-content a { color: inherit; }
-.footer-content a:hover { color: #b35f00; }
+.footer-content a:hover { color: var(--accent-ink); }
 /* body の break-all だと英単語（License 等）が途中で折れる */
 .site-footer, .brand-link { word-break: normal; }
 /* 件数が未確定のときに空の丸だけが表示されるのを防ぐ */
@@ -246,7 +328,7 @@ body {
   width: 28px;
   height: 28px;
   margin: 0 auto 8px;
-  color: #f28c06;
+  color: var(--accent);
 }
 .spinner-sm {
   display: inline-block;
@@ -254,8 +336,8 @@ body {
   height: 12px;
   margin-right: 8px;
   vertical-align: -1px;
-  border: 2px solid #ffd9a8;
-  border-top-color: #f28c06;
+  border: 2px solid var(--accent-line);
+  border-top-color: var(--accent);
   border-radius: 50%;
   animation: hyoki-spin 0.8s linear infinite;
 }

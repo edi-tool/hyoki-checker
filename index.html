@@ -10,7 +10,8 @@ lang: ja
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f8f6f2" />
+    <meta name="theme-color" content="#f8f6f2" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1c1b19" media="(prefers-color-scheme: dark)" />
 
     <title>{{ page.title }} | 表記統一さん</title>
     <meta name="description" content="{{ page.description }}" />
@@ -106,15 +107,15 @@ lang: ja
     ></script>
 
     <!-- JS更新時は ?v= を一括で上げてキャッシュを破棄（js/app.js の APP_VERSION と揃える）-->
-    <script defer src="js/defaultDict.js?v=20261030a"></script>
-    <script defer src="js/prh.js?v=20261030a"></script>
-    <script defer src="js/dictManager.js?v=20261030a"></script>
-    <script defer src="js/documentText.js?v=20261030a"></script>
-    <script defer src="js/analyzer.js?v=20261030a"></script>
-    <script defer src="js/app.js?v=20261030a"></script>
+    <script defer src="js/defaultDict.js?v=20261105a"></script>
+    <script defer src="js/prh.js?v=20261105a"></script>
+    <script defer src="js/dictManager.js?v=20261105a"></script>
+    <script defer src="js/documentText.js?v=20261105a"></script>
+    <script defer src="js/analyzer.js?v=20261105a"></script>
+    <script defer src="js/app.js?v=20261105a"></script>
 
     <link rel="icon" href="favicon.png" type="image/png" />
-    <link rel="stylesheet" href="style.dist.css?v=20261030a" />
+    <link rel="stylesheet" href="style.dist.css?v=20261105a" />
   </head>
   <body>
     <header class="site-header">
@@ -126,7 +127,7 @@ lang: ja
     <main>
       <div
         id="dictErrorBanner"
-        class="hidden w-full max-w-[1300px] bg-[#fef2f2] border border-[#f87171] rounded-xl px-5 py-3 mb-4 shadow-sm mx-auto"
+        class="hidden w-full max-w-[1300px] bg-[var(--danger-soft)] border border-[var(--danger)] rounded-xl px-5 py-3 mb-4 shadow-sm mx-auto"
       >
         <div class="flex items-start justify-between gap-4">
           <div class="flex-1">
@@ -226,14 +227,14 @@ lang: ja
 
             <div
               id="loading"
-              class="hidden text-center text-sm text-[#b35f00] font-bold py-1 bg-[#fff8f0] rounded-lg"
+              class="hidden text-center text-sm text-[var(--accent-ink)] font-bold py-1 bg-[var(--accent-soft)] rounded-lg"
             >
               <span class="spinner-sm" aria-hidden="true"></span
               ><span>読み込み中...</span>
             </div>
 
             <div
-              class="flex items-center gap-3 flex-shrink-0 bg-[#fafafa] p-2 rounded-lg border border-[#e0e0e0]"
+              class="flex items-center gap-3 flex-shrink-0 bg-[var(--surface-2)] p-2 rounded-lg border border-[var(--border)]"
             >
               <button
                 id="exportDocxBtn"
@@ -262,7 +263,7 @@ lang: ja
               <div class="flex-1"></div>
               <span
                 id="replacementBadge"
-                class="hidden text-xs text-[#2e7d32] bg-[#e8f5e9] border border-[#a5d6a7] rounded-full px-3 py-1 font-bold"
+                class="hidden text-xs text-[var(--ok)] bg-[var(--ok-soft)] border border-[var(--ok-line)] rounded-full px-3 py-1 font-bold"
               ></span>
               <button
                 onclick="clearAll()"
@@ -275,12 +276,12 @@ lang: ja
             <div class="flex-1 flex flex-col gap-5 min-h-0">
               <div class="flex-1 flex flex-col gap-2 min-h-0">
                 <label
-                  class="text-[15px] font-bold text-[#0f0f0f] border-l-4 border-[#f28c06] pl-2 leading-none"
+                  class="text-[15px] font-bold text-[var(--text)] border-l-4 border-[#f28c06] pl-2 leading-none"
                   >入力テキスト</label
                 >
                 <textarea
                   id="inputText"
-                  class="flex-1 w-full border border-[#e0e0e0] rounded-xl p-4 text-[15px] resize-none focus:outline-none focus:border-[#f28c06] focus:ring-2 focus:ring-[#f28c06]/20 transition-shadow bg-white shadow-inner leading-relaxed"
+                  class="flex-1 w-full border border-[var(--border)] rounded-xl p-4 text-[15px] resize-none focus:outline-none focus:border-[#f28c06] focus:ring-2 focus:ring-[#f28c06]/20 transition-shadow bg-white shadow-inner leading-relaxed"
                   placeholder="ここにテキストを入力、またはファイルをドロップしてください..."
                 ></textarea>
               </div>
@@ -288,7 +289,7 @@ lang: ja
               <div class="flex-1 flex flex-col gap-2 min-h-0">
                 <div class="flex items-center justify-between">
                   <label
-                    class="text-[15px] font-bold text-[#0f0f0f] border-l-4 border-[#e53935] pl-2 leading-none"
+                    class="text-[15px] font-bold text-[var(--text)] border-l-4 border-[var(--danger)] pl-2 leading-none"
                     >プレビュー（ハイライト）</label
                   >
                   <span
@@ -298,7 +299,7 @@ lang: ja
                 </div>
                 <div
                   id="preview"
-                  class="flex-1 overflow-y-auto border border-[#e0e0e0] rounded-xl p-4 text-[15px] bg-[#fafafa] leading-relaxed whitespace-pre-wrap break-words text-gray-800 shadow-inner"
+                  class="flex-1 overflow-y-auto border border-[var(--border)] rounded-xl p-4 text-[15px] bg-[var(--surface-2)] leading-relaxed whitespace-pre-wrap break-words text-gray-800 shadow-inner"
                 >
                   <span class="text-gray-500"
                     >ここにハイライト表示されます</span
@@ -309,9 +310,9 @@ lang: ja
           </div>
 
           <div
-            class="side-panel w-[400px] flex flex-col flex-shrink-0 bg-white border border-[#e0e0e0] rounded-xl shadow-sm h-full overflow-hidden"
+            class="side-panel w-[400px] flex flex-col flex-shrink-0 bg-white border border-[var(--border)] rounded-xl shadow-sm h-full overflow-hidden"
           >
-            <div class="tabs px-2 pt-2 bg-[#fafafa] border-b border-[#e0e0e0]">
+            <div class="tabs px-2 pt-2 bg-[var(--surface-2)] border-b border-[var(--border)]">
               <button
                 id="tabBtn-results"
                 class="tab-btn active flex items-center gap-1.5"
@@ -320,7 +321,7 @@ lang: ja
                 検知結果
                 <span
                   id="resultCount"
-                  class="text-[11px] bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full font-bold"
+                  class="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full font-bold"
                   >0 件</span
                 >
               </button>
@@ -331,7 +332,7 @@ lang: ja
               >
                 活用形
                 <span
-                  class="text-[10px] bg-orange-100 text-orange-600 border border-orange-300 px-1.5 py-0.5 rounded ml-1.5 font-bold"
+                  class="text-xs bg-orange-100 text-orange-600 border border-orange-300 px-1.5 py-0.5 rounded ml-1.5 font-bold"
                   >Beta</span
                 >
               </button>
@@ -345,7 +346,7 @@ lang: ja
               >
                 ファジー
                 <span
-                  class="text-[10px] bg-orange-100 text-orange-600 border border-orange-300 px-1.5 py-0.5 rounded ml-1.5 font-bold"
+                  class="text-xs bg-orange-100 text-orange-600 border border-orange-300 px-1.5 py-0.5 rounded ml-1.5 font-bold"
                   >Beta</span
                 >
               </button>
@@ -356,7 +357,7 @@ lang: ja
               >
                 辞書設定
                 <span
-                  class="text-[10px] bg-orange-100 text-orange-600 border border-orange-300 px-1.5 py-0.5 rounded ml-1.5 font-bold"
+                  class="text-xs bg-orange-100 text-orange-600 border border-orange-300 px-1.5 py-0.5 rounded ml-1.5 font-bold"
                   >Beta</span
                 >
               </button>
@@ -375,7 +376,7 @@ lang: ja
 
               <div id="tab-kuromoji" class="tab-pane hidden flex-col gap-4">
                 <div
-                  class="bg-[#fff8f0] border border-[#ffe0b2] p-3 rounded-lg text-sm text-[#d97706] leading-relaxed"
+                  class="bg-[var(--accent-soft)] border border-[var(--accent-line)] p-3 rounded-lg text-sm text-[var(--accent-ink)] leading-relaxed"
                 >
                   文章を単語に区切って（形態素解析）、「気づいた /
                   気付いた」のように活用した形の表記の混在を調べます。<br />
@@ -439,7 +440,7 @@ lang: ja
 
               <div id="tab-fuzzy" class="tab-pane hidden flex-col gap-4">
                 <div
-                  class="bg-[#f3e5f5] border border-[#ce93d8] p-3 rounded-lg text-sm text-[#6a1b9a] leading-relaxed"
+                  class="bg-[var(--violet-soft)] border border-[var(--violet-line)] p-3 rounded-lg text-sm text-[var(--violet-text)] leading-relaxed"
                 >
                   辞書に近い（ただし完全一致しない）表記をスキャンします。誤字や異体字の発見に有効です。
                 </div>
@@ -453,7 +454,7 @@ lang: ja
                     <label>許容する編集距離</label>
                     <span
                       id="fuzzyDistLabel"
-                      class="text-[#f28c06] bg-[#fff8f0] px-2 py-0.5 rounded border border-[#ffe0b2]"
+                      class="text-[var(--accent-ink)] bg-[var(--accent-soft)] px-2 py-0.5 rounded border border-[var(--accent-line)]"
                       >1（厳格）</span
                     >
                   </div>
@@ -480,7 +481,7 @@ lang: ja
 
                 <div
                   id="fuzzyLoading"
-                  class="hidden text-sm text-[#b35f00] font-bold text-center animate-pulse py-2"
+                  class="hidden text-sm text-[var(--accent-ink)] font-bold text-center animate-pulse py-2"
                 >
                   <span class="spinner-sm" aria-hidden="true"></span>解析中...
                 </div>
@@ -489,7 +490,7 @@ lang: ja
 
               <div id="tab-dict" class="tab-pane hidden flex-col gap-6">
                 <div
-                  class="flex flex-col gap-2 bg-[#fff8f0] p-4 rounded-lg border border-[#ffe0b2]"
+                  class="flex flex-col gap-2 bg-[var(--accent-soft)] p-4 rounded-lg border border-[var(--accent-line)]"
                 >
                   <div>
                     <p class="text-sm font-bold text-gray-800">ルールパック</p>
@@ -515,7 +516,7 @@ lang: ja
                   <input
                     id="newRuleInput"
                     type="text"
-                    class="border border-[#e0e0e0] rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[#f28c06] focus:ring-2 focus:ring-[#f28c06]/20 bg-white"
+                    class="border border-[var(--border)] rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[#f28c06] focus:ring-2 focus:ring-[#f28c06]/20 bg-white"
                     placeholder="例: Web、ウェブ、ウエブ"
                     onkeydown="if (event.key === 'Enter') addCustomRule();"
                   />
@@ -541,7 +542,7 @@ lang: ja
                   </p>
                   <div class="grid grid-cols-2 gap-2">
                     <label
-                      class="block text-center text-sm font-bold text-[#b35f00] border-2 border-[#f28c06] rounded-lg px-2 py-2 hover:bg-[#fff8f0] cursor-pointer transition-colors bg-white"
+                      class="block text-center text-sm font-bold text-[var(--accent-ink)] border-2 border-[#f28c06] rounded-lg px-2 py-2 hover:bg-[var(--accent-soft)] cursor-pointer transition-colors bg-white"
                     >
                       <svg
                         class="icon"
@@ -595,7 +596,7 @@ lang: ja
                   </div>
                   <div class="grid grid-cols-2 gap-2">
                     <label
-                      class="block text-center text-sm font-bold text-[#b35f00] border-2 border-[#f28c06] rounded-lg px-2 py-2 hover:bg-[#fff8f0] cursor-pointer transition-colors bg-white"
+                      class="block text-center text-sm font-bold text-[var(--accent-ink)] border-2 border-[#f28c06] rounded-lg px-2 py-2 hover:bg-[var(--accent-soft)] cursor-pointer transition-colors bg-white"
                     >
                       <svg
                         class="icon"
@@ -677,7 +678,7 @@ lang: ja
                   </p>
                   <div
                     id="customDictList"
-                    class="flex flex-col gap-2 max-h-[25vh] overflow-y-auto border border-gray-200 rounded-lg p-2 bg-[#fafafa]"
+                    class="flex flex-col gap-2 max-h-[25vh] overflow-y-auto border border-gray-200 rounded-lg p-2 bg-[var(--surface-2)]"
                   ></div>
                 </div>
               </div>

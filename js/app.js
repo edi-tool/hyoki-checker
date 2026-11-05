@@ -37,7 +37,7 @@ async function fetchBackendAnalyze(text) {
 // ---- Worker 通信 ----
 // JSを更新したら APP_VERSION を変更し、worker/importScripts のキャッシュを破棄する
 // （index.html のローカル<script>の ?v= とも揃えること）
-const APP_VERSION = "20261030a";
+const APP_VERSION = "20261105a";
 const worker = new Worker(`js/worker.js?v=${APP_VERSION}`);
 const workerCallbackMap = new Map();
 let messageIdCounter = 0;
@@ -263,7 +263,7 @@ function renderResults(results) {
   updateExportButton();
   // 隠した指摘があるときは、戻すための行を先頭に出す
   const restoreHtml = ignoredGroups.size
-    ? `<button type="button" onclick="restoreIgnored()" class="text-xs text-[#b35f00] font-bold text-left hover:bg-gray-50 rounded px-1 py-1">隠した指摘を戻す（${ignoredGroups.size}件）</button>`
+    ? `<button type="button" onclick="restoreIgnored()" class="text-xs text-[var(--accent-ink)] font-bold text-left hover:bg-gray-50 rounded px-1 py-1">隠した指摘を戻す（${ignoredGroups.size}件）</button>`
     : "";
   if (!results || results.length === 0) {
     resultsEl.innerHTML =
@@ -312,7 +312,7 @@ function renderResults(results) {
             `<button type="button" onclick="focusOccurrence(${resultIndex}, ${countIndex})"
                  class="flex justify-between text-xs py-1 px-1 -mx-1 rounded hover:bg-white text-left"
                  title="原文の次の出現箇所へ移動">
-          <span class="${word === r.recommended ? "text-[#b35f00] font-bold" : "text-gray-700"}">${esc(word)}${word === r.recommended ? "（基準）" : ""}${formsLabel(r.counts[countIndex], esc)}</span>
+          <span class="${word === r.recommended ? "text-[var(--accent-ink)] font-bold" : "text-gray-700"}">${esc(word)}${word === r.recommended ? "（基準）" : ""}${formsLabel(r.counts[countIndex], esc)}</span>
           <span class="font-bold text-gray-500 ml-4">${count}件 ↗</span>
         </button>`,
         )
@@ -322,12 +322,12 @@ function renderResults(results) {
         .map((w) => `<div class="text-xs text-gray-700 py-0.5">${esc(w)}</div>`)
         .join("");
     }
-    html += `<div class="p-3 border border-[#e0e0e0] bg-white rounded-xl shadow-sm flex flex-col gap-1.5">
+    html += `<div class="p-3 border border-[var(--border)] bg-white rounded-xl shadow-sm flex flex-col gap-1.5">
       <div class="flex items-start justify-between gap-2">
-        <div class="text-sm font-bold text-[#0f0f0f]">${groupLabel}</div>
-        <span class="text-[10px] whitespace-nowrap border rounded-full px-2 py-0.5 font-bold ${statusClass}">${statusLabel}</span>
+        <div class="text-sm font-bold text-[var(--text)]">${groupLabel}</div>
+        <span class="text-xs whitespace-nowrap border rounded-full px-2 py-0.5 font-bold ${statusClass}">${statusLabel}</span>
       </div>
-      <div class="text-xs text-gray-500">推奨表記: <strong class="text-[#d97706]">${esc(preferredLabel)}</strong></div>
+      <div class="text-xs text-gray-500">推奨表記: <strong class="text-[var(--accent-ink)]">${esc(preferredLabel)}</strong></div>
       ${r.type === "consistency" ? `<div class="text-xs text-gray-500">原稿内最多: <strong>${esc(r.observedMajority || "-")}</strong></div>` : ""}
       <div class="text-xs text-gray-500">出典: ${esc(sourceLabel)}</div>
       <div class="text-xs text-gray-500">修正: <strong>${fixLabel}</strong></div>
@@ -346,7 +346,7 @@ function formsLabel(countItem, esc) {
   );
   if (forms.length === 0) return "";
   const shown = forms.slice(0, 4).map(esc).join("・");
-  return `<span class="block text-[11px] text-gray-500 font-medium">原文: ${shown}${forms.length > 4 ? " ほか" : ""}</span>`;
+  return `<span class="block text-xs text-gray-500 font-medium">原文: ${shown}${forms.length > 4 ? " ほか" : ""}</span>`;
 }
 
 /** 結果カードで選んだ表記の次の出現位置を textarea 上で選択する。 */
@@ -504,7 +504,7 @@ function setKuromojiStatus(status, text) {
   if (!el) return;
   let colorClass =
     status === "ready"
-      ? "bg-[#43a047]"
+      ? "bg-[#2e7d32]"
       : status === "error"
         ? "bg-red-500"
         : "bg-gray-300";
@@ -533,14 +533,14 @@ function renderKuromojiResults(results) {
         return `<button type="button" onclick="focusKuromojiOccurrence(${resultIndex}, ${baseIndex})"
                  class="flex justify-between text-xs py-1 px-1 -mx-1 rounded hover:bg-white text-left"
                  title="原文の次の出現箇所へ移動">
-          <span class="${isPreferred ? "text-[#b35f00] font-bold" : "text-gray-700"}">${esc(item.word)}${isPreferred ? "（基準）" : ""}<span class="block text-[11px] text-gray-500 font-medium">原文: ${surfaces}${item.surfaces.length > 4 ? " ほか" : ""}</span></span>
+          <span class="${isPreferred ? "text-[var(--accent-ink)] font-bold" : "text-gray-700"}">${esc(item.word)}${isPreferred ? "（基準）" : ""}<span class="block text-xs text-gray-500 font-medium">原文: ${surfaces}${item.surfaces.length > 4 ? " ほか" : ""}</span></span>
           <span class="font-bold text-gray-500 ml-4">${item.count}件 ↗</span>
         </button>`;
       })
       .join("");
-    html += `<div class="p-3 border border-[#ffe0b2] bg-white rounded-xl shadow-sm flex flex-col gap-1.5">
-      <div class="text-sm font-bold text-[#0f0f0f]">${r.group.map(esc).join(" ・ ")}</div>
-      <div class="text-xs text-gray-500">推奨表記: <strong class="text-[#d97706]">${esc(r.preferred || "指定なし（文書内で統一）")}</strong></div>
+    html += `<div class="p-3 border border-[var(--accent-line)] bg-white rounded-xl shadow-sm flex flex-col gap-1.5">
+      <div class="text-sm font-bold text-[var(--text)]">${r.group.map(esc).join(" ・ ")}</div>
+      <div class="text-xs text-gray-500">推奨表記: <strong class="text-[var(--accent-ink)]">${esc(r.preferred || "指定なし（文書内で統一）")}</strong></div>
       ${r.reason ? `<div class="text-xs text-gray-600 bg-gray-50 rounded p-2">${esc(r.reason)}</div>` : ""}
       <div class="bg-gray-50 border border-gray-200 rounded p-2 flex flex-col">${rows}</div>
     </div>`;
@@ -592,9 +592,9 @@ async function runFuzzyCheck(event) {
       fuzzResults.forEach(({ dictWord, candidates }) => {
         const card = document.createElement("div");
         card.className =
-          "p-3 border border-[#e0e0e0] bg-white rounded-xl shadow-sm flex flex-col gap-1.5";
+          "p-3 border border-[var(--border)] bg-white rounded-xl shadow-sm flex flex-col gap-1.5";
         card.innerHTML = `
-          <div class="text-sm font-bold text-[#0f0f0f]">「${esc(dictWord)}」に類似</div>
+          <div class="text-sm font-bold text-[var(--text)]">「${esc(dictWord)}」に類似</div>
           <div class="text-sm text-gray-600 flex flex-wrap gap-1.5 mt-1">
             ${candidates.map((c) => `<code class="bg-yellow-50 text-red-600 rounded px-1.5 py-0.5 border border-red-100 font-bold">${esc(c)}</code>`).join("")}
           </div>`;
