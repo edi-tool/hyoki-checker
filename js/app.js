@@ -37,7 +37,7 @@ async function fetchBackendAnalyze(text) {
 // ---- Worker 通信 ----
 // JSを更新したら APP_VERSION を変更し、worker/importScripts のキャッシュを破棄する
 // （index.html のローカル<script>の ?v= とも揃えること）
-const APP_VERSION = "20261106b";
+const APP_VERSION = "20261106c";
 const worker = new Worker(`js/worker.js?v=${APP_VERSION}`);
 const workerCallbackMap = new Map();
 let messageIdCounter = 0;
@@ -706,7 +706,8 @@ function downloadCorrectedDocx() {
   const total = log.reduce((sum, l) => sum + l.count, 0);
   const badge = document.getElementById("replacementBadge");
   if (badge) {
-    badge.textContent = `✓ ${total}箇所を推奨表記に統一`;
+    badge.dataset.icon = "check";
+    badge.textContent = `${total}箇所を推奨表記に統一`;
     badge.classList.toggle("hidden", total === 0);
   }
 }
@@ -733,6 +734,8 @@ function runDictValidation() {
 function toggleDictErrorDetail() {
   const list = document.getElementById("dictErrorList");
   if (list) list.classList.toggle("hidden");
+  const btn = document.getElementById("dictErrorDetailBtn");
+  if (btn && list) btn.setAttribute("aria-expanded", String(!list.classList.contains("hidden")));
 }
 
 /** 辞書設定タブの操作結果を、ポップアップではなくタブ内に表示する。 */
