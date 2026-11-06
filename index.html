@@ -107,17 +107,17 @@ lang: ja
     ></script>
 
     <!-- JS更新時は ?v= を一括で上げてキャッシュを破棄（js/app.js の APP_VERSION と揃える）-->
-    <script defer src="js/defaultDict.js?v=20261106d"></script>
-    <script defer src="js/prh.js?v=20261106d"></script>
-    <script defer src="js/dictManager.js?v=20261106d"></script>
-    <script defer src="js/documentText.js?v=20261106d"></script>
-    <script defer src="js/analyzer.js?v=20261106d"></script>
-    <script defer src="js/app.js?v=20261106d"></script>
+    <script defer src="js/defaultDict.js?v=20261106e"></script>
+    <script defer src="js/prh.js?v=20261106e"></script>
+    <script defer src="js/dictManager.js?v=20261106e"></script>
+    <script defer src="js/documentText.js?v=20261106e"></script>
+    <script defer src="js/analyzer.js?v=20261106e"></script>
+    <script defer src="js/app.js?v=20261106e"></script>
 
     <link rel="icon" href="favicon.ico" sizes="any" />
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-    <link rel="stylesheet" href="style.dist.css?v=20261106d" />
+    <link rel="stylesheet" href="style.dist.css?v=20261106e" />
   </head>
   <body>
     <nav class="et-bar" aria-label="現在地">
@@ -700,25 +700,28 @@ lang: ja
       </div>
     </main>
 
-    <section class="et-about" aria-labelledby="et-about-h">
-        <h2 id="et-about-h">表記統一さんでできること</h2>
-        <p>原稿や資料の中の表記ゆれ（「気付く／気づく」「Web／ウェブ」など）を見つけ、基準の表記に統一するための無料ツールです。辞書の語の活用形（気づいた・気づかない）や、PDF の行末で分かれた語も検出します。Word（.docx）・PDF・テキストの読み込みと貼り付けに対応し、文章はブラウザの中だけで処理して外部に送信しません。</p>
-        <h2>使い方</h2>
-        <ol>
-            <li>文章を貼り付けるか、Word・PDF・テキストのファイルを読み込みます。</li>
-            <li>「検知結果」で表記ゆれのグループと出現数を確かめます。表記を押すと、原文の該当箇所へ移動します。</li>
-            <li>必要なら「基準表記に統一したWordを作成」で、統一済みの .docx を保存します。</li>
-        </ol>
-        <h2>よくある質問</h2>
-        <dl>
-            <dt>表記の基準はどう決めていますか？</dt>
-            <dd>辞書の各グループの先頭を基準表記とし、文書内の多数派ではなく基準に合わせて指摘します。既定の辞書（新聞表記・212 ルール）に加えて、自社の表記基準をカスタム辞書として追加できます。</dd>
-            <dt>元の Word の書式は残りますか？</dt>
-            <dd>統一後に作る Word は文字だけの新しい文書で、書式・画像・脚注・変更履歴は引き継ぎません。書式を保ちたいときは、結果から原文の位置へ移動して Word 側で直してください。</dd>
-            <dt>文章はどこかに送られますか？</dt>
-            <dd>送られません。解析はすべてブラウザ内で行い、カスタム辞書もこの端末のブラウザにだけ保存します。</dd>
-        </dl>
-    </section>
+    <details class="et-about">
+        <summary>使い方・よくある質問<span class="et-i et-i-chevron-down" aria-hidden="true"></span></summary>
+        <div class="et-about-body">
+            <h2>表記統一さんでできること</h2>
+            <p>原稿や資料の中の表記ゆれ（「気付く／気づく」「Web／ウェブ」など）を見つけ、基準の表記に統一するための無料ツールです。辞書の語の活用形（気づいた・気づかない）や、PDF の行末で分かれた語も検出します。Word（.docx）・PDF・テキストの読み込みと貼り付けに対応し、文章はブラウザの中だけで処理して外部に送信しません。</p>
+            <h2>使い方</h2>
+            <ol>
+                <li>文章を貼り付けるか、Word・PDF・テキストのファイルを読み込みます。</li>
+                <li>「検知結果」で表記ゆれのグループと出現数を確かめます。表記を押すと、原文の該当箇所へ移動します。</li>
+                <li>必要なら「基準表記に統一したWordを作成」で、統一済みの .docx を保存します。</li>
+            </ol>
+            <h2>よくある質問</h2>
+            <dl>
+                <dt>表記の基準はどう決めていますか？</dt>
+                <dd>辞書の各グループの先頭を基準表記とし、文書内の多数派ではなく基準に合わせて指摘します。既定の辞書（新聞表記・212 ルール）に加えて、自社の表記基準をカスタム辞書として追加できます。</dd>
+                <dt>元の Word の書式は残りますか？</dt>
+                <dd>統一後に作る Word は文字だけの新しい文書で、書式・画像・脚注・変更履歴は引き継ぎません。書式を保ちたいときは、結果から原文の位置へ移動して Word 側で直してください。</dd>
+                <dt>文章はどこかに送られますか？</dt>
+                <dd>送られません。解析はすべてブラウザ内で行い、カスタム辞書もこの端末のブラウザにだけ保存します。</dd>
+            </dl>
+        </div>
+    </details>
 
     <footer class="site-footer">
       <div class="footer-content">
