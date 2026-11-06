@@ -37,7 +37,7 @@ async function fetchBackendAnalyze(text) {
 // ---- Worker 通信 ----
 // JSを更新したら APP_VERSION を変更し、worker/importScripts のキャッシュを破棄する
 // （index.html のローカル<script>の ?v= とも揃えること）
-const APP_VERSION = "20261105a";
+const APP_VERSION = "20261106b";
 const worker = new Worker(`js/worker.js?v=${APP_VERSION}`);
 const workerCallbackMap = new Map();
 let messageIdCounter = 0;
@@ -812,7 +812,7 @@ function renderRulePackControls() {
         pack,
       ) => `<label class="flex items-center justify-between gap-3 text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white">
         <span><strong>${pack.label}</strong><small class="block text-gray-500">${pack.description ? `${pack.description}（${pack.ruleCount}ルール）` : `${pack.ruleCount}ルール`}</small></span>
-        <input type="checkbox" ${pack.enabled ? "checked" : ""} onchange="toggleRulePack('${pack.id}', this.checked)" class="accent-[#f28c06]">
+        <input type="checkbox" ${pack.enabled ? "checked" : ""} onchange="toggleRulePack('${pack.id}', this.checked)" class="accent-[#ff6a00]">
       </label>`,
     )
     .join("");
